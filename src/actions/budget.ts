@@ -35,8 +35,13 @@ export async function createBudget(formData: FormData) {
     return { error: "You already have a budget with this name." };
   }
 
-  await db.budget.create({
+  const budget = await db.budget.create({
     data: { userId: user.id, name, year, currency },
+  });
+
+  // Auto-create "General" category
+  await db.category.create({
+    data: { budgetId: budget.id, name: "General", sortOrder: 0 },
   });
 
   revalidatePath("/budgets");
@@ -57,8 +62,10 @@ export async function getBudget(id: string) {
   return db.budget.findFirst({
     where: { id, userId: user.id },
     include: {
+      categories: { orderBy: { sortOrder: "asc" } },
       lines: {
         orderBy: { sortOrder: "asc" },
+        include: { category: true },
       },
     },
   });

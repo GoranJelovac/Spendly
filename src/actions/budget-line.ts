@@ -5,14 +5,35 @@ import { getAuthUser } from "@/lib/auth-utils";
 import { TIER_LIMITS, type SubscriptionTier } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 
+function parseAmountsFromForm(formData: FormData): {
+  mode: "fixed" | "custom";
+  monthlyAmount: number;
+  monthlyAmounts: number[] | null;
+} {
+  const mode = formData.get("amountMode") as string;
+
+  if (mode === "custom") {
+    const amounts: number[] = [];
+    for (let i = 0; i < 12; i++) {
+      amounts.push(parseFloat(formData.get(`month_${i}`) as string) || 0);
+    }
+    const avg = amounts.reduce((s, a) => s + a, 0) / 12;
+    return { mode: "custom", monthlyAmount: avg, monthlyAmounts: amounts };
+  }
+
+  const monthlyAmount = parseFloat(formData.get("monthlyAmount") as string);
+  return { mode: "fixed", monthlyAmount, monthlyAmounts: null };
+}
+
 export async function createBudgetLine(budgetId: string, formData: FormData) {
   const user = await getAuthUser();
   const name = formData.get("name") as string;
   const code = (formData.get("code") as string) || null;
-  const monthlyAmount = parseFloat(formData.get("monthlyAmount") as string);
+  const categoryId = formData.get("categoryId") as string;
+  const { monthlyAmount, monthlyAmounts } = parseAmountsFromForm(formData);
 
   if (!name || isNaN(monthlyAmount)) {
-    return { error: "Name and monthly amount are required." };
+    return { error: "Name and amount are required." };
   }
 
   // Verify budget ownership
@@ -43,17 +64,29 @@ export async function createBudgetLine(budgetId: string, formData: FormData) {
     _max: { sortOrder: true },
   });
 
+  // Resolve categoryId: use provided or default to General
+  let resolvedCategoryId = categoryId;
+  if (!resolvedCategoryId) {
+    const general = await db.category.findFirst({
+      where: { budgetId, name: "General" },
+    });
+    if (!general) return { error: "General category not found." };
+    resolvedCategoryId = general.id;
+  }
+
   await db.budgetLine.create({
     data: {
       budgetId,
+      categoryId: resolvedCategoryId,
       name,
       code,
       monthlyAmount,
+      monthlyAmounts: monthlyAmounts ?? undefined,
       sortOrder: (maxOrder._max.sortOrder ?? -1) + 1,
     },
   });
 
-  revalidatePath(`/budgets/${budgetId}`);
+  revalidatePath("/budgets");
   return { success: "Line added!" };
 }
 
@@ -61,10 +94,11 @@ export async function updateBudgetLine(id: string, formData: FormData) {
   const user = await getAuthUser();
   const name = formData.get("name") as string;
   const code = (formData.get("code") as string) || null;
-  const monthlyAmount = parseFloat(formData.get("monthlyAmount") as string);
+  const categoryId = (formData.get("categoryId") as string) || undefined;
+  const { monthlyAmount, monthlyAmounts } = parseAmountsFromForm(formData);
 
   if (!name || isNaN(monthlyAmount)) {
-    return { error: "Name and monthly amount are required." };
+    return { error: "Name and amount are required." };
   }
 
   const line = await db.budgetLine.findUnique({
@@ -84,10 +118,16 @@ export async function updateBudgetLine(id: string, formData: FormData) {
 
   await db.budgetLine.update({
     where: { id },
-    data: { name, code, monthlyAmount },
+    data: {
+      name,
+      code,
+      categoryId,
+      monthlyAmount,
+      monthlyAmounts: monthlyAmounts ?? undefined,
+    },
   });
 
-  revalidatePath(`/budgets/${line.budgetId}`);
+  revalidatePath("/budgets");
   return { success: "Line updated!" };
 }
 
@@ -105,6 +145,6 @@ export async function deleteBudgetLine(id: string) {
 
   await db.budgetLine.delete({ where: { id } });
 
-  revalidatePath(`/budgets/${line.budgetId}`);
+  revalidatePath("/budgets");
   return { success: "Line deleted!" };
 }

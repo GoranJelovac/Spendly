@@ -3,24 +3,44 @@
 import { useState } from "react";
 import { deleteBudgetLine, updateBudgetLine } from "@/actions/budget-line";
 import { Button } from "@/components/ui/button";
+import { getMonthlyAmounts, getYearlyTotal } from "@/lib/budget-utils";
+
+const MONTH_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+type CategoryOption = { id: string; name: string };
 
 type BudgetLine = {
   id: string;
   name: string;
   code: string | null;
+  categoryId: string;
+  category: { id: string; name: string };
   monthlyAmount: number;
+  monthlyAmounts: unknown;
   sortOrder: number;
 };
 
 export function BudgetLineTable({
   lines,
   currency,
+  categories,
 }: {
   lines: BudgetLine[];
   currency: string;
+  categories: CategoryOption[];
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState<"fixed" | "custom">("fixed");
   const [error, setError] = useState("");
+
+  function startEdit(line: BudgetLine) {
+    setEditingId(line.id);
+    setEditMode(line.monthlyAmounts ? "custom" : "fixed");
+    setError("");
+  }
 
   async function handleUpdate(id: string, formData: FormData) {
     setError("");
@@ -48,83 +68,146 @@ export function BudgetLineTable({
           <tr>
             <th className="pb-2 font-medium">Name</th>
             <th className="pb-2 font-medium">Code</th>
+            <th className="pb-2 font-medium">Category</th>
+            <th className="pb-2 font-medium">Type</th>
             <th className="pb-2 text-right font-medium">Monthly ({currency})</th>
             <th className="pb-2 text-right font-medium">Yearly ({currency})</th>
             <th className="pb-2 text-right font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {lines.map((line) => (
-            <tr key={line.id} className="border-b">
-              {editingId === line.id ? (
-                <td colSpan={5} className="py-2">
+          {lines.map((line) => {
+            const amounts = getMonthlyAmounts(line);
+            const yearly = getYearlyTotal(amounts);
+            const isCustom = !!line.monthlyAmounts;
+            const displayMonthly = isCustom
+              ? `${Math.min(...amounts)}–${Math.max(...amounts)}`
+              : line.monthlyAmount.toFixed(2);
+
+            return editingId === line.id ? (
+              <tr key={line.id} className="border-b">
+                <td colSpan={7} className="py-3">
                   <form
                     action={(fd) => handleUpdate(line.id, fd)}
-                    className="flex items-end gap-2"
+                    className="space-y-3"
                   >
-                    <input
-                      name="name"
-                      defaultValue={line.name}
-                      required
-                      className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
-                    />
-                    <input
-                      name="code"
-                      defaultValue={line.code || ""}
-                      className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
-                    />
-                    <input
-                      name="monthlyAmount"
-                      type="number"
-                      step="0.01"
-                      defaultValue={line.monthlyAmount}
-                      required
-                      className="w-28 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
-                    />
-                    <Button size="sm" type="submit">
-                      Save
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      type="button"
-                      onClick={() => setEditingId(null)}
-                    >
-                      Cancel
-                    </Button>
-                  </form>
-                  {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
-                </td>
-              ) : (
-                <>
-                  <td className="py-2">{line.name}</td>
-                  <td className="py-2 text-gray-500">{line.code || "—"}</td>
-                  <td className="py-2 text-right">{line.monthlyAmount.toFixed(2)}</td>
-                  <td className="py-2 text-right">
-                    {(line.monthlyAmount * 12).toFixed(2)}
-                  </td>
-                  <td className="py-2 text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingId(line.id)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDelete(line.id)}
-                      >
-                        Delete
+                    <input type="hidden" name="amountMode" value={editMode} />
+                    <div className="flex flex-wrap items-end gap-2">
+                      <div>
+                        <label className="block text-xs text-gray-500">Name</label>
+                        <input
+                          name="name"
+                          defaultValue={line.name}
+                          required
+                          className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500">Code</label>
+                        <input
+                          name="code"
+                          defaultValue={line.code || ""}
+                          className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500">Category</label>
+                        <select
+                          name="categoryId"
+                          defaultValue={line.categoryId}
+                          className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        >
+                          {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex rounded-md border">
+                        <button
+                          type="button"
+                          onClick={() => setEditMode("fixed")}
+                          className={`px-2 py-1 text-xs ${
+                            editMode === "fixed"
+                              ? "bg-black text-white dark:bg-white dark:text-black"
+                              : ""
+                          }`}
+                        >
+                          Fixed
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditMode("custom")}
+                          className={`px-2 py-1 text-xs ${
+                            editMode === "custom"
+                              ? "bg-black text-white dark:bg-white dark:text-black"
+                              : ""
+                          }`}
+                        >
+                          Custom
+                        </button>
+                      </div>
+                    </div>
+
+                    {editMode === "fixed" ? (
+                      <div className="w-32">
+                        <label className="block text-xs text-gray-500">Monthly</label>
+                        <input
+                          name="monthlyAmount"
+                          type="number"
+                          step="0.01"
+                          defaultValue={line.monthlyAmount}
+                          required
+                          className="w-full rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                        />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
+                        {MONTH_SHORT.map((m, i) => (
+                          <div key={i}>
+                            <label className="block text-xs text-gray-500">{m}</label>
+                            <input
+                              name={`month_${i}`}
+                              type="number"
+                              step="0.01"
+                              defaultValue={amounts[i]}
+                              className="w-full rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {error && <p className="text-sm text-red-500">{error}</p>}
+                    <div className="flex gap-1">
+                      <Button size="sm" type="submit">Save</Button>
+                      <Button size="sm" variant="outline" type="button" onClick={() => setEditingId(null)}>
+                        Cancel
                       </Button>
                     </div>
-                  </td>
-                </>
-              )}
-            </tr>
-          ))}
+                  </form>
+                </td>
+              </tr>
+            ) : (
+              <tr key={line.id} className="border-b">
+                <td className="py-2">{line.name}</td>
+                <td className="py-2 text-gray-500">{line.code || "—"}</td>
+                <td className="py-2 text-gray-500 text-xs">{line.category.name}</td>
+                <td className="py-2 text-gray-500 text-xs">{isCustom ? "Custom" : "Fixed"}</td>
+                <td className="py-2 text-right">{displayMonthly}</td>
+                <td className="py-2 text-right">{yearly.toFixed(2)}</td>
+                <td className="py-2 text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button size="sm" variant="outline" onClick={() => startEdit(line)}>
+                      Edit
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(line.id)}>
+                      Delete
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -3,16 +3,31 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BudgetSelector } from "./budget-selector";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/budgets", label: "Budgets" },
+  { href: "/categories", label: "Categories" },
+  { href: "/budgets", label: "Budget Lines" },
   { href: "/expenses", label: "Expenses" },
   { href: "/billing", label: "Billing" },
   { href: "/settings", label: "Settings" },
 ];
 
-export function MobileNav() {
+type Budget = {
+  id: string;
+  name: string;
+  year: number;
+  currency: string;
+};
+
+export function MobileNav({
+  budgets,
+  activeBudgetId,
+}: {
+  budgets: Budget[];
+  activeBudgetId: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -30,22 +45,27 @@ export function MobileNav() {
         </button>
       </div>
       {open && (
-        <nav className="border-b bg-white p-3 dark:bg-gray-950">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className={`block rounded-md px-3 py-2 text-sm font-medium ${
-                pathname.startsWith(item.href)
-                  ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
-                  : "text-gray-600 hover:bg-gray-50 dark:text-gray-400"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="border-b bg-white dark:bg-gray-950">
+          <div className="border-b py-3">
+            <BudgetSelector budgets={budgets} activeBudgetId={activeBudgetId} />
+          </div>
+          <nav className="p-3">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={`block rounded-md px-3 py-2 text-sm font-medium ${
+                  pathname.startsWith(item.href)
+                    ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
+                    : "text-gray-600 hover:bg-gray-50 dark:text-gray-400"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       )}
     </div>
   );

@@ -1,12 +1,10 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getActiveBudget } from "@/actions/active-budget";
-import { getExpenses } from "@/actions/expense";
-import { getBudget } from "@/actions/budget";
-import { AddExpenseForm } from "@/components/expenses/add-expense-form";
-import { ExpenseList } from "@/components/expenses/expense-list";
+import { getCategories } from "@/actions/category";
+import { CategoryList } from "@/components/categories/category-list";
 
-export default async function ExpensesPage() {
+export default async function CategoriesPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
@@ -15,7 +13,7 @@ export default async function ExpensesPage() {
   if (!activeBudget) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="mb-4 text-3xl font-bold">Expenses</h1>
+        <h1 className="mb-4 text-3xl font-bold">Categories</h1>
         <p className="text-gray-500">
           No budget selected. Create one using the selector in the sidebar.
         </p>
@@ -23,21 +21,15 @@ export default async function ExpensesPage() {
     );
   }
 
-  const [expenses, budget] = await Promise.all([
-    getExpenses({ budgetId: activeBudget.id }),
-    getBudget(activeBudget.id),
-  ]);
-
-  const lines = budget?.lines || [];
+  const categories = await getCategories(activeBudget.id);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-2 text-3xl font-bold">Expenses</h1>
+      <h1 className="mb-2 text-3xl font-bold">Categories</h1>
       <p className="mb-6 text-gray-500">
         {activeBudget.name} &middot; {activeBudget.year} &middot; {activeBudget.currency}
       </p>
-      <AddExpenseForm lines={lines} />
-      <ExpenseList expenses={expenses} />
+      <CategoryList categories={categories} budgetId={activeBudget.id} />
     </div>
   );
 }

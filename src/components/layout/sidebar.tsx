@@ -2,16 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BudgetSelector } from "./budget-selector";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/budgets", label: "Budgets" },
+  { href: "/categories", label: "Categories" },
+  { href: "/budgets", label: "Budget Lines" },
   { href: "/expenses", label: "Expenses" },
   { href: "/billing", label: "Billing" },
   { href: "/settings", label: "Settings" },
 ];
 
-export function Sidebar() {
+type Budget = {
+  id: string;
+  name: string;
+  year: number;
+  currency: string;
+};
+
+export function Sidebar({
+  budgets,
+  activeBudgetId,
+}: {
+  budgets: Budget[];
+  activeBudgetId: string | null;
+}) {
   const pathname = usePathname();
 
   return (
@@ -22,6 +37,12 @@ export function Sidebar() {
             Spendly
           </Link>
         </div>
+
+        {/* Budget Selector */}
+        <div className="border-b py-3">
+          <BudgetSelector budgets={budgets} activeBudgetId={activeBudgetId} />
+        </div>
+
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
             <Link

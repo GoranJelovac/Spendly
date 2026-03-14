@@ -4,20 +4,15 @@ import { useState } from "react";
 import { createExpense } from "@/actions/expense";
 import { Button } from "@/components/ui/button";
 
-type BudgetWithLines = {
+type BudgetLine = {
   id: string;
   name: string;
-  currency: string;
-  lines: { id: string; name: string }[];
 };
 
-export function AddExpenseForm({ budgets }: { budgets: BudgetWithLines[] }) {
+export function AddExpenseForm({ lines }: { lines: BudgetLine[] }) {
   const [open, setOpen] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const currentBudget = budgets.find((b) => b.id === selectedBudget);
 
   async function handleSubmit(formData: FormData) {
     setError("");
@@ -27,9 +22,16 @@ export function AddExpenseForm({ budgets }: { budgets: BudgetWithLines[] }) {
       setError(result.error);
     } else {
       setOpen(false);
-      setSelectedBudget("");
     }
     setLoading(false);
+  }
+
+  if (lines.length === 0) {
+    return (
+      <p className="mb-6 text-gray-500">
+        No budget lines yet. Add some on the Budget Lines page first.
+      </p>
+    );
   }
 
   if (!open) {
@@ -46,40 +48,20 @@ export function AddExpenseForm({ budgets }: { budgets: BudgetWithLines[] }) {
       <form action={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium">Budget</label>
-            <select
-              onChange={(e) => setSelectedBudget(e.target.value)}
-              value={selectedBudget}
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
-              required
-            >
-              <option value="">Select budget...</option>
-              {budgets.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Line</label>
+            <label className="block text-sm font-medium">Category</label>
             <select
               name="budgetLineId"
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
               required
-              disabled={!selectedBudget}
             >
-              <option value="">Select line...</option>
-              {currentBudget?.lines.map((l) => (
+              <option value="">Select category...</option>
+              {lines.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.name}
                 </option>
               ))}
             </select>
           </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-sm font-medium">Amount</label>
             <input
@@ -91,6 +73,9 @@ export function AddExpenseForm({ budgets }: { budgets: BudgetWithLines[] }) {
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
             />
           </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium">Date</label>
             <input
