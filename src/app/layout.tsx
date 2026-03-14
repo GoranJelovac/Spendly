@@ -13,8 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Spendly - Budget Tracker",
-  description: "Track your spending, stay on budget. A simple SaaS budget tracking app.",
+  title: {
+    default: "Spendly - Budget Tracker",
+    template: "%s | Spendly",
+  },
+  description:
+    "Track your spending, stay on budget. Create budgets, log expenses, and see exactly where your money goes.",
+  keywords: ["budget", "tracker", "expenses", "spending", "finance"],
+  openGraph: {
+    title: "Spendly - Budget Tracker",
+    description: "Track your spending, stay on budget.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
