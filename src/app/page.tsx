@@ -1,4 +1,8 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   return (
@@ -12,10 +16,18 @@ export default function Home() {
           see exactly where your money goes.
         </p>
         <div className="flex gap-4">
-          <Button size="lg">Get Started</Button>
-          <Button variant="outline" size="lg">
-            Learn More
-          </Button>
+          <Link
+            href="/register"
+            className={cn(buttonVariants({ size: "lg" }))}
+          >
+            Get Started
+          </Link>
+          <Link
+            href="/login"
+            className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+          >
+            Log In
+          </Link>
         </div>
       </main>
     </div>
