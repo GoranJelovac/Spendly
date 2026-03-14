@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getDashboardData, type DashboardData } from "@/actions/dashboard";
+import { BudgetVsActualChart, SpendingPieChart } from "@/components/dashboard/charts";
 
 type Budget = { id: string; name: string; year: number; currency: string };
 
@@ -84,6 +85,26 @@ export function DashboardContent({ budgets }: { budgets: Budget[] }) {
               value={data.totals.percentage}
               suffix="%"
               color={data.totals.percentage > 100 ? "red" : undefined}
+            />
+          </div>
+
+          {/* Charts */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <BudgetVsActualChart
+              data={data.lines.map((l) => ({
+                name: l.name,
+                planned: l.planned,
+                spent: l.spent,
+              }))}
+              currency={currency}
+            />
+            <SpendingPieChart
+              data={data.lines.map((l) => ({
+                name: l.name,
+                planned: l.planned,
+                spent: l.spent,
+              }))}
+              currency={currency}
             />
           </div>
 
