@@ -122,16 +122,22 @@ export function CategoryList({
 
   return (
     <div>
-      {/* Add form */}
-      <form action={handleCreate} className="mb-6 flex gap-2">
+      {/* Add form — card */}
+      <form
+        action={handleCreate}
+        className="mb-6 flex items-center gap-3 rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]"
+      >
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] bg-indigo-50 text-lg text-indigo-500 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8]">
+          +
+        </div>
         <input
           name="name"
           required
           placeholder="New category name"
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-[#252345] dark:bg-[#1a1835]"
+          className="flex-1 rounded-[10px] border border-gray-200 bg-white px-3 py-2 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
         />
         <Button type="submit" size="sm">
-          Add Category
+          Add
         </Button>
       </form>
 
