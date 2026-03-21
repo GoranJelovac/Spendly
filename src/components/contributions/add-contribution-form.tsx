@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { createContribution } from "@/actions/contribution";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,7 @@ type BudgetLine = {
   categoryName: string;
 };
 
-export function AddContributionForm({ lines }: { lines: BudgetLine[] }) {
+export function AddContributionForm({ lines, actionSlot }: { lines: BudgetLine[]; actionSlot?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,9 +47,12 @@ export function AddContributionForm({ lines }: { lines: BudgetLine[] }) {
 
   if (!open) {
     return (
-      <Button onClick={() => setOpen(true)} className="mb-6">
-        + Add Contribution
-      </Button>
+      <div className="mb-6 flex items-center justify-between">
+        <Button onClick={() => setOpen(true)}>
+          + Add Contribution
+        </Button>
+        <div>{actionSlot}</div>
+      </div>
     );
   }
 

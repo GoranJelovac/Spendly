@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { createExpense } from "@/actions/expense";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +11,7 @@ type BudgetLine = {
   categoryName: string;
 };
 
-export function AddExpenseForm({ lines }: { lines: BudgetLine[] }) {
+export function AddExpenseForm({ lines, actionSlot }: { lines: BudgetLine[]; actionSlot?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,9 +48,12 @@ export function AddExpenseForm({ lines }: { lines: BudgetLine[] }) {
 
   if (!open) {
     return (
-      <Button onClick={() => setOpen(true)} className="mb-6">
-        + Add Expense
-      </Button>
+      <div className="mb-6 flex items-center justify-between">
+        <Button onClick={() => setOpen(true)}>
+          + Add Expense
+        </Button>
+        <div>{actionSlot}</div>
+      </div>
     );
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { createBudgetLine } from "@/actions/budget-line";
 import { Button } from "@/components/ui/button";
 
@@ -14,9 +14,11 @@ type CategoryOption = { id: string; name: string };
 export function AddLineForm({
   budgetId,
   categories,
+  actionSlot,
 }: {
   budgetId: string;
   categories: CategoryOption[];
+  actionSlot?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"fixed" | "custom">("fixed");
@@ -38,9 +40,12 @@ export function AddLineForm({
 
   if (!open) {
     return (
-      <Button onClick={() => setOpen(true)} className="mb-4">
-        + Add Line
-      </Button>
+      <div className="mb-4 flex items-center justify-between">
+        <Button onClick={() => setOpen(true)}>
+          + Add Line
+        </Button>
+        <div>{actionSlot}</div>
+      </div>
     );
   }
 

@@ -338,14 +338,16 @@ export function DashboardContent({
                 value={displayTotals.remaining}
                 currency={budgetCurrency}
                 accent="green"
-                valueColor={displayTotals.remaining < 0 ? "red" : "green"}
+                valueColor={displayTotals.remaining < 0
+                  ? (displayTotals.percentage > 150 ? "red" : displayTotals.percentage > 125 ? "orange" : "yellow")
+                  : "green"}
               />
               <SummaryCard
                 label="Used"
                 value={displayTotals.percentage}
                 suffix="%"
                 accent="amber"
-                valueColor={displayTotals.percentage > 100 ? "red" : undefined}
+                valueColor={displayTotals.percentage > 150 ? "red" : displayTotals.percentage > 125 ? "orange" : displayTotals.percentage > 110 ? "yellow" : undefined}
               />
             </div>
           </CollapsibleSection>
@@ -479,7 +481,13 @@ export function DashboardContent({
                       <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmt(item.spent)}</td>
                       <td
                         className={`py-[6px] pr-4 text-right tabular-nums font-semibold ${
-                          item.remaining < 0 ? "text-red-500" : "text-emerald-500"
+                          item.remaining < 0
+                            ? item.percentage > 150
+                              ? "text-red-500"
+                              : item.percentage > 125
+                                ? "text-orange-500"
+                                : "text-yellow-500"
+                            : "text-emerald-500"
                         }`}
                       >
                         {fmt(item.remaining)}
@@ -489,11 +497,15 @@ export function DashboardContent({
                           <div className="h-[11px] w-full rounded-xl bg-gray-200 dark:bg-[rgba(107,107,138,0.15)]">
                             <div
                               className={`h-[11px] rounded-xl transition-all duration-500 ease-out ${
-                                item.percentage > 100
+                                item.percentage > 150
                                   ? "bg-red-500"
-                                  : item.percentage > 80
-                                    ? "bg-amber-500"
-                                    : "bg-emerald-500"
+                                  : item.percentage > 125
+                                    ? "bg-orange-500"
+                                    : item.percentage > 110
+                                      ? "bg-yellow-500"
+                                      : item.percentage > 80
+                                        ? "bg-amber-500"
+                                        : "bg-emerald-500"
                               }`}
                               style={{
                                 width: `${Math.min(item.percentage, 100)}%`,
@@ -535,6 +547,8 @@ const ACCENT_HEX = {
 
 const VALUE_COLORS = {
   red: "text-red-500",
+  orange: "text-orange-500",
+  yellow: "text-yellow-500",
   green: "text-emerald-500",
 };
 
@@ -551,7 +565,7 @@ function SummaryCard({
   currency?: string;
   suffix?: string;
   accent: keyof typeof ACCENT_HEX;
-  valueColor?: "red" | "green";
+  valueColor?: keyof typeof VALUE_COLORS;
 }) {
   return (
     <div

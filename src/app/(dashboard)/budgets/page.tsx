@@ -60,8 +60,7 @@ export default async function BudgetLinesPage({
 
       <MonthlyBreakdown monthTotals={monthTotals} currency={budget.currency} />
 
-      <AddLineForm budgetId={budget.id} categories={budget.categories} />
-      <ImportExportLines budgetId={budget.id} />
+      <AddLineForm budgetId={budget.id} categories={budget.categories} actionSlot={<ImportExportLines budgetId={budget.id} />} />
       <BudgetLineTable
         lines={paginatedLines}
         currency={budget.currency}

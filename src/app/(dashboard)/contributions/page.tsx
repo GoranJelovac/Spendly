@@ -48,14 +48,15 @@ export default async function ContributionsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
       <h1 className="mb-6 text-center text-2xl font-bold">Contributions</h1>
-      <ImportExportTransactions
-        budgetId={activeBudget.id}
-        label="Contributions"
-        downloadCsv={downloadContributionsCsv}
-        previewImport={previewImportContributions}
-        applyImport={applyImportContributions}
-      />
-      <AddContributionForm lines={lines} />
+      <AddContributionForm lines={lines} actionSlot={
+        <ImportExportTransactions
+          budgetId={activeBudget.id}
+          label="Contributions"
+          downloadCsv={downloadContributionsCsv}
+          previewImport={previewImportContributions}
+          applyImport={applyImportContributions}
+        />
+      } />
       <ContributionList
         contributions={contributions}
         lines={lines}

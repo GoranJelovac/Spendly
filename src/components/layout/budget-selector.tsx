@@ -135,18 +135,25 @@ export function BudgetSelector({
 
   return (
     <div className="space-y-2 px-3">
-      {/* Dropdown */}
-      <select
-        value={activeBudgetId || ""}
-        onChange={(e) => handleSwitch(e.target.value)}
-        className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-semibold dark:border-[#252345] dark:bg-[#13112b]"
-      >
-        {budgets.map((b) => (
-          <option key={b.id} value={b.id}>
-            {b.name} ({b.currency})
-          </option>
-        ))}
-      </select>
+      {/* Dropdown + currency badge */}
+      <div className="flex items-center gap-1.5">
+        <select
+          value={activeBudgetId || ""}
+          onChange={(e) => handleSwitch(e.target.value)}
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-semibold dark:border-[#252345] dark:bg-[#13112b]"
+        >
+          {budgets.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.name}
+            </option>
+          ))}
+        </select>
+        {activeBudget && (
+          <span className="shrink-0 rounded-md bg-indigo-50 px-2 py-1 text-[11px] font-bold text-indigo-500 dark:bg-[rgba(129,140,248,0.15)] dark:text-[#818cf8]">
+            {activeBudget.currency}
+          </span>
+        )}
+      </div>
 
       {/* Spread action buttons */}
       {!showCreate && !showEdit && (

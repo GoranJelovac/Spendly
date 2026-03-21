@@ -48,14 +48,15 @@ export default async function ExpensesPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
       <h1 className="mb-6 text-center text-2xl font-bold">Expenses</h1>
-      <ImportExportTransactions
-        budgetId={activeBudget.id}
-        label="Expenses"
-        downloadCsv={downloadExpensesCsv}
-        previewImport={previewImportExpenses}
-        applyImport={applyImportExpenses}
-      />
-      <AddExpenseForm lines={lines} />
+      <AddExpenseForm lines={lines} actionSlot={
+        <ImportExportTransactions
+          budgetId={activeBudget.id}
+          label="Expenses"
+          downloadCsv={downloadExpensesCsv}
+          previewImport={previewImportExpenses}
+          applyImport={applyImportExpenses}
+        />
+      } />
       <ExpenseList
         expenses={expenses}
         lines={lines}

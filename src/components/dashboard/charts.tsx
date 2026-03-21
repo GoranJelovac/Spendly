@@ -2,16 +2,11 @@
 
 import { useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
+  Tooltip,
 } from "recharts";
 import { fmt } from "@/lib/format";
 
@@ -29,22 +24,18 @@ type PieEntry = {
 };
 
 const COLORS = [
-  "#3b82f6",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#ec4899",
-  "#06b6d4",
-  "#84cc16",
-  "#f97316",
-  "#14b8a6",
-  "#a855f7",
-  "#e11d48",
-  "#0ea5e9",
-  "#65a30d",
-  "#d946ef",
-  "#fb923c",
+  "#3b82f6",  // Blue
+  "#8b5cf6",  // Purple
+  "#06b6d4",  // Cyan
+  "#f59e0b",  // Amber
+  "#ec4899",  // Pink
+  "#0ea5e9",  // Sky
+  "#a855f7",  // Violet
+  "#d946ef",  // Fuchsia
+  "#2563eb",  // Blue dark
+  "#7c3aed",  // Violet dark
+  "#0891b2",  // Cyan dark
+  "#db2777",  // Pink dark
 ];
 
 function getColor(index: number, name?: string) {
@@ -148,34 +139,80 @@ function DonutWithLegend({
   );
 }
 
-const BAR_SPENT = "#ef4444";
-
-/** Get the color triplet for a given line index */
-function getBarColors(index: number) {
-  const base = COLORS[index % COLORS.length];
-  return { planned: base, contributed: lighten(base, 0.4), spent: BAR_SPENT };
+/** Get graduated overspend color: light red at 110% → full red at 200%+ */
+function getOverspendColor(pct: number): string | null {
+  if (pct <= 110) return null;
+  const t = Math.min((pct - 110) / 90, 1);
+  const r = Math.round(248 + (220 - 248) * t);
+  const g = Math.round(113 + (38 - 113) * t);
+  const b = Math.round(113 + (38 - 113) * t);
+  return `rgb(${r},${g},${b})`;
 }
 
-function BarTooltip({ active, payload, currency, data }: { active?: boolean; payload?: Array<{ payload: LineData; dataKey: string; value: number }>; currency: string; data: LineData[] }) {
-  if (!active || !payload || payload.length === 0) return null;
-  const item = payload[0].payload;
-  const idx = data.findIndex((d) => d.name === item.name);
-  const colors = getBarColors(idx);
+/** Get graduated green color for spent: very light at 0% → full green at 110% */
+function getSpentGreenColor(pct: number): string {
+  const t = Math.min(pct / 110, 1);
+  const r = Math.round(187 + (22 - 187) * t);
+  const g = Math.round(247 + (163 - 247) * t);
+  const b = Math.round(208 + (74 - 208) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+/** Get the color pair for a given line index */
+function getBarColors(index: number) {
+  const base = COLORS[index % COLORS.length];
+  return { planned: base, contributed: lighten(base, 0.4) };
+}
+
+function withAlpha(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function AmountBars({ data, currency }: { data: LineData[]; currency: string }) {
+  const maxVal = Math.max(...data.map((d) => Math.max(d.planned + d.contributed, d.spent))) * 1.08;
+
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs shadow-lg dark:border-[#252345] dark:bg-[#13112b]">
-      <p className="mb-1 font-semibold">{item.name}</p>
-      {item.categoryName && (
-        <p className="mb-1.5 text-[10px] text-gray-500 dark:text-[#6b6b8a]">{item.categoryName}</p>
-      )}
-      {payload.map((entry) => {
-        const label = entry.dataKey === "planned" ? "Planned" : entry.dataKey === "contributed" ? "Contributed" : "Spent";
-        const color = entry.dataKey === "planned" ? colors.planned : entry.dataKey === "contributed" ? colors.contributed : colors.spent;
+    <div className="space-y-3">
+      {data.map((item, idx) => {
+        const color = COLORS[idx % COLORS.length];
+        const total = item.planned + item.contributed;
+        const pct = total > 0 ? (item.spent / total) * 100 : 0;
+        const oc = getOverspendColor(pct);
+        const spentBarColor = oc || getSpentGreenColor(pct);
+        const plannedW = (total / maxVal) * 100;
+        const spentW = (item.spent / maxVal) * 100;
+
         return (
-          <p key={entry.dataKey} className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: color }} />
-            <span className="text-gray-500 dark:text-[#6b6b8a]">{label}:</span>
-            <span className="font-medium">{fmt(entry.value)} {currency}</span>
-          </p>
+          <div key={item.name}>
+            <div className="mb-1 flex items-center gap-2">
+              <span className="w-[110px] shrink-0 truncate text-sm font-medium" style={{ color }} title={item.name}>
+                {item.name}
+              </span>
+              <span className="flex-1 text-center text-[11px] font-semibold tabular-nums" style={{ color }}>
+                {fmt(pct, 0)}%
+              </span>
+              <span className="shrink-0 text-[11px] tabular-nums" style={{ color }}>
+                <span className="font-semibold">{fmt(item.spent)}</span> / {fmt(total)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="relative h-5 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
+                <div
+                  className="absolute inset-y-0 left-0 rounded-md transition-all duration-500"
+                  style={{ width: `${plannedW}%`, backgroundColor: withAlpha(color, 0.35) }}
+                />
+              </div>
+              <div className="relative h-2 w-full overflow-hidden rounded bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
+                <div
+                  className="absolute inset-y-0 left-0 rounded transition-all duration-500"
+                  style={{ width: `${spentW}%`, backgroundColor: spentBarColor }}
+                />
+              </div>
+            </div>
+          </div>
         );
       })}
     </div>
@@ -189,7 +226,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
         const total = item.planned + item.contributed;
         const spentPct = total > 0 ? (item.spent / total) * 100 : 0;
         const contributedPct = total > 0 ? (item.contributed / total) * 100 : 0;
-        const isOver = spentPct > 100;
+        const overspendClr = getOverspendColor(spentPct);
         const colors = getBarColors(idx);
 
         return (
@@ -207,7 +244,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
                 )}
               </div>
               <div className="flex-shrink-0 text-right">
-                <span className={`text-sm font-semibold tabular-nums ${isOver ? "text-red-500" : ""}`}>
+                <span className="text-sm font-semibold tabular-nums" style={overspendClr ? { color: overspendClr } : undefined}>
                   {fmt(spentPct, 1)}%
                 </span>
                 <span className="ml-2 text-[11px] text-gray-400 dark:text-[#6b6b8a] tabular-nums">
@@ -246,17 +283,17 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
                 className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
                 style={{
                   width: `${Math.min(spentPct, 100)}%`,
-                  backgroundColor: isOver ? BAR_SPENT : colors.planned,
+                  backgroundColor: overspendClr || colors.planned,
                 }}
               />
 
               {/* Overspent portion */}
-              {isOver && (
+              {overspendClr && spentPct > 100 && (
                 <div
-                  className="absolute inset-y-0 right-0 rounded-r-full animate-pulse"
+                  className={`absolute inset-y-0 right-0 rounded-r-full ${spentPct > 150 ? "animate-pulse" : ""}`}
                   style={{
                     width: `${Math.min(spentPct - 100, 100)}%`,
-                    backgroundColor: BAR_SPENT,
+                    backgroundColor: overspendClr,
                     marginLeft: "auto",
                   }}
                 />
@@ -267,7 +304,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
       })}
 
       {/* Legend */}
-      <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-500">
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-500">
         <span className="flex items-center gap-1">
           <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-500 to-purple-500" /> Spent
         </span>
@@ -278,7 +315,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
           <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300 opacity-50" /> Contributed
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_SPENT }} /> Over budget
+          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: "#f87171" }} /> Over budget
         </span>
       </div>
     </div>
@@ -323,51 +360,9 @@ export function PlannedVsSpentChart({
       </div>
 
       {mode === "amount" ? (
-        <>
-          <div className="overflow-y-auto" style={{ maxHeight: 600 }}>
-            <ResponsiveContainer width="100%" height={Math.max(420, data.length * 40 + 40)}>
-              <BarChart data={data} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#252345" horizontal={false} />
-                <XAxis type="number" fontSize={11} />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  fontSize={11}
-                  width={120}
-                  tick={{ fill: "currentColor" }}
-                  interval={0}
-                />
-                <Tooltip content={<BarTooltip currency={currency} data={data} />} />
-                <Bar dataKey="planned" stackId="budget" name="planned" barSize={18}>
-                  {data.map((_, i) => (
-                    <Cell key={`p-${i}`} fill={getBarColors(i).planned} />
-                  ))}
-                </Bar>
-                <Bar dataKey="contributed" stackId="budget" name="contributed" barSize={18}>
-                  {data.map((_, i) => (
-                    <Cell key={`c-${i}`} fill={getBarColors(i).contributed} />
-                  ))}
-                </Bar>
-                <Bar dataKey="spent" name="spent" barSize={18}>
-                  {data.map((_, i) => (
-                    <Cell key={`s-${i}`} fill={BAR_SPENT} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-2 flex items-center justify-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-500 to-purple-500" /> Planned
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300" /> Contributed
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_SPENT }} /> Spent
-            </span>
-          </div>
-        </>
+        <div className="overflow-y-auto" style={{ maxHeight: 600 }}>
+          <AmountBars data={data} currency={currency} />
+        </div>
       ) : (
         <div className="overflow-y-auto" style={{ maxHeight: 600 }}>
           <PercentageBars data={data} currency={currency} />
@@ -448,11 +443,15 @@ export function SpendingOverviewChart({
   return (
     <div className="rounded-2xl bg-gray-50 p-4 dark:bg-[#1a1835]">
       <h3 className="mb-4 font-semibold">Spending Overview</h3>
-      {overspent > 0 && (
-        <p className="mb-2 text-xs text-red-500">
-          Over budget by {fmt(overspent)} {currency}
-        </p>
-      )}
+      {overspent > 0 && (() => {
+        const overPct = totalPlanned > 0 ? (totalSpent / totalPlanned) * 100 : 0;
+        const overColor = getOverspendColor(overPct);
+        return (
+          <p className="mb-2 text-xs" style={overColor ? { color: overColor } : { color: "#f87171" }}>
+            Over budget by {fmt(overspent)} {currency}
+          </p>
+        );
+      })()}
       <DonutWithLegend
         data={pieData}
         currency={currency}
