@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import * as XLSX from "xlsx";
+import { fmt } from "@/lib/format";
 
 type ParsedTransaction = {
   date: string;
@@ -225,7 +226,7 @@ export function ImportExportTransactions({
       {successMsg && <p className="mb-4 text-sm text-green-600">{successMsg}</p>}
 
       {preview && (
-        <div className="mb-6 rounded-xl bg-white p-5 shadow-sm dark:bg-gray-900">
+        <div className="mb-6 rounded-2xl bg-white p-5 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
           <h3 className="mb-1 text-lg font-semibold">Import Preview</h3>
           <p className="mb-3 text-sm text-gray-500">
             {readyCount} ready to import
@@ -265,7 +266,7 @@ export function ImportExportTransactions({
                         <div className="text-xs text-red-500">{row.error}</div>
                       )}
                     </td>
-                    <td className="py-2 text-right">{row.amount.toFixed(2)}</td>
+                    <td className="py-2 text-right">{fmt(row.amount)}</td>
                     <td className="py-2 text-gray-500">{row.description || "—"}</td>
                   </tr>
                 ))}

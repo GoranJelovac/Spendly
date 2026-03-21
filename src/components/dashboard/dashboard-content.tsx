@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { getDashboardData, type DashboardData } from "@/actions/dashboard";
 import { PlannedVsSpentChart, BudgetBreakdownChart, SpendingOverviewChart } from "@/components/dashboard/charts";
 import { ColumnFilter } from "@/components/shared/column-filter";
+import { fmt } from "@/lib/format";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -22,23 +23,23 @@ function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-xl bg-white shadow-sm dark:bg-gray-900">
+    <div className="rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl"
+        className="flex w-full items-center justify-between rounded-t-2xl px-5 py-3.5 text-left transition-colors bg-indigo-50/40 hover:bg-indigo-50/60 dark:bg-[rgba(129,140,248,0.08)] dark:hover:bg-[rgba(129,140,248,0.12)]"
       >
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-[#6b6b8a]">
           {title}
         </h3>
         <span
-          className={`text-gray-400 text-xs transition-transform duration-200 ${
+          className={`text-[10px] text-gray-400 dark:text-[#6b6b8a] transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         >
           &#9660;
         </span>
       </button>
-      {open && <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-gray-800">{children}</div>}
+      {open && <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-[#252345]">{children}</div>}
     </div>
   );
 }
@@ -55,10 +56,10 @@ function ToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
+      className={`rounded-xl px-3.5 py-1.5 text-[13px] font-medium transition-all ${
         active
-          ? "bg-blue-600 text-white shadow-sm"
-          : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+          ? "bg-indigo-400 text-white shadow-sm dark:bg-[#818cf8]"
+          : "text-gray-500 hover:bg-gray-100 dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.08)]"
       }`}
     >
       {children}
@@ -173,12 +174,12 @@ export function DashboardContent({
       const vals: Record<ColKey, string> = {
         name: item.name,
         categoryName: "categoryName" in item ? String(item.categoryName) : "",
-        planned: item.planned.toFixed(2),
-        contributed: item.contributed > 0 ? item.contributed.toFixed(2) : "—",
-        available: item.available.toFixed(2),
-        spent: item.spent.toFixed(2),
-        remaining: item.remaining.toFixed(2),
-        percentage: item.percentage.toFixed(0) + "%",
+        planned: fmt(item.planned),
+        contributed: item.contributed > 0 ? fmt(item.contributed) : "—",
+        available: fmt(item.available),
+        spent: fmt(item.spent),
+        remaining: fmt(item.remaining),
+        percentage: fmt(item.percentage, 0) + "%",
       };
       for (const key of Object.keys(vals) as ColKey[]) {
         if (!sets[key].has(vals[key])) {
@@ -206,12 +207,12 @@ export function DashboardContent({
       const vals: Record<ColKey, string> = {
         name: item.name,
         categoryName: "categoryName" in item ? String(item.categoryName) : "",
-        planned: item.planned.toFixed(2),
-        contributed: item.contributed > 0 ? item.contributed.toFixed(2) : "—",
-        available: item.available.toFixed(2),
-        spent: item.spent.toFixed(2),
-        remaining: item.remaining.toFixed(2),
-        percentage: item.percentage.toFixed(0) + "%",
+        planned: fmt(item.planned),
+        contributed: item.contributed > 0 ? fmt(item.contributed) : "—",
+        available: fmt(item.available),
+        spent: fmt(item.spent),
+        remaining: fmt(item.remaining),
+        percentage: fmt(item.percentage, 0) + "%",
       };
 
       for (const [col, selected] of Object.entries(columnFilters)) {
@@ -224,14 +225,14 @@ export function DashboardContent({
   }, [displayItems, columnFilters, columnValues]);
 
   return (
-    <div className="space-y-4">
+    <div className="font-[var(--font-jakarta)]" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {/* Budget name */}
-      <div className="flex items-center justify-center gap-2">
-        <span className="text-2xl font-bold">{budgetName}</span>
-        <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+      <div className="flex items-center justify-center gap-3">
+        <span className="text-[28px] font-bold dark:text-[#e0e0f0]">{budgetName}</span>
+        <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-600 dark:bg-[rgba(129,140,248,0.15)] dark:text-[#818cf8]">
           {budgetYear}
         </span>
-        <span className="text-sm text-gray-400">{budgetCurrency}</span>
+        <span className="text-sm text-gray-400 dark:text-[#6b6b8a]">{budgetCurrency}</span>
       </div>
 
       {/* Filters */}
@@ -239,8 +240,8 @@ export function DashboardContent({
         <div className="space-y-3">
           {/* Period */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="w-14 text-xs font-medium text-gray-500">Period</span>
-            <div className="flex gap-1 rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
+            <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-[#6b6b8a]">Period</span>
+            <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-[#1e1c38]">
               <ToggleButton active={period === "month"} onClick={() => setPeriod("month")}>
                 This Month
               </ToggleButton>
@@ -256,17 +257,17 @@ export function DashboardContent({
           {/* By Month controls */}
           {period === "bymonth" && (
             <div className="flex flex-wrap items-center gap-3">
-              <span className="w-14 text-xs font-medium text-gray-500">Month</span>
+              <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-[#6b6b8a]">Month</span>
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800"
+                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-[#252345] dark:bg-[#1e1c38] dark:text-[#e0e0f0]"
               >
                 {MONTH_NAMES.map((name, i) => (
                   <option key={i} value={i}>{name}</option>
                 ))}
               </select>
-              <div className="flex gap-1 rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
+              <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-[#1e1c38]">
                 <ToggleButton active={byMonthMode === "single"} onClick={() => setByMonthMode("single")}>
                   Only {MONTH_NAMES[selectedMonth]}
                 </ToggleButton>
@@ -279,8 +280,8 @@ export function DashboardContent({
 
           {/* View mode */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="w-14 text-xs font-medium text-gray-500">View</span>
-            <div className="flex gap-1 rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
+            <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-[#6b6b8a]">View</span>
+            <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-[#1e1c38]">
               <ToggleButton
                 active={viewMode === "lines"}
                 onClick={() => { setViewMode("lines"); setCategoryFilter("all"); }}
@@ -298,7 +299,7 @@ export function DashboardContent({
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800"
+                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-[#252345] dark:bg-[#1e1c38] dark:text-[#e0e0f0]"
               >
                 <option value="all">All categories</option>
                 {uniqueCategories.map((cat) => (
@@ -312,10 +313,10 @@ export function DashboardContent({
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-400 border-t-transparent dark:border-[#818cf8]" />
         </div>
       ) : !data ? (
-        <p className="text-gray-500">No data found.</p>
+        <p className="text-gray-500 dark:text-[#6b6b8a]">No data found.</p>
       ) : (
         <>
           {/* Summary */}
@@ -367,6 +368,7 @@ export function DashboardContent({
             <PlannedVsSpentChart
               data={displayItems.map((l) => ({
                 name: l.name,
+                categoryName: "categoryName" in l ? String(l.categoryName) : undefined,
                 planned: l.planned,
                 contributed: l.contributed,
                 spent: l.spent,
@@ -377,6 +379,7 @@ export function DashboardContent({
               <BudgetBreakdownChart
                 data={displayItems.map((l) => ({
                   name: l.name,
+                  categoryName: "categoryName" in l ? String(l.categoryName) : undefined,
                   planned: l.planned,
                   contributed: l.contributed,
                   spent: l.spent,
@@ -386,6 +389,7 @@ export function DashboardContent({
               <SpendingOverviewChart
                 data={displayItems.map((l) => ({
                   name: l.name,
+                  categoryName: "categoryName" in l ? String(l.categoryName) : undefined,
                   planned: l.available,
                   contributed: 0,
                   spent: l.spent,
@@ -399,10 +403,10 @@ export function DashboardContent({
           {/* Details */}
           <CollapsibleSection title="Details">
             <div className="min-h-[20rem] overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="text-xs uppercase tracking-wider text-gray-500">
-                  <tr className="border-b border-gray-100 dark:border-gray-800">
-                    <th className="pb-3 font-medium">
+              <table className="w-full border-separate border-spacing-y-2 text-left text-[14px]">
+                <thead>
+                  <tr className="bg-indigo-50/50 dark:bg-[rgba(129,140,248,0.08)]">
+                    <th className="rounded-l-2xl pb-2.5 pl-3 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       {viewMode === "categories" && categoryFilter === "all" ? "Category" : "Line"}
                       <ColumnFilter
                         values={columnValues.name}
@@ -411,7 +415,7 @@ export function DashboardContent({
                       />
                     </th>
                     {viewMode === "lines" && (
-                      <th className="pb-3 font-medium">
+                      <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                         Category
                         <ColumnFilter
                           values={columnValues.categoryName}
@@ -420,7 +424,7 @@ export function DashboardContent({
                         />
                       </th>
                     )}
-                    <th className="pb-3 text-right font-medium">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       Planned
                       <ColumnFilter
                         values={columnValues.planned}
@@ -428,7 +432,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("planned", s)}
                       />
                     </th>
-                    <th className="pb-3 text-right font-medium">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       Contrib.
                       <ColumnFilter
                         values={columnValues.contributed}
@@ -436,7 +440,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("contributed", s)}
                       />
                     </th>
-                    <th className="pb-3 text-right font-medium">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       Available
                       <ColumnFilter
                         values={columnValues.available}
@@ -444,7 +448,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("available", s)}
                       />
                     </th>
-                    <th className="pb-3 text-right font-medium">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       Spent
                       <ColumnFilter
                         values={columnValues.spent}
@@ -452,7 +456,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("spent", s)}
                       />
                     </th>
-                    <th className="pb-3 pr-4 text-right font-medium">
+                    <th className="pb-2.5 pr-4 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       Remaining
                       <ColumnFilter
                         values={columnValues.remaining}
@@ -460,7 +464,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("remaining", s)}
                       />
                     </th>
-                    <th className="pb-3 pl-4 font-medium">
+                    <th className="rounded-r-2xl pb-2.5 pl-4 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
                       Progress
                       <ColumnFilter
                         values={columnValues.percentage}
@@ -472,31 +476,32 @@ export function DashboardContent({
                 </thead>
                 <tbody>
                   {detailsItems.map((item) => (
-                    <tr key={item.id} className="border-b border-gray-50 last:border-0 dark:border-gray-800/50">
-                      <td className="py-2.5 font-medium">{item.name}</td>
+                    <tr key={item.id} className="bg-gray-50 dark:bg-[#1a1835]">
+                      <td className="rounded-l-xl py-[6px] pl-3 font-semibold dark:text-[#e0e0f0]">{item.name}</td>
                       {viewMode === "lines" && (
-                        <td className="py-2.5">
-                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                        <td className="py-[6px]">
+                          <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-[#6b6b8a]">
+                            <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-400 dark:bg-[#818cf8]" />
                             {"categoryName" in item ? String(item.categoryName) : ""}
                           </span>
                         </td>
                       )}
-                      <td className="py-2.5 text-right tabular-nums">{item.planned.toFixed(2)}</td>
-                      <td className="py-2.5 text-right tabular-nums">{item.contributed > 0 ? item.contributed.toFixed(2) : "—"}</td>
-                      <td className="py-2.5 text-right tabular-nums font-medium">{item.available.toFixed(2)}</td>
-                      <td className="py-2.5 text-right tabular-nums">{item.spent.toFixed(2)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmt(item.planned)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{item.contributed > 0 ? fmt(item.contributed) : "—"}</td>
+                      <td className="py-[6px] text-right tabular-nums font-semibold dark:text-[#e0e0f0]">{fmt(item.available)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmt(item.spent)}</td>
                       <td
-                        className={`py-2.5 pr-4 text-right tabular-nums font-medium ${
-                          item.remaining < 0 ? "text-red-500" : "text-green-600"
+                        className={`py-[6px] pr-4 text-right tabular-nums font-semibold ${
+                          item.remaining < 0 ? "text-red-500" : "text-emerald-500"
                         }`}
                       >
-                        {item.remaining.toFixed(2)}
+                        {fmt(item.remaining)}
                       </td>
-                      <td className="py-2.5 pl-4">
+                      <td className="rounded-r-xl py-[6px] pl-4 pr-3">
                         <div className="flex items-center gap-2">
-                          <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800">
+                          <div className="h-[11px] w-full rounded-xl bg-gray-200 dark:bg-[rgba(107,107,138,0.15)]">
                             <div
-                              className={`h-2 rounded-full transition-all duration-500 ease-out ${
+                              className={`h-[11px] rounded-xl transition-all duration-500 ease-out ${
                                 item.percentage > 100
                                   ? "bg-red-500"
                                   : item.percentage > 80
@@ -508,8 +513,8 @@ export function DashboardContent({
                               }}
                             />
                           </div>
-                          <span className="w-12 text-xs tabular-nums text-gray-500">
-                            {item.percentage.toFixed(0)}%
+                          <span className="w-12 text-xs tabular-nums text-gray-500 dark:text-[#6b6b8a]">
+                            {fmt(item.percentage, 0)}%
                           </span>
                         </div>
                       </td>
@@ -517,7 +522,7 @@ export function DashboardContent({
                   ))}
                   {detailsItems.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="py-4 text-center text-gray-400">
+                      <td colSpan={8} className="py-4 text-center text-gray-400 dark:text-[#6b6b8a]">
                         No items match the current filters.
                       </td>
                     </tr>
@@ -532,18 +537,18 @@ export function DashboardContent({
   );
 }
 
-const ACCENT_COLORS = {
-  blue: "border-l-blue-500",
-  purple: "border-l-purple-500",
-  cyan: "border-l-cyan-500",
-  red: "border-l-red-500",
-  green: "border-l-emerald-500",
-  amber: "border-l-amber-500",
+const ACCENT_HEX = {
+  blue: "#3b82f6",
+  purple: "#8b5cf6",
+  cyan: "#06b6d4",
+  red: "#ef4444",
+  green: "#10b981",
+  amber: "#f59e0b",
 };
 
 const VALUE_COLORS = {
   red: "text-red-500",
-  green: "text-emerald-600",
+  green: "text-emerald-500",
 };
 
 function SummaryCard({
@@ -558,22 +563,23 @@ function SummaryCard({
   value: number;
   currency?: string;
   suffix?: string;
-  accent: keyof typeof ACCENT_COLORS;
+  accent: keyof typeof ACCENT_HEX;
   valueColor?: "red" | "green";
 }) {
   return (
     <div
-      className={`rounded-xl border-l-4 bg-gray-50 p-3.5 shadow-sm dark:bg-gray-800/50 ${ACCENT_COLORS[accent]}`}
+      className="rounded-2xl border-2 bg-transparent p-[15px]"
+      style={{ borderColor: ACCENT_HEX[accent] }}
     >
-      <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+      <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
         {label}
       </p>
       <p
-        className={`mt-1 text-xl font-bold ${
-          valueColor ? VALUE_COLORS[valueColor] : ""
+        className={`mt-1 text-[18px] font-bold tabular-nums ${
+          valueColor ? VALUE_COLORS[valueColor] : "dark:text-[#e0e0f0]"
         }`}
       >
-        {value.toFixed(suffix === "%" ? 1 : 2)}
+        {fmt(value, suffix === "%" ? 1 : 2)}
         {suffix || (currency ? ` ${currency}` : "")}
       </p>
     </div>

@@ -128,7 +128,7 @@ export function CategoryList({
           name="name"
           required
           placeholder="New category name"
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-gray-700 dark:bg-gray-800"
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-[#252345] dark:bg-[#1a1835]"
         />
         <Button type="submit" size="sm">
           Add Category
@@ -157,10 +157,10 @@ export function CategoryList({
       )}
 
       {/* Category list */}
-      <div className="min-h-[20rem] rounded-xl bg-white shadow-sm dark:bg-gray-900">
+      <div className="min-h-[20rem] rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
         <table className="w-full text-left text-sm">
           <thead className="text-xs uppercase tracking-wider text-gray-500">
-            <tr className="border-b border-gray-100 dark:border-gray-800">
+            <tr className="border-b border-gray-100 dark:border-[#252345]">
               <th className="p-4 w-12 font-medium">#</th>
               <th className="p-4 font-medium">
                 Name
@@ -192,7 +192,7 @@ export function CategoryList({
           </thead>
           <tbody>
             {filteredCategories.map((cat, index) => (
-              <tr key={cat.id} className="border-b border-gray-50 last:border-0 dark:border-gray-800/50">
+              <tr key={cat.id} className="border-b border-gray-50 last:border-0 dark:border-[#252345]/50">
                 <td className="p-4 text-gray-400">
                   {(currentPage - 1) * pageSize + index + 1}
                 </td>
@@ -206,7 +206,7 @@ export function CategoryList({
                         name="name"
                         defaultValue={cat.name}
                         required
-                        className="rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+                        className="rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
                       />
                       <Button size="sm" type="submit">Save</Button>
                       <Button
@@ -223,7 +223,7 @@ export function CategoryList({
                   )}
                 </td>
                 <td className="p-4 text-right">
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8]">
                     {cat._count.lines}
                   </span>
                 </td>

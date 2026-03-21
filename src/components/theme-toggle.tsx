@@ -12,12 +12,12 @@ export function ThemeToggle() {
   if (!mounted) return <div className="h-7 w-20" />;
 
   return (
-    <div className="flex items-center rounded-full border bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800">
+    <div className="flex items-center rounded-full border bg-gray-100 p-0.5 dark:border-[#252345] dark:bg-[#1a1835]">
       <button
         onClick={() => setTheme("light")}
         className={`rounded-full px-2 py-1 text-xs transition-colors ${
           theme === "light"
-            ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white"
+            ? "bg-white text-gray-900 shadow-sm dark:bg-[#818cf8] dark:text-white"
             : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
         }`}
         title="Light"
@@ -28,7 +28,7 @@ export function ThemeToggle() {
         onClick={() => setTheme("dark")}
         className={`rounded-full px-2 py-1 text-xs transition-colors ${
           theme === "dark"
-            ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white"
+            ? "bg-white text-gray-900 shadow-sm dark:bg-[#818cf8] dark:text-white"
             : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
         }`}
         title="Dark"
@@ -39,7 +39,7 @@ export function ThemeToggle() {
         onClick={() => setTheme("system")}
         className={`rounded-full px-2 py-1 text-xs transition-colors ${
           theme === "system"
-            ? "bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-white"
+            ? "bg-white text-gray-900 shadow-sm dark:bg-[#818cf8] dark:text-white"
             : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
         }`}
         title="System"

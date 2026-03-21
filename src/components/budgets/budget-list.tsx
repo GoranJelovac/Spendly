@@ -39,7 +39,7 @@ export function BudgetList({ budgets }: { budgets: Budget[] }) {
       {budgets.map((budget) => (
         <div
           key={budget.id}
-          className="flex items-center justify-between rounded-lg border bg-white p-4 dark:bg-gray-900"
+          className="flex items-center justify-between rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]"
         >
           <Link
             href={`/budgets/${budget.id}`}

@@ -6,6 +6,7 @@ import { deleteExpense, deleteExpenses, updateExpense } from "@/actions/expense"
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 import { ColumnFilter } from "@/components/shared/column-filter";
+import { fmt } from "@/lib/format";
 
 type BudgetLine = {
   id: string;
@@ -69,7 +70,7 @@ export function ExpenseList({
         date: new Date(e.date).toLocaleDateString(),
         line: e.budgetLine.name,
         description: e.description || "—",
-        amount: e.amount.toFixed(2) + " " + e.budgetLine.budget.currency,
+        amount: fmt(e.amount) + " " + e.budgetLine.budget.currency,
       };
       for (const key of Object.keys(vals) as ColKey[]) {
         if (!sets[key].has(vals[key])) { sets[key].add(vals[key]); cols[key].push(vals[key]); }
@@ -89,7 +90,7 @@ export function ExpenseList({
         date: new Date(e.date).toLocaleDateString(),
         line: e.budgetLine.name,
         description: e.description || "—",
-        amount: e.amount.toFixed(2) + " " + e.budgetLine.budget.currency,
+        amount: fmt(e.amount) + " " + e.budgetLine.budget.currency,
       };
       for (const [col, sel] of Object.entries(columnFilters)) {
         if (sel.size < columnValues[col as ColKey].length && !sel.has(vals[col as ColKey])) return false;
@@ -215,7 +216,7 @@ export function ExpenseList({
           <tbody>
             {filteredExpenses.map((expense, index) =>
               editingId === expense.id ? (
-                <tr key={expense.id} className="border-b bg-gray-50 dark:bg-gray-800/50">
+                <tr key={expense.id} className="border-b bg-gray-50 dark:bg-[#1a1835]/50">
                   <td colSpan={7} className="py-3 px-1">
                     <form
                       action={(formData) => handleSave(expense.id, formData)}
@@ -227,7 +228,7 @@ export function ExpenseList({
                           <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           >
                             <option value="">Select...</option>
                             {categories.map((cat) => (
@@ -240,7 +241,7 @@ export function ExpenseList({
                           <select
                             name="budgetLineId"
                             defaultValue={expense.budgetLineId}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                             required
                             disabled={!selectedCategory}
                           >
@@ -257,7 +258,7 @@ export function ExpenseList({
                             type="date"
                             required
                             defaultValue={new Date(expense.date).toISOString().split("T")[0]}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                         <div>
@@ -268,7 +269,7 @@ export function ExpenseList({
                             step="0.01"
                             required
                             defaultValue={expense.amount}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                       </div>
@@ -278,7 +279,7 @@ export function ExpenseList({
                           name="description"
                           defaultValue={expense.description || ""}
                           placeholder="Optional"
-                          className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                          className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                         />
                       </div>
                       {editError && <p className="text-sm text-red-500">{editError}</p>}
@@ -311,7 +312,7 @@ export function ExpenseList({
                     {expense.description || "—"}
                   </td>
                   <td className="py-2 text-right">
-                    {expense.amount.toFixed(2)}{" "}
+                    {fmt(expense.amount)}{" "}
                     {expense.budgetLine.budget.currency}
                   </td>
                   <td className="py-2 text-right">

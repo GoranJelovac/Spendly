@@ -17,7 +17,7 @@ export default async function BillingPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
       <h1 className="mb-8 text-center text-2xl font-bold">Billing</h1>
       <BillingContent
         tier={user?.subscriptionTier || "free"}

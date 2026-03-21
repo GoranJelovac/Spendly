@@ -10,10 +10,10 @@ export default async function DashboardPage() {
   const activeBudget = await getActiveBudget();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-6xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
 
       {!activeBudget ? (
-        <div className="rounded-xl bg-white p-8 text-center shadow-sm dark:bg-gray-900">
+        <div className="rounded-2xl bg-white p-8 text-center shadow-md dark:bg-[#13112b]">
           <p className="text-gray-500">
             No budget selected. Create one using the selector in the sidebar.
           </p>

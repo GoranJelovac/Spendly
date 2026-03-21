@@ -18,9 +18,9 @@ export default async function CategoriesPage({
 
   if (!activeBudget) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
         <h1 className="mb-4 text-2xl font-bold">Categories</h1>
-        <div className="rounded-xl bg-white p-8 text-center shadow-sm dark:bg-gray-900">
+        <div className="rounded-2xl bg-white p-8 text-center shadow-md dark:bg-[#13112b]">
           <p className="text-gray-500">
             No budget selected. Create one using the selector in the sidebar.
           </p>
@@ -35,7 +35,7 @@ export default async function CategoriesPage({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
       <h1 className="mb-1 text-center text-2xl font-bold">Categories</h1>
       <p className="mb-6 text-center text-sm text-gray-500">
         {activeBudget.name} &middot; {activeBudget.year} &middot; {activeBudget.currency}

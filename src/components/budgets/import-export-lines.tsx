@@ -197,7 +197,7 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
       {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 
       {preview && (
-        <div className="mb-6 rounded-xl bg-white p-5 shadow-sm dark:bg-gray-900">
+        <div className="mb-6 rounded-2xl bg-white p-5 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
           <h3 className="mb-3 text-lg font-semibold">Import Preview</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
@@ -223,7 +223,7 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
                             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                             : line.status === "changed"
                               ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                              : "bg-gray-100 text-gray-600 dark:bg-[#1a1835] dark:text-[#6b6b8a]"
                         }`}
                       >
                         {line.status}

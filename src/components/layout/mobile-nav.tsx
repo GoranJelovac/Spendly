@@ -44,8 +44,8 @@ export function MobileNav({
         onClick={() => setOpen(false)}
         className={`flex items-center gap-3 px-3 py-[9px] text-[14px] font-medium transition-colors ${
           active
-            ? "border-b-2 border-blue-500 bg-blue-500/[0.04] text-blue-500 dark:bg-blue-500/[0.04] dark:text-blue-400"
-            : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 dark:text-gray-400 dark:hover:bg-white/[0.04]"
+            ? "border-b-2 border-indigo-400 bg-indigo-500/[0.04] text-indigo-500 dark:border-[#818cf8] dark:bg-[rgba(129,140,248,0.08)] dark:text-[#818cf8]"
+            : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.06)]"
         }`}
       >
         <span className={`text-[15px] ${active ? "opacity-100" : "opacity-60"}`}>{item.icon}</span>
@@ -56,33 +56,33 @@ export function MobileNav({
 
   return (
     <div className="font-[var(--font-sora)] lg:hidden">
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-[#252345]">
         <Link href="/dashboard" className="text-lg font-bold tracking-tight">
-          <span className="text-blue-500">$</span>pendly
+          <span className="text-indigo-400 dark:text-[#818cf8]">$</span>pendly
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <button
             onClick={() => setOpen(!open)}
-            className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-[rgba(129,140,248,0.1)]"
           >
             <span className="text-lg">{open ? "✕" : "☰"}</span>
           </button>
         </div>
       </div>
       {open && (
-        <div className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-[#18181b]">
-          <div className="border-b border-gray-100 p-3 dark:border-gray-800">
+        <div className="border-b border-gray-200 bg-white dark:border-[#252345] dark:bg-[#13112b]">
+          <div className="border-b border-gray-100 p-3 dark:border-[#252345]">
             <BudgetSelector budgets={budgets} activeBudgetId={activeBudgetId} />
           </div>
           <nav className="p-3">
-            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-600">
+            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-[#6b6b8a]">
               Main
             </p>
             <div className="flex flex-col gap-[1px]">
               {mainItems.map((item) => <NavLink key={item.href} item={item} />)}
             </div>
-            <p className="mb-1 mt-4 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-600">
+            <p className="mb-1 mt-4 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-[#6b6b8a]">
               Account
             </p>
             <div className="flex flex-col gap-[1px]">

@@ -30,7 +30,7 @@ export function CreateBudgetForm() {
   }
 
   return (
-    <div className="mb-6 rounded-lg border bg-white p-4 dark:bg-gray-900">
+    <div className="mb-6 rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
       <h2 className="mb-4 text-lg font-semibold">Create Budget</h2>
       <form action={handleSubmit} className="space-y-3">
         <div>
@@ -42,7 +42,7 @@ export function CreateBudgetForm() {
             name="name"
             required
             placeholder="e.g. Household 2026"
-            className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+            className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
           />
         </div>
         <div className="flex gap-3">
@@ -56,7 +56,7 @@ export function CreateBudgetForm() {
               type="number"
               required
               defaultValue={new Date().getFullYear()}
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
             />
           </div>
           <div className="flex-1">
@@ -67,7 +67,7 @@ export function CreateBudgetForm() {
               id="currency"
               name="currency"
               defaultValue="EUR"
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700"
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
             >
               <option value="EUR">EUR</option>
               <option value="USD">USD</option>

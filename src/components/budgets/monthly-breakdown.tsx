@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { fmt } from "@/lib/format";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -15,17 +16,17 @@ export function MonthlyBreakdown({
   const yearlyTotal = monthTotals.reduce((sum, a) => sum + a, 0);
 
   return (
-    <div className="mb-6 rounded-xl bg-white shadow-sm dark:bg-gray-900">
+    <div className="mb-6 rounded-2xl bg-white shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl"
+        className="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-[#1a1835]/50 rounded-2xl"
       >
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-[#6b6b8a]">
           Monthly Breakdown
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold">
-            {yearlyTotal.toFixed(2)} {currency} / year
+            {fmt(yearlyTotal)} {currency} / year
           </span>
           <span
             className={`text-gray-400 text-xs transition-transform duration-200 ${
@@ -37,21 +38,21 @@ export function MonthlyBreakdown({
         </div>
       </button>
       {open && (
-        <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-gray-800">
+        <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-[#252345]">
           <div className="grid grid-cols-7 gap-2">
             {/* Jan - Jun */}
             {monthTotals.slice(0, 6).map((val, i) => (
               <div
                 key={i}
-                className="rounded-lg border border-gray-100 bg-gray-50/50 p-2.5 text-center dark:border-gray-800 dark:bg-gray-800/30"
+                className="rounded-lg border border-gray-100 bg-gray-50/50 p-2.5 text-center dark:border-[#252345] dark:bg-[#1a1835]/30"
               >
-                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-[#6b6b8a]">
                   {MONTHS[i]}
                 </p>
                 <p className={`mt-0.5 text-sm font-semibold ${
-                  val === 0 ? "text-gray-300 dark:text-gray-600" : ""
+                  val === 0 ? "text-gray-300 dark:text-[#252345]" : ""
                 }`}>
-                  {val.toFixed(2)}
+                  {fmt(val)}
                 </p>
               </div>
             ))}
@@ -61,7 +62,7 @@ export function MonthlyBreakdown({
                 Total
               </p>
               <p className="mt-0.5 text-lg font-bold text-emerald-700 dark:text-emerald-300">
-                {yearlyTotal.toFixed(2)}
+                {fmt(yearlyTotal)}
               </p>
               <p className="text-[10px] text-emerald-500 dark:text-emerald-500">
                 {currency}
@@ -71,15 +72,15 @@ export function MonthlyBreakdown({
             {monthTotals.slice(6, 12).map((val, i) => (
               <div
                 key={i + 6}
-                className="rounded-lg border border-gray-100 bg-gray-50/50 p-2.5 text-center dark:border-gray-800 dark:bg-gray-800/30"
+                className="rounded-lg border border-gray-100 bg-gray-50/50 p-2.5 text-center dark:border-[#252345] dark:bg-[#1a1835]/30"
               >
-                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-[#6b6b8a]">
                   {MONTHS[i + 6]}
                 </p>
                 <p className={`mt-0.5 text-sm font-semibold ${
-                  val === 0 ? "text-gray-300 dark:text-gray-600" : ""
+                  val === 0 ? "text-gray-300 dark:text-[#252345]" : ""
                 }`}>
-                  {val.toFixed(2)}
+                  {fmt(val)}
                 </p>
               </div>
             ))}

@@ -24,7 +24,7 @@ export default async function DashboardLayout({
   }));
 
   return (
-    <div className="flex min-h-screen bg-gray-50/50 dark:bg-gray-950">
+    <div className="flex min-h-screen bg-gray-50/50 dark:bg-[#0c0a1d]">
       <Sidebar budgets={budgetData} activeBudgetId={activeBudget?.id || null} />
       <div className="flex-1">
         <MobileNav budgets={budgetData} activeBudgetId={activeBudget?.id || null} />

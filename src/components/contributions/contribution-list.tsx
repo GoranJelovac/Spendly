@@ -6,6 +6,7 @@ import { deleteContribution, deleteContributions, updateContribution } from "@/a
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 import { ColumnFilter } from "@/components/shared/column-filter";
+import { fmt } from "@/lib/format";
 
 type BudgetLine = {
   id: string;
@@ -69,7 +70,7 @@ export function ContributionList({
         date: new Date(c.date).toLocaleDateString(),
         line: c.budgetLine.name,
         description: c.description || "—",
-        amount: "+" + c.amount.toFixed(2) + " " + c.budgetLine.budget.currency,
+        amount: "+" + fmt(c.amount) + " " + c.budgetLine.budget.currency,
       };
       for (const key of Object.keys(vals) as ColKey[]) {
         if (!sets[key].has(vals[key])) { sets[key].add(vals[key]); cols[key].push(vals[key]); }
@@ -89,7 +90,7 @@ export function ContributionList({
         date: new Date(c.date).toLocaleDateString(),
         line: c.budgetLine.name,
         description: c.description || "—",
-        amount: "+" + c.amount.toFixed(2) + " " + c.budgetLine.budget.currency,
+        amount: "+" + fmt(c.amount) + " " + c.budgetLine.budget.currency,
       };
       for (const [col, sel] of Object.entries(columnFilters)) {
         if (sel.size < columnValues[col as ColKey].length && !sel.has(vals[col as ColKey])) return false;
@@ -215,7 +216,7 @@ export function ContributionList({
           <tbody>
             {filteredContributions.map((c, index) =>
               editingId === c.id ? (
-                <tr key={c.id} className="border-b bg-gray-50 dark:bg-gray-800/50">
+                <tr key={c.id} className="border-b bg-gray-50 dark:bg-[#1a1835]/50">
                   <td colSpan={7} className="py-3 px-1">
                     <form
                       action={(formData) => handleSave(c.id, formData)}
@@ -227,7 +228,7 @@ export function ContributionList({
                           <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           >
                             <option value="">Select...</option>
                             {categories.map((cat) => (
@@ -240,7 +241,7 @@ export function ContributionList({
                           <select
                             name="budgetLineId"
                             defaultValue={c.budgetLineId}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                             required
                             disabled={!selectedCategory}
                           >
@@ -257,7 +258,7 @@ export function ContributionList({
                             type="date"
                             required
                             defaultValue={new Date(c.date).toISOString().split("T")[0]}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                         <div>
@@ -268,7 +269,7 @@ export function ContributionList({
                             step="0.01"
                             required
                             defaultValue={c.amount}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                       </div>
@@ -278,7 +279,7 @@ export function ContributionList({
                           name="description"
                           defaultValue={c.description || ""}
                           placeholder="Optional"
-                          className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                          className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                         />
                       </div>
                       {editError && <p className="text-sm text-red-500">{editError}</p>}
@@ -311,7 +312,7 @@ export function ContributionList({
                     {c.description || "—"}
                   </td>
                   <td className="py-2 text-right text-green-600 font-medium">
-                    +{c.amount.toFixed(2)}{" "}
+                    +{fmt(c.amount)}{" "}
                     {c.budgetLine.budget.currency}
                   </td>
                   <td className="py-2 text-right">

@@ -44,7 +44,7 @@ export function BillingContent({
   return (
     <div className="space-y-6">
       {/* Current plan */}
-      <div className="rounded-lg border bg-white p-6 dark:bg-gray-900">
+      <div className="rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
         <h2 className="text-lg font-semibold">Current Plan</h2>
         <p className="mt-1 text-2xl font-bold capitalize">{tier}</p>
         {status && (
@@ -69,10 +69,10 @@ export function BillingContent({
         {plans.map((plan) => (
           <div
             key={plan.tier}
-            className={`rounded-lg border p-6 ${
+            className={`rounded-2xl border-2 p-6 shadow-md ${
               tier === plan.tier
-                ? "border-black dark:border-white"
-                : "bg-white dark:bg-gray-900"
+                ? "border-[#818cf8] dark:border-[#818cf8] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]"
+                : "border-gray-200 bg-white dark:border-[#252345] dark:bg-[#13112b]"
             }`}
           >
             <h3 className="text-lg font-bold">{plan.name}</h3>

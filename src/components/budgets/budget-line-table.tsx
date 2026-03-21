@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 import { ColumnFilter } from "@/components/shared/column-filter";
 import { getMonthlyAmounts, getYearlyTotal } from "@/lib/budget-utils";
+import { fmt } from "@/lib/format";
 
 const MONTH_SHORT = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -204,8 +205,8 @@ export function BudgetLineTable({
               const yearly = getYearlyTotal(amounts);
               const isCustom = !!line.monthlyAmounts;
               const displayMonthly = isCustom
-                ? `${Math.min(...amounts)}–${Math.max(...amounts)}`
-                : line.monthlyAmount.toFixed(2);
+                ? `${fmt(Math.min(...amounts))}–${fmt(Math.max(...amounts))}`
+                : fmt(line.monthlyAmount);
               const rowNumber = (currentPage - 1) * pageSize + index + 1;
 
               return editingId === line.id ? (
@@ -223,7 +224,7 @@ export function BudgetLineTable({
                             name="name"
                             defaultValue={line.name}
                             required
-                            className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                         <div>
@@ -231,7 +232,7 @@ export function BudgetLineTable({
                           <input
                             name="code"
                             defaultValue={line.code || ""}
-                            className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                         <div>
@@ -239,7 +240,7 @@ export function BudgetLineTable({
                           <select
                             name="categoryId"
                             defaultValue={line.categoryId}
-                            className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           >
                             {categories.map((cat) => (
                               <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -252,7 +253,7 @@ export function BudgetLineTable({
                             onClick={() => setEditMode("fixed")}
                             className={`px-2 py-1 text-xs ${
                               editMode === "fixed"
-                                ? "bg-black text-white dark:bg-white dark:text-black"
+                                ? "bg-black text-white dark:bg-[#818cf8] dark:text-white"
                                 : ""
                             }`}
                           >
@@ -263,7 +264,7 @@ export function BudgetLineTable({
                             onClick={() => setEditMode("custom")}
                             className={`px-2 py-1 text-xs ${
                               editMode === "custom"
-                                ? "bg-black text-white dark:bg-white dark:text-black"
+                                ? "bg-black text-white dark:bg-[#818cf8] dark:text-white"
                                 : ""
                             }`}
                           >
@@ -281,7 +282,7 @@ export function BudgetLineTable({
                             step="0.01"
                             defaultValue={line.monthlyAmount}
                             required
-                            className="w-full rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                            className="w-full rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                           />
                         </div>
                       ) : (
@@ -294,7 +295,7 @@ export function BudgetLineTable({
                                 type="number"
                                 step="0.01"
                                 defaultValue={amounts[i]}
-                                className="w-full rounded-md border px-2 py-1 text-sm dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
                               />
                             </div>
                           ))}
@@ -319,7 +320,7 @@ export function BudgetLineTable({
                   <td className="py-2 text-gray-500 text-xs">{line.category.name}</td>
                   <td className="py-2 text-gray-500 text-xs">{isCustom ? "Custom" : "Fixed"}</td>
                   <td className="py-2 text-right">{displayMonthly}</td>
-                  <td className="py-2 text-right">{yearly.toFixed(2)}</td>
+                  <td className="py-2 text-right">{fmt(yearly)}</td>
                   <td className="py-2 text-right">
                     <div className="flex justify-end gap-1">
                       <Button size="sm" variant="outline" onClick={() => startEdit(line)}>

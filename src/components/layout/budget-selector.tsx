@@ -91,7 +91,7 @@ export function BudgetSelector({
       <select
         value={activeBudgetId || ""}
         onChange={(e) => handleSwitch(e.target.value)}
-        className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm font-medium dark:border-gray-700 dark:bg-gray-800"
+        className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm font-medium dark:border-[#252345] dark:bg-[#1a1835]"
       >
         {budgets.map((b) => (
           <option key={b.id} value={b.id}>
@@ -105,7 +105,7 @@ export function BudgetSelector({
         <button
           title="New budget"
           onClick={() => { setShowCreate(true); setShowEdit(false); setShowDelete(false); }}
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:border-[#252345] dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.1)]"
         >
           ＋
         </button>
@@ -114,7 +114,7 @@ export function BudgetSelector({
             <button
               title="Edit budget"
               onClick={() => { setShowEdit(true); setShowCreate(false); setShowDelete(false); }}
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:border-[#252345] dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.1)]"
             >
               ✎
             </button>
@@ -131,12 +131,12 @@ export function BudgetSelector({
 
       {/* Create form */}
       {showCreate && (
-        <form action={handleCreate} className="space-y-2 rounded-lg border border-gray-200 p-2 dark:border-gray-700">
+        <form action={handleCreate} className="space-y-2 rounded-lg border border-gray-200 p-2 dark:border-[#252345]">
           <input
             name="name"
             required
             placeholder="Budget name"
-            className="w-full rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+            className="w-full rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
           />
           <div className="flex gap-2">
             <input
@@ -144,12 +144,12 @@ export function BudgetSelector({
               type="number"
               required
               defaultValue={new Date().getFullYear()}
-              className="w-20 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+              className="w-20 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
             />
             <select
               name="currency"
               defaultValue="EUR"
-              className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+              className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
             >
               <option value="EUR">EUR</option>
               <option value="USD">USD</option>
@@ -171,12 +171,12 @@ export function BudgetSelector({
 
       {/* Edit form */}
       {showEdit && activeBudget && (
-        <form action={handleEdit} className="space-y-2 rounded-lg border border-gray-200 p-2 dark:border-gray-700">
+        <form action={handleEdit} className="space-y-2 rounded-lg border border-gray-200 p-2 dark:border-[#252345]">
           <input
             name="name"
             required
             defaultValue={activeBudget.name}
-            className="w-full rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+            className="w-full rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
           />
           <div className="flex gap-2">
             <input
@@ -184,12 +184,12 @@ export function BudgetSelector({
               type="number"
               required
               defaultValue={activeBudget.year}
-              className="w-20 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+              className="w-20 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
             />
             <select
               name="currency"
               defaultValue={activeBudget.currency}
-              className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+              className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
             >
               <option value="EUR">EUR</option>
               <option value="USD">USD</option>
@@ -222,7 +222,7 @@ export function BudgetSelector({
             value={deleteConfirm}
             onChange={(e) => setDeleteConfirm(e.target.value)}
             placeholder={activeBudget.name}
-            className="w-full rounded-lg border border-red-200 px-2 py-1 text-sm dark:border-red-800 dark:bg-gray-800"
+            className="w-full rounded-lg border border-red-200 px-2 py-1 text-sm dark:border-red-800 dark:bg-[#1a1835]"
           />
           {error && <p className="text-xs text-red-500">{error}</p>}
           <div className="flex gap-1">
