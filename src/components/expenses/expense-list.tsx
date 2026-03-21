@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { deleteExpense, deleteExpenses, updateExpense } from "@/actions/expense";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
+import { ColumnFilter } from "@/components/shared/column-filter";
 
 type BudgetLine = {
   id: string;
@@ -49,6 +50,7 @@ export function ExpenseList({
   const [saving, setSaving] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [columnFilters, setColumnFilters] = useState<Record<string, Set<string>>>({});
 
   const categories = Array.from(
     new Map(lines.map((l) => [l.categoryId, l.categoryName])).entries()
@@ -58,7 +60,45 @@ export function ExpenseList({
     ? lines.filter((l) => l.categoryId === selectedCategory)
     : [];
 
-  const allSelected = expenses.length > 0 && selected.size === expenses.length;
+  type ColKey = "date" | "line" | "description" | "amount";
+  const columnValues = useMemo(() => {
+    const cols: Record<ColKey, string[]> = { date: [], line: [], description: [], amount: [] };
+    const sets: Record<ColKey, Set<string>> = { date: new Set(), line: new Set(), description: new Set(), amount: new Set() };
+    for (const e of expenses) {
+      const vals: Record<ColKey, string> = {
+        date: new Date(e.date).toLocaleDateString(),
+        line: e.budgetLine.name,
+        description: e.description || "—",
+        amount: e.amount.toFixed(2) + " " + e.budgetLine.budget.currency,
+      };
+      for (const key of Object.keys(vals) as ColKey[]) {
+        if (!sets[key].has(vals[key])) { sets[key].add(vals[key]); cols[key].push(vals[key]); }
+      }
+    }
+    return cols;
+  }, [expenses]);
+
+  function getSelectedForCol(col: ColKey): Set<string> {
+    return columnFilters[col] || new Set(columnValues[col]);
+  }
+
+  const filteredExpenses = useMemo(() => {
+    if (Object.keys(columnFilters).length === 0) return expenses;
+    return expenses.filter((e) => {
+      const vals: Record<ColKey, string> = {
+        date: new Date(e.date).toLocaleDateString(),
+        line: e.budgetLine.name,
+        description: e.description || "—",
+        amount: e.amount.toFixed(2) + " " + e.budgetLine.budget.currency,
+      };
+      for (const [col, sel] of Object.entries(columnFilters)) {
+        if (sel.size < columnValues[col as ColKey].length && !sel.has(vals[col as ColKey])) return false;
+      }
+      return true;
+    });
+  }, [expenses, columnFilters, columnValues]);
+
+  const allSelected = filteredExpenses.length > 0 && selected.size === filteredExpenses.length;
 
   function goToPage(page: number) {
     router.push(`/expenses?page=${page}`);
@@ -68,7 +108,7 @@ export function ExpenseList({
     if (allSelected) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(expenses.map((e) => e.id)));
+      setSelected(new Set(filteredExpenses.map((e) => e.id)));
     }
   }
 
@@ -140,15 +180,27 @@ export function ExpenseList({
           </Button>
         </div>
       )}
-      <div className="overflow-x-auto">
+      <div className="min-h-[20rem] overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="border-b text-gray-500">
             <tr>
               <th className="pb-2 w-12 font-medium">#</th>
-              <th className="pb-2 font-medium">Date</th>
-              <th className="pb-2 font-medium">Line</th>
-              <th className="pb-2 font-medium">Description</th>
-              <th className="pb-2 text-right font-medium">Amount</th>
+              <th className="pb-2 font-medium">
+                Date
+                <ColumnFilter values={columnValues.date} selected={getSelectedForCol("date")} onChange={(s) => setColumnFilters((p) => ({ ...p, date: s }))} />
+              </th>
+              <th className="pb-2 font-medium">
+                Line
+                <ColumnFilter values={columnValues.line} selected={getSelectedForCol("line")} onChange={(s) => setColumnFilters((p) => ({ ...p, line: s }))} />
+              </th>
+              <th className="pb-2 font-medium">
+                Description
+                <ColumnFilter values={columnValues.description} selected={getSelectedForCol("description")} onChange={(s) => setColumnFilters((p) => ({ ...p, description: s }))} />
+              </th>
+              <th className="pb-2 text-right font-medium">
+                Amount
+                <ColumnFilter values={columnValues.amount} selected={getSelectedForCol("amount")} onChange={(s) => setColumnFilters((p) => ({ ...p, amount: s }))} />
+              </th>
               <th className="pb-2 text-right font-medium"></th>
               <th className="pb-2 w-8 text-right">
                 <input
@@ -161,7 +213,7 @@ export function ExpenseList({
             </tr>
           </thead>
           <tbody>
-            {expenses.map((expense, index) =>
+            {filteredExpenses.map((expense, index) =>
               editingId === expense.id ? (
                 <tr key={expense.id} className="border-b bg-gray-50 dark:bg-gray-800/50">
                   <td colSpan={7} className="py-3 px-1">

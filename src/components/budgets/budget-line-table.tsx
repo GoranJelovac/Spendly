@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { deleteBudgetLine, deleteBudgetLines, updateBudgetLine } from "@/actions/budget-line";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
+import { ColumnFilter } from "@/components/shared/column-filter";
 import { getMonthlyAmounts, getYearlyTotal } from "@/lib/budget-utils";
 
 const MONTH_SHORT = [
@@ -46,8 +47,47 @@ export function BudgetLineTable({
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [columnFilters, setColumnFilters] = useState<Record<string, Set<string>>>({});
 
-  const allSelected = lines.length > 0 && selected.size === lines.length;
+  type ColKey = "name" | "code" | "category" | "type";
+  const columnValues = useMemo(() => {
+    const cols: Record<ColKey, string[]> = { name: [], code: [], category: [], type: [] };
+    const sets: Record<ColKey, Set<string>> = { name: new Set(), code: new Set(), category: new Set(), type: new Set() };
+    for (const line of lines) {
+      const vals: Record<ColKey, string> = {
+        name: line.name,
+        code: line.code || "—",
+        category: line.category.name,
+        type: line.monthlyAmounts ? "Custom" : "Fixed",
+      };
+      for (const key of Object.keys(vals) as ColKey[]) {
+        if (!sets[key].has(vals[key])) { sets[key].add(vals[key]); cols[key].push(vals[key]); }
+      }
+    }
+    return cols;
+  }, [lines]);
+
+  function getSelectedForCol(col: ColKey): Set<string> {
+    return columnFilters[col] || new Set(columnValues[col]);
+  }
+
+  const filteredLines = useMemo(() => {
+    if (Object.keys(columnFilters).length === 0) return lines;
+    return lines.filter((line) => {
+      const vals: Record<ColKey, string> = {
+        name: line.name,
+        code: line.code || "—",
+        category: line.category.name,
+        type: line.monthlyAmounts ? "Custom" : "Fixed",
+      };
+      for (const [col, selected] of Object.entries(columnFilters)) {
+        if (selected.size < columnValues[col as ColKey].length && !selected.has(vals[col as ColKey])) return false;
+      }
+      return true;
+    });
+  }, [lines, columnFilters, columnValues]);
+
+  const allSelected = filteredLines.length > 0 && selected.size === filteredLines.length;
 
   function goToPage(page: number) {
     router.push(`/budgets?page=${page}`);
@@ -57,7 +97,7 @@ export function BudgetLineTable({
     if (allSelected) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(lines.map((l) => l.id)));
+      setSelected(new Set(filteredLines.map((l) => l.id)));
     }
   }
 
@@ -124,15 +164,27 @@ export function BudgetLineTable({
           </Button>
         </div>
       )}
-      <div className="overflow-x-auto">
+      <div className="min-h-[20rem] overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="border-b text-gray-500">
             <tr>
               <th className="pb-2 w-12 font-medium">#</th>
-              <th className="pb-2 font-medium">Name</th>
-              <th className="pb-2 font-medium">Code</th>
-              <th className="pb-2 font-medium">Category</th>
-              <th className="pb-2 font-medium">Type</th>
+              <th className="pb-2 font-medium">
+                Name
+                <ColumnFilter values={columnValues.name} selected={getSelectedForCol("name")} onChange={(s) => setColumnFilters((p) => ({ ...p, name: s }))} />
+              </th>
+              <th className="pb-2 font-medium">
+                Code
+                <ColumnFilter values={columnValues.code} selected={getSelectedForCol("code")} onChange={(s) => setColumnFilters((p) => ({ ...p, code: s }))} />
+              </th>
+              <th className="pb-2 font-medium">
+                Category
+                <ColumnFilter values={columnValues.category} selected={getSelectedForCol("category")} onChange={(s) => setColumnFilters((p) => ({ ...p, category: s }))} />
+              </th>
+              <th className="pb-2 font-medium">
+                Type
+                <ColumnFilter values={columnValues.type} selected={getSelectedForCol("type")} onChange={(s) => setColumnFilters((p) => ({ ...p, type: s }))} />
+              </th>
               <th className="pb-2 text-right font-medium">Monthly ({currency})</th>
               <th className="pb-2 text-right font-medium">Yearly ({currency})</th>
               <th className="pb-2 text-right font-medium">Actions</th>
@@ -147,7 +199,7 @@ export function BudgetLineTable({
             </tr>
           </thead>
           <tbody>
-            {lines.map((line, index) => {
+            {filteredLines.map((line, index) => {
               const amounts = getMonthlyAmounts(line);
               const yearly = getYearlyTotal(amounts);
               const isCustom = !!line.monthlyAmounts;

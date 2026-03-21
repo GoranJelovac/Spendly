@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createCategory, deleteCategory, deleteCategories, renameCategory } from "@/actions/category";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
+import { ColumnFilter } from "@/components/shared/column-filter";
 
 type CategoryItem = {
   id: string;
@@ -30,9 +31,39 @@ export function CategoryList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [columnFilters, setColumnFilters] = useState<Record<string, Set<string>>>({});
+
+  // Column filter logic
+  const columnValues = useMemo(() => {
+    const names: string[] = [];
+    const lines: string[] = [];
+    const nameSet = new Set<string>();
+    const lineSet = new Set<string>();
+    for (const cat of categories) {
+      if (!nameSet.has(cat.name)) { nameSet.add(cat.name); names.push(cat.name); }
+      const lv = String(cat._count.lines);
+      if (!lineSet.has(lv)) { lineSet.add(lv); lines.push(lv); }
+    }
+    return { name: names, lines };
+  }, [categories]);
+
+  function getSelectedForCol(col: "name" | "lines"): Set<string> {
+    return columnFilters[col] || new Set(columnValues[col]);
+  }
+
+  const filteredCategories = useMemo(() => {
+    if (Object.keys(columnFilters).length === 0) return categories;
+    return categories.filter((cat) => {
+      const nameSelected = columnFilters.name;
+      if (nameSelected && nameSelected.size < columnValues.name.length && !nameSelected.has(cat.name)) return false;
+      const linesSelected = columnFilters.lines;
+      if (linesSelected && linesSelected.size < columnValues.lines.length && !linesSelected.has(String(cat._count.lines))) return false;
+      return true;
+    });
+  }, [categories, columnFilters, columnValues]);
 
   // Only non-General categories are selectable
-  const selectableCategories = categories.filter((c) => c.name !== "General");
+  const selectableCategories = filteredCategories.filter((c) => c.name !== "General");
   const allSelected = selectableCategories.length > 0 && selected.size === selectableCategories.length;
 
   function goToPage(page: number) {
@@ -126,13 +157,27 @@ export function CategoryList({
       )}
 
       {/* Category list */}
-      <div className="rounded-xl bg-white shadow-sm dark:bg-gray-900">
+      <div className="min-h-[20rem] rounded-xl bg-white shadow-sm dark:bg-gray-900">
         <table className="w-full text-left text-sm">
           <thead className="text-xs uppercase tracking-wider text-gray-500">
             <tr className="border-b border-gray-100 dark:border-gray-800">
               <th className="p-4 w-12 font-medium">#</th>
-              <th className="p-4 font-medium">Name</th>
-              <th className="p-4 text-right font-medium">Lines</th>
+              <th className="p-4 font-medium">
+                Name
+                <ColumnFilter
+                  values={columnValues.name}
+                  selected={getSelectedForCol("name")}
+                  onChange={(s) => setColumnFilters((p) => ({ ...p, name: s }))}
+                />
+              </th>
+              <th className="p-4 text-right font-medium">
+                Lines
+                <ColumnFilter
+                  values={columnValues.lines}
+                  selected={getSelectedForCol("lines")}
+                  onChange={(s) => setColumnFilters((p) => ({ ...p, lines: s }))}
+                />
+              </th>
               <th className="p-4 text-right font-medium">Actions</th>
               <th className="p-4 w-8 text-right">
                 <input
@@ -146,7 +191,7 @@ export function CategoryList({
             </tr>
           </thead>
           <tbody>
-            {categories.map((cat, index) => (
+            {filteredCategories.map((cat, index) => (
               <tr key={cat.id} className="border-b border-gray-50 last:border-0 dark:border-gray-800/50">
                 <td className="p-4 text-gray-400">
                   {(currentPage - 1) * pageSize + index + 1}

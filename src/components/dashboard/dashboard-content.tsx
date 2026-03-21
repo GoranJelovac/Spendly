@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { getDashboardData, type DashboardData } from "@/actions/dashboard";
 import { PlannedVsSpentChart, BudgetBreakdownChart, SpendingOverviewChart } from "@/components/dashboard/charts";
+import { ColumnFilter } from "@/components/shared/column-filter";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -135,6 +136,92 @@ export function DashboardContent({
     data.lines.forEach((l) => map.set(l.categoryId, l.categoryName));
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [data]);
+
+  // Column filters for Details table
+  type ColKey = "name" | "categoryName" | "planned" | "contributed" | "available" | "spent" | "remaining" | "percentage";
+  const [columnFilters, setColumnFilters] = useState<Record<string, Set<string>>>({});
+
+  // Reset column filters when data/view changes
+  useEffect(() => {
+    setColumnFilters({});
+  }, [data, viewMode, categoryFilter]);
+
+  // Get unique values for each column from displayItems
+  const columnValues = useMemo(() => {
+    const cols: Record<ColKey, string[]> = {
+      name: [],
+      categoryName: [],
+      planned: [],
+      contributed: [],
+      available: [],
+      spent: [],
+      remaining: [],
+      percentage: [],
+    };
+    const sets: Record<ColKey, Set<string>> = {
+      name: new Set(),
+      categoryName: new Set(),
+      planned: new Set(),
+      contributed: new Set(),
+      available: new Set(),
+      spent: new Set(),
+      remaining: new Set(),
+      percentage: new Set(),
+    };
+
+    for (const item of displayItems) {
+      const vals: Record<ColKey, string> = {
+        name: item.name,
+        categoryName: "categoryName" in item ? String(item.categoryName) : "",
+        planned: item.planned.toFixed(2),
+        contributed: item.contributed > 0 ? item.contributed.toFixed(2) : "—",
+        available: item.available.toFixed(2),
+        spent: item.spent.toFixed(2),
+        remaining: item.remaining.toFixed(2),
+        percentage: item.percentage.toFixed(0) + "%",
+      };
+      for (const key of Object.keys(vals) as ColKey[]) {
+        if (!sets[key].has(vals[key])) {
+          sets[key].add(vals[key]);
+          cols[key].push(vals[key]);
+        }
+      }
+    }
+    return cols;
+  }, [displayItems]);
+
+  function setColumnFilter(col: string, selected: Set<string>) {
+    setColumnFilters((prev) => ({ ...prev, [col]: selected }));
+  }
+
+  function getSelectedForCol(col: ColKey): Set<string> {
+    return columnFilters[col] || new Set(columnValues[col]);
+  }
+
+  // Apply column filters to displayItems
+  const detailsItems = useMemo(() => {
+    if (Object.keys(columnFilters).length === 0) return displayItems;
+
+    return displayItems.filter((item) => {
+      const vals: Record<ColKey, string> = {
+        name: item.name,
+        categoryName: "categoryName" in item ? String(item.categoryName) : "",
+        planned: item.planned.toFixed(2),
+        contributed: item.contributed > 0 ? item.contributed.toFixed(2) : "—",
+        available: item.available.toFixed(2),
+        spent: item.spent.toFixed(2),
+        remaining: item.remaining.toFixed(2),
+        percentage: item.percentage.toFixed(0) + "%",
+      };
+
+      for (const [col, selected] of Object.entries(columnFilters)) {
+        if (selected.size < columnValues[col as ColKey].length) {
+          if (!selected.has(vals[col as ColKey])) return false;
+        }
+      }
+      return true;
+    });
+  }, [displayItems, columnFilters, columnValues]);
 
   return (
     <div className="space-y-4">
@@ -311,26 +398,80 @@ export function DashboardContent({
 
           {/* Details */}
           <CollapsibleSection title="Details">
-            <div className="overflow-x-auto">
+            <div className="min-h-[20rem] overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="text-xs uppercase tracking-wider text-gray-500">
                   <tr className="border-b border-gray-100 dark:border-gray-800">
                     <th className="pb-3 font-medium">
                       {viewMode === "categories" && categoryFilter === "all" ? "Category" : "Line"}
+                      <ColumnFilter
+                        values={columnValues.name}
+                        selected={getSelectedForCol("name")}
+                        onChange={(s) => setColumnFilter("name", s)}
+                      />
                     </th>
                     {viewMode === "lines" && (
-                      <th className="pb-3 font-medium">Category</th>
+                      <th className="pb-3 font-medium">
+                        Category
+                        <ColumnFilter
+                          values={columnValues.categoryName}
+                          selected={getSelectedForCol("categoryName")}
+                          onChange={(s) => setColumnFilter("categoryName", s)}
+                        />
+                      </th>
                     )}
-                    <th className="pb-3 text-right font-medium">Planned</th>
-                    <th className="pb-3 text-right font-medium">Contrib.</th>
-                    <th className="pb-3 text-right font-medium">Available</th>
-                    <th className="pb-3 text-right font-medium">Spent</th>
-                    <th className="pb-3 text-right font-medium">Remaining</th>
-                    <th className="pb-3 font-medium">Progress</th>
+                    <th className="pb-3 text-right font-medium">
+                      Planned
+                      <ColumnFilter
+                        values={columnValues.planned}
+                        selected={getSelectedForCol("planned")}
+                        onChange={(s) => setColumnFilter("planned", s)}
+                      />
+                    </th>
+                    <th className="pb-3 text-right font-medium">
+                      Contrib.
+                      <ColumnFilter
+                        values={columnValues.contributed}
+                        selected={getSelectedForCol("contributed")}
+                        onChange={(s) => setColumnFilter("contributed", s)}
+                      />
+                    </th>
+                    <th className="pb-3 text-right font-medium">
+                      Available
+                      <ColumnFilter
+                        values={columnValues.available}
+                        selected={getSelectedForCol("available")}
+                        onChange={(s) => setColumnFilter("available", s)}
+                      />
+                    </th>
+                    <th className="pb-3 text-right font-medium">
+                      Spent
+                      <ColumnFilter
+                        values={columnValues.spent}
+                        selected={getSelectedForCol("spent")}
+                        onChange={(s) => setColumnFilter("spent", s)}
+                      />
+                    </th>
+                    <th className="pb-3 pr-4 text-right font-medium">
+                      Remaining
+                      <ColumnFilter
+                        values={columnValues.remaining}
+                        selected={getSelectedForCol("remaining")}
+                        onChange={(s) => setColumnFilter("remaining", s)}
+                      />
+                    </th>
+                    <th className="pb-3 pl-4 font-medium">
+                      Progress
+                      <ColumnFilter
+                        values={columnValues.percentage}
+                        selected={getSelectedForCol("percentage")}
+                        onChange={(s) => setColumnFilter("percentage", s)}
+                      />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {displayItems.map((item) => (
+                  {detailsItems.map((item) => (
                     <tr key={item.id} className="border-b border-gray-50 last:border-0 dark:border-gray-800/50">
                       <td className="py-2.5 font-medium">{item.name}</td>
                       {viewMode === "lines" && (
@@ -341,17 +482,17 @@ export function DashboardContent({
                         </td>
                       )}
                       <td className="py-2.5 text-right tabular-nums">{item.planned.toFixed(2)}</td>
-                      <td className="py-2.5 text-right tabular-nums ">{item.contributed > 0 ? item.contributed.toFixed(2) : "—"}</td>
+                      <td className="py-2.5 text-right tabular-nums">{item.contributed > 0 ? item.contributed.toFixed(2) : "—"}</td>
                       <td className="py-2.5 text-right tabular-nums font-medium">{item.available.toFixed(2)}</td>
                       <td className="py-2.5 text-right tabular-nums">{item.spent.toFixed(2)}</td>
                       <td
-                        className={`py-2.5 text-right tabular-nums font-medium ${
+                        className={`py-2.5 pr-4 text-right tabular-nums font-medium ${
                           item.remaining < 0 ? "text-red-500" : "text-green-600"
                         }`}
                       >
                         {item.remaining.toFixed(2)}
                       </td>
-                      <td className="py-2.5">
+                      <td className="py-2.5 pl-4">
                         <div className="flex items-center gap-2">
                           <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800">
                             <div
@@ -374,6 +515,13 @@ export function DashboardContent({
                       </td>
                     </tr>
                   ))}
+                  {detailsItems.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="py-4 text-center text-gray-400">
+                        No items match the current filters.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
