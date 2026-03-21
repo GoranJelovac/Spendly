@@ -143,26 +143,10 @@ export function BudgetSelector({
       >
         {budgets.map((b) => (
           <option key={b.id} value={b.id}>
-            {b.name} ({b.year})
+            {b.name} ({b.currency})
           </option>
         ))}
       </select>
-
-      {/* Prominent display */}
-      {activeBudget && !showCreate && !showEdit && (
-        <div>
-          <p className="text-base font-bold tracking-tight">{activeBudget.name}</p>
-          <div className="mt-0.5 flex items-center gap-1.5">
-            <span className="text-[11px] text-gray-500 dark:text-[#6b6b8a]">
-              {activeBudget.year}
-            </span>
-            <span className="inline-block h-[3px] w-[3px] rounded-full bg-gray-400 opacity-50 dark:bg-[#6b6b8a]" />
-            <span className="rounded-md bg-indigo-50 px-1.5 py-[1px] text-[10px] font-bold text-indigo-500 dark:bg-[rgba(129,140,248,0.15)] dark:text-[#818cf8]">
-              {activeBudget.currency}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Spread action buttons */}
       {!showCreate && !showEdit && (
