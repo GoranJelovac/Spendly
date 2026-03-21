@@ -14,11 +14,7 @@ import {
 
 const PAGE_SIZE = 20;
 
-export default async function ContributionsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
+export default async function ContributionsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
@@ -37,15 +33,10 @@ export default async function ContributionsPage({
     );
   }
 
-  const params = await searchParams;
-  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
-
-  const [{ items: contributions, total }, budget] = await Promise.all([
-    getContributionsPaginated({ budgetId: activeBudget.id }, page, PAGE_SIZE),
+  const [{ items: contributions }, budget] = await Promise.all([
+    getContributionsPaginated({ budgetId: activeBudget.id }, 1, 10000),
     getBudget(activeBudget.id),
   ]);
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const lines = (budget?.lines || []).map((l) => ({
     id: l.id,
@@ -56,10 +47,7 @@ export default async function ContributionsPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
-      <h1 className="mb-1 text-center text-2xl font-bold">Contributions</h1>
-      <p className="mb-6 text-center text-sm text-gray-500">
-        {activeBudget.name} &middot; {activeBudget.year} &middot; {activeBudget.currency}
-      </p>
+      <h1 className="mb-6 text-center text-2xl font-bold">Contributions</h1>
       <ImportExportTransactions
         budgetId={activeBudget.id}
         label="Contributions"
@@ -71,8 +59,6 @@ export default async function ContributionsPage({
       <ContributionList
         contributions={contributions}
         lines={lines}
-        currentPage={page}
-        totalPages={totalPages}
         pageSize={PAGE_SIZE}
       />
     </div>

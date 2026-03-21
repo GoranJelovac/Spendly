@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { setActiveBudget } from "@/actions/active-budget";
 import { createBudget, deleteBudget, updateBudget } from "@/actions/budget";
-import { Button } from "@/components/ui/button";
+import { CURRENCIES } from "@/lib/constants";
 
 type Budget = {
   id: string;
@@ -11,6 +11,9 @@ type Budget = {
   year: number;
   currency: string;
 };
+
+const INPUT_CLS =
+  "w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm dark:border-[#252345] dark:bg-[#13112b]";
 
 export function BudgetSelector({
   budgets,
@@ -27,6 +30,14 @@ export function BudgetSelector({
   const [loading, setLoading] = useState(false);
 
   const activeBudget = budgets.find((b) => b.id === activeBudgetId);
+
+  function closeAll() {
+    setShowCreate(false);
+    setShowEdit(false);
+    setShowDelete(false);
+    setDeleteConfirm("");
+    setError("");
+  }
 
   async function handleSwitch(budgetId: string) {
     await setActiveBudget(budgetId);
@@ -71,27 +82,64 @@ export function BudgetSelector({
     setLoading(false);
   }
 
+  // Empty state
   if (budgets.length === 0 && !showCreate) {
     return (
       <div className="px-3">
-        <Button
-          size="sm"
-          className="w-full"
+        <button
           onClick={() => setShowCreate(true)}
+          className="flex w-full items-center justify-center gap-1 rounded-lg bg-[#818cf8] px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#6366f1]"
         >
           + New Budget
-        </Button>
+        </button>
+      </div>
+    );
+  }
+
+  // Delete replace — takes over entire card
+  if (showDelete && activeBudget) {
+    return (
+      <div className="space-y-2 px-3">
+        <div className="py-2 text-center">
+          <p className="text-lg">⚠</p>
+          <p className="mt-1 text-xs font-medium text-red-500">
+            Permanently delete &ldquo;{activeBudget.name}&rdquo; and all its data?
+          </p>
+          <p className="mt-2 text-[10px] text-red-400">
+            Type &ldquo;<span className="font-bold">{activeBudget.name}</span>&rdquo; to confirm:
+          </p>
+          <input
+            value={deleteConfirm}
+            onChange={(e) => setDeleteConfirm(e.target.value)}
+            placeholder={activeBudget.name}
+            className="mt-1.5 w-full rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-center text-sm dark:border-red-800 dark:bg-[#13112b]"
+          />
+          {error && <p className="mt-1 text-[10px] text-red-500">{error}</p>}
+          <button
+            onClick={handleDelete}
+            disabled={loading || deleteConfirm !== activeBudget.name}
+            className="mt-2 w-full rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-50"
+          >
+            {loading ? "..." : "Delete"}
+          </button>
+          <button
+            onClick={closeAll}
+            className="mt-1 w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-[#6b6b8a] dark:hover:text-[#e0e0f0]"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-2 px-3">
-      {/* Budget dropdown */}
+      {/* Dropdown */}
       <select
         value={activeBudgetId || ""}
         onChange={(e) => handleSwitch(e.target.value)}
-        className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm font-medium dark:border-[#252345] dark:bg-[#1a1835]"
+        className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-semibold dark:border-[#252345] dark:bg-[#13112b]"
       >
         {budgets.map((b) => (
           <option key={b.id} value={b.id}>
@@ -100,145 +148,134 @@ export function BudgetSelector({
         ))}
       </select>
 
-      {/* Action buttons */}
-      <div className="flex items-center gap-1.5">
-        <button
-          title="New budget"
-          onClick={() => { setShowCreate(true); setShowEdit(false); setShowDelete(false); }}
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:border-[#252345] dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.1)]"
-        >
-          ＋
-        </button>
-        {activeBudget && (
-          <>
-            <button
-              title="Edit budget"
-              onClick={() => { setShowEdit(true); setShowCreate(false); setShowDelete(false); }}
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:border-[#252345] dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.1)]"
-            >
-              ✎
-            </button>
-            <button
-              title="Delete budget"
-              onClick={() => { setShowDelete(true); setShowCreate(false); setShowEdit(false); setDeleteConfirm(""); setError(""); }}
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-red-200 text-sm text-red-500 transition-colors hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/30"
-            >
-              ✕
-            </button>
-          </>
-        )}
-      </div>
+      {/* Prominent display */}
+      {activeBudget && !showCreate && !showEdit && (
+        <div>
+          <p className="text-base font-bold tracking-tight">{activeBudget.name}</p>
+          <div className="mt-0.5 flex items-center gap-1.5">
+            <span className="text-[11px] text-gray-500 dark:text-[#6b6b8a]">
+              {activeBudget.year}
+            </span>
+            <span className="inline-block h-[3px] w-[3px] rounded-full bg-gray-400 opacity-50 dark:bg-[#6b6b8a]" />
+            <span className="rounded-md bg-indigo-50 px-1.5 py-[1px] text-[10px] font-bold text-indigo-500 dark:bg-[rgba(129,140,248,0.15)] dark:text-[#818cf8]">
+              {activeBudget.currency}
+            </span>
+          </div>
+        </div>
+      )}
 
-      {/* Create form */}
+      {/* Spread action buttons */}
+      {!showCreate && !showEdit && (
+        <div className="flex gap-1">
+          <button
+            onClick={() => { closeAll(); setShowCreate(true); }}
+            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8] dark:hover:bg-[rgba(129,140,248,0.2)]"
+          >
+            New
+          </button>
+          {activeBudget && (
+            <>
+              <button
+                onClick={() => { closeAll(); setShowEdit(true); }}
+                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8] dark:hover:bg-[rgba(129,140,248,0.2)]"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => { closeAll(); setShowDelete(true); }}
+                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-red-50 px-2 py-1.5 text-[11px] font-semibold text-red-500 transition-colors hover:bg-red-100 dark:bg-[rgba(239,68,68,0.08)] dark:text-red-400 dark:hover:bg-[rgba(239,68,68,0.15)]"
+              >
+                Del
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Create form — stacked, full-width buttons, no separator */}
       {showCreate && (
-        <form action={handleCreate} className="space-y-2 rounded-lg border border-gray-200 p-2 dark:border-[#252345]">
+        <form action={handleCreate} className="space-y-1.5">
           <input
             name="name"
             required
             placeholder="Budget name"
-            className="w-full rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+            className={INPUT_CLS}
           />
-          <div className="flex gap-2">
-            <input
-              name="year"
-              type="number"
-              required
-              defaultValue={new Date().getFullYear()}
-              className="w-20 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
-            />
-            <select
-              name="currency"
-              defaultValue="EUR"
-              className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
-            >
-              <option value="EUR">EUR</option>
-              <option value="USD">USD</option>
-              <option value="GBP">GBP</option>
-              <option value="RSD">RSD</option>
-            </select>
-          </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
-          <div className="flex gap-1">
-            <Button size="xs" type="submit" disabled={loading}>
-              {loading ? "..." : "Create"}
-            </Button>
-            <Button size="xs" variant="outline" type="button" onClick={() => setShowCreate(false)}>
-              Cancel
-            </Button>
-          </div>
+          <input
+            name="year"
+            type="number"
+            required
+            defaultValue={new Date().getFullYear()}
+            className={INPUT_CLS}
+          />
+          <select
+            name="currency"
+            defaultValue="EUR"
+            className={INPUT_CLS}
+          >
+            {CURRENCIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          {error && <p className="text-[10px] text-red-500">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-[#818cf8] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#6366f1] disabled:opacity-50"
+          >
+            {loading ? "..." : "Create"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCreate(false)}
+            className="w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-[#6b6b8a] dark:hover:text-[#e0e0f0]"
+          >
+            Cancel
+          </button>
         </form>
       )}
 
-      {/* Edit form */}
+      {/* Edit form — stacked, full-width buttons, no separator */}
       {showEdit && activeBudget && (
-        <form action={handleEdit} className="space-y-2 rounded-lg border border-gray-200 p-2 dark:border-[#252345]">
+        <form action={handleEdit} className="space-y-1.5">
           <input
             name="name"
             required
             defaultValue={activeBudget.name}
-            className="w-full rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+            className={INPUT_CLS}
           />
-          <div className="flex gap-2">
-            <input
-              name="year"
-              type="number"
-              required
-              defaultValue={activeBudget.year}
-              className="w-20 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
-            />
-            <select
-              name="currency"
-              defaultValue={activeBudget.currency}
-              className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
-            >
-              <option value="EUR">EUR</option>
-              <option value="USD">USD</option>
-              <option value="GBP">GBP</option>
-              <option value="RSD">RSD</option>
-            </select>
-          </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
-          <div className="flex gap-1">
-            <Button size="xs" type="submit" disabled={loading}>
-              {loading ? "..." : "Save"}
-            </Button>
-            <Button size="xs" variant="outline" type="button" onClick={() => setShowEdit(false)}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      )}
-
-      {/* Delete confirmation */}
-      {showDelete && activeBudget && (
-        <div className="space-y-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30">
-          <p className="text-xs font-medium text-red-700 dark:text-red-400">
-            This will permanently delete this budget, all its lines and expenses.
-          </p>
-          <p className="text-xs text-red-600 dark:text-red-400">
-            Type &ldquo;<span className="font-bold">{activeBudget.name}</span>&rdquo; to confirm:
-          </p>
           <input
-            value={deleteConfirm}
-            onChange={(e) => setDeleteConfirm(e.target.value)}
-            placeholder={activeBudget.name}
-            className="w-full rounded-lg border border-red-200 px-2 py-1 text-sm dark:border-red-800 dark:bg-[#1a1835]"
+            name="year"
+            type="number"
+            required
+            defaultValue={activeBudget.year}
+            className={INPUT_CLS}
           />
-          {error && <p className="text-xs text-red-500">{error}</p>}
-          <div className="flex gap-1">
-            <Button
-              size="xs"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={loading || deleteConfirm !== activeBudget.name}
-            >
-              {loading ? "..." : "Delete"}
-            </Button>
-            <Button size="xs" variant="outline" onClick={() => { setShowDelete(false); setDeleteConfirm(""); setError(""); }}>
-              Cancel
-            </Button>
-          </div>
-        </div>
+          <select
+            name="currency"
+            defaultValue={activeBudget.currency}
+            className={INPUT_CLS}
+          >
+            {CURRENCIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          {error && <p className="text-[10px] text-red-500">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-[#818cf8] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#6366f1] disabled:opacity-50"
+          >
+            {loading ? "..." : "Save"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowEdit(false)}
+            className="w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-[#6b6b8a] dark:hover:text-[#e0e0f0]"
+          >
+            Cancel
+          </button>
+        </form>
       )}
     </div>
   );

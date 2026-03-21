@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createBudget } from "@/actions/budget";
+import { CURRENCIES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 
 export function CreateBudgetForm() {
@@ -69,10 +70,9 @@ export function CreateBudgetForm() {
               defaultValue="EUR"
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
             >
-              <option value="EUR">EUR</option>
-              <option value="USD">USD</option>
-              <option value="GBP">GBP</option>
-              <option value="RSD">RSD</option>
+              {CURRENCIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
           </div>
         </div>

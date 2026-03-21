@@ -161,8 +161,8 @@ export function CategoryList({
         <table className="w-full text-left text-sm">
           <thead className="text-xs uppercase tracking-wider text-gray-500">
             <tr className="border-b border-gray-100 dark:border-[#252345]">
-              <th className="p-4 w-12 font-medium">#</th>
-              <th className="p-4 font-medium">
+              <th className="px-4 py-2 w-12 font-medium">#</th>
+              <th className="px-4 py-2 font-medium">
                 Name
                 <ColumnFilter
                   values={columnValues.name}
@@ -170,7 +170,7 @@ export function CategoryList({
                   onChange={(s) => setColumnFilters((p) => ({ ...p, name: s }))}
                 />
               </th>
-              <th className="p-4 text-right font-medium">
+              <th className="px-4 py-2 text-right font-medium">
                 Lines
                 <ColumnFilter
                   values={columnValues.lines}
@@ -178,8 +178,8 @@ export function CategoryList({
                   onChange={(s) => setColumnFilters((p) => ({ ...p, lines: s }))}
                 />
               </th>
-              <th className="p-4 text-right font-medium">Actions</th>
-              <th className="p-4 w-8 text-right">
+              <th className="px-4 py-2 text-right font-medium">Actions</th>
+              <th className="px-4 py-2 w-8 text-right">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -193,10 +193,10 @@ export function CategoryList({
           <tbody>
             {filteredCategories.map((cat, index) => (
               <tr key={cat.id} className="border-b border-gray-50 last:border-0 dark:border-[#252345]/50">
-                <td className="p-4 text-gray-400">
+                <td className="px-4 py-2 text-gray-400">
                   {(currentPage - 1) * pageSize + index + 1}
                 </td>
-                <td className="p-4">
+                <td className="px-4 py-2">
                   {editingId === cat.id ? (
                     <form
                       action={(fd) => handleRename(cat.id, fd)}
@@ -222,12 +222,12 @@ export function CategoryList({
                     <span className="font-medium">{cat.name}</span>
                   )}
                 </td>
-                <td className="p-4 text-right">
+                <td className="px-4 py-2 text-right">
                   <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8]">
                     {cat._count.lines}
                   </span>
                 </td>
-                <td className="p-4 text-right">
+                <td className="px-4 py-2 text-right">
                   {cat.name !== "General" && editingId !== cat.id && (
                     <div className="flex justify-end gap-1">
                       <Button
@@ -247,7 +247,7 @@ export function CategoryList({
                     </div>
                   )}
                 </td>
-                <td className="p-4 text-right">
+                <td className="px-4 py-2 text-right">
                   {cat.name !== "General" ? (
                     <input
                       type="checkbox"

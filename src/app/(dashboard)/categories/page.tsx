@@ -36,10 +36,7 @@ export default async function CategoriesPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
-      <h1 className="mb-1 text-center text-2xl font-bold">Categories</h1>
-      <p className="mb-6 text-center text-sm text-gray-500">
-        {activeBudget.name} &middot; {activeBudget.year} &middot; {activeBudget.currency}
-      </p>
+      <h1 className="mb-6 text-center text-2xl font-bold">Categories</h1>
       <CategoryList
         categories={categories}
         budgetId={activeBudget.id}

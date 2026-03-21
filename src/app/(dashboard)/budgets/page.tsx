@@ -56,10 +56,7 @@ export default async function BudgetLinesPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
-      <h1 className="mb-1 text-center text-2xl font-bold">Budget Lines</h1>
-      <p className="mb-6 text-center text-sm text-gray-500">
-        {budget.name} &middot; {budget.year} &middot; {budget.currency}
-      </p>
+      <h1 className="mb-6 text-center text-2xl font-bold">Budget Lines</h1>
 
       <MonthlyBreakdown monthTotals={monthTotals} currency={budget.currency} />
 

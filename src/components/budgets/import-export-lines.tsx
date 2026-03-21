@@ -210,7 +210,7 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
                   {MONTH_SHORT.map((m) => (
                     <th key={m} className="pb-2 text-right font-medium text-xs">{m}</th>
                   ))}
-                  <th className="pb-2 font-medium">Action</th>
+                  <th className="pb-2 pl-4 font-medium">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -259,7 +259,7 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
                         )}
                       </td>
                     ))}
-                    <td className="py-2">
+                    <td className="py-2 pl-4">
                       {line.status === "new" && (
                         <span className="text-xs text-green-600">Will add</span>
                       )}

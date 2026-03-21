@@ -11,3 +11,9 @@ export const TIER_PRICES = {
   pro: 5,
   business: 15,
 } as const;
+
+export const CURRENCIES = [
+  "EUR", "USD", "GBP", "RSD", "CHF", "JPY", "CNY", "AUD", "CAD", "SEK",
+  "NOK", "DKK", "PLN", "CZK", "HUF", "RON", "BGN", "HRK", "TRY", "BRL",
+  "INR", "KRW", "MXN", "ZAR",
+] as const;

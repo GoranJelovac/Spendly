@@ -69,13 +69,9 @@ function ToggleButton({
 
 export function DashboardContent({
   budgetId,
-  budgetName,
-  budgetYear,
   budgetCurrency,
 }: {
   budgetId: string;
-  budgetName: string;
-  budgetYear: number;
   budgetCurrency: string;
 }) {
   const [period, setPeriod] = useState<"month" | "ytd" | "bymonth">("month");
@@ -226,15 +222,6 @@ export function DashboardContent({
 
   return (
     <div className="font-[var(--font-jakarta)]" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      {/* Budget name */}
-      <div className="flex items-center justify-center gap-3">
-        <span className="text-[28px] font-bold dark:text-[#e0e0f0]">{budgetName}</span>
-        <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-600 dark:bg-[rgba(129,140,248,0.15)] dark:text-[#818cf8]">
-          {budgetYear}
-        </span>
-        <span className="text-sm text-gray-400 dark:text-[#6b6b8a]">{budgetCurrency}</span>
-      </div>
-
       {/* Filters */}
       <CollapsibleSection title="Filters">
         <div className="space-y-3">
@@ -402,7 +389,7 @@ export function DashboardContent({
 
           {/* Details */}
           <CollapsibleSection title="Details">
-            <div className="min-h-[20rem] overflow-x-auto">
+            <div className="min-h-[20rem] overflow-x-auto overflow-y-auto" style={{ maxHeight: 600 }}>
               <table className="w-full border-separate border-spacing-y-2 text-left text-[14px]">
                 <thead>
                   <tr className="bg-indigo-50/50 dark:bg-[rgba(129,140,248,0.08)]">
@@ -505,8 +492,8 @@ export function DashboardContent({
                                 item.percentage > 100
                                   ? "bg-red-500"
                                   : item.percentage > 80
-                                  ? "bg-amber-500"
-                                  : "bg-emerald-500"
+                                    ? "bg-amber-500"
+                                    : "bg-emerald-500"
                               }`}
                               style={{
                                 width: `${Math.min(item.percentage, 100)}%`,

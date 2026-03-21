@@ -148,13 +148,19 @@ function DonutWithLegend({
   );
 }
 
-const BAR_PLANNED = "#818cf8";
-const BAR_CONTRIBUTED = lighten("#818cf8", 0.4);
 const BAR_SPENT = "#ef4444";
 
-function BarTooltip({ active, payload, currency }: { active?: boolean; payload?: Array<{ payload: LineData; dataKey: string; value: number }>; currency: string }) {
+/** Get the color triplet for a given line index */
+function getBarColors(index: number) {
+  const base = COLORS[index % COLORS.length];
+  return { planned: base, contributed: lighten(base, 0.4), spent: BAR_SPENT };
+}
+
+function BarTooltip({ active, payload, currency, data }: { active?: boolean; payload?: Array<{ payload: LineData; dataKey: string; value: number }>; currency: string; data: LineData[] }) {
   if (!active || !payload || payload.length === 0) return null;
   const item = payload[0].payload;
+  const idx = data.findIndex((d) => d.name === item.name);
+  const colors = getBarColors(idx);
   return (
     <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs shadow-lg dark:border-[#252345] dark:bg-[#13112b]">
       <p className="mb-1 font-semibold">{item.name}</p>
@@ -163,7 +169,7 @@ function BarTooltip({ active, payload, currency }: { active?: boolean; payload?:
       )}
       {payload.map((entry) => {
         const label = entry.dataKey === "planned" ? "Planned" : entry.dataKey === "contributed" ? "Contributed" : "Spent";
-        const color = entry.dataKey === "planned" ? BAR_PLANNED : entry.dataKey === "contributed" ? BAR_CONTRIBUTED : BAR_SPENT;
+        const color = entry.dataKey === "planned" ? colors.planned : entry.dataKey === "contributed" ? colors.contributed : colors.spent;
         return (
           <p key={entry.dataKey} className="flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: color }} />
@@ -179,18 +185,23 @@ function BarTooltip({ active, payload, currency }: { active?: boolean; payload?:
 function PercentageBars({ data, currency }: { data: LineData[]; currency: string }) {
   return (
     <div className="space-y-3">
-      {data.map((item) => {
+      {data.map((item, idx) => {
         const total = item.planned + item.contributed;
         const spentPct = total > 0 ? (item.spent / total) * 100 : 0;
         const contributedPct = total > 0 ? (item.contributed / total) * 100 : 0;
         const isOver = spentPct > 100;
+        const colors = getBarColors(idx);
 
         return (
           <div key={item.name} className="group">
             {/* Label row */}
             <div className="mb-1 flex items-baseline justify-between gap-2">
-              <div className="min-w-0">
-                <span className="text-sm font-medium truncate block">{item.name}</span>
+              <div className="min-w-0 flex items-center gap-1.5">
+                <span
+                  className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-sm"
+                  style={{ backgroundColor: colors.planned }}
+                />
+                <span className="text-sm font-medium truncate">{item.name}</span>
                 {item.categoryName && (
                   <span className="text-[10px] text-gray-400 dark:text-[#6b6b8a]">{item.categoryName}</span>
                 )}
@@ -207,13 +218,13 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
 
             {/* Bar */}
             <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-[#252345]">
-              {/* Contributed segment (lighter, stacked after planned) */}
+              {/* Contributed segment (lighter) */}
               {contributedPct > 0 && (
                 <div
                   className="absolute inset-y-0 left-0 rounded-full"
                   style={{
-                    width: `${Math.min(100, 100)}%`,
-                    backgroundColor: BAR_CONTRIBUTED,
+                    width: "100%",
+                    backgroundColor: colors.contributed,
                     opacity: 0.5,
                   }}
                   title={`Contributed: ${fmt(item.contributed)} ${currency}`}
@@ -225,7 +236,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
                 className="absolute inset-y-0 left-0 rounded-full"
                 style={{
                   width: `${Math.min(contributedPct > 0 ? 100 - contributedPct : 100, 100)}%`,
-                  backgroundColor: BAR_PLANNED,
+                  backgroundColor: colors.planned,
                   opacity: 0.2,
                 }}
               />
@@ -235,7 +246,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
                 className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
                 style={{
                   width: `${Math.min(spentPct, 100)}%`,
-                  backgroundColor: isOver ? BAR_SPENT : BAR_PLANNED,
+                  backgroundColor: isOver ? BAR_SPENT : colors.planned,
                 }}
               />
 
@@ -258,13 +269,13 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
       {/* Legend */}
       <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-500">
         <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_PLANNED }} /> Spent
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-500 to-purple-500" /> Spent
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_PLANNED, opacity: 0.2 }} /> Planned
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300 opacity-20" /> Planned
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_CONTRIBUTED, opacity: 0.5 }} /> Contributed
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300 opacity-50" /> Contributed
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_SPENT }} /> Over budget
@@ -290,7 +301,7 @@ export function PlannedVsSpentChart({
         <div className="flex rounded-xl border border-gray-200 dark:border-[#252345]">
           <button
             onClick={() => setMode("amount")}
-            className={`rounded-l-xl px-3 py-1 text-xs font-medium transition-colors ${
+            className={`w-16 rounded-l-xl py-1 text-xs font-medium transition-colors ${
               mode === "amount"
                 ? "bg-[#818cf8] text-white"
                 : "text-gray-500 hover:bg-gray-100 dark:text-[#6b6b8a] dark:hover:bg-[#252345]"
@@ -300,7 +311,7 @@ export function PlannedVsSpentChart({
           </button>
           <button
             onClick={() => setMode("percent")}
-            className={`rounded-r-xl px-3 py-1 text-xs font-medium transition-colors ${
+            className={`w-16 rounded-r-xl py-1 text-xs font-medium transition-colors ${
               mode === "percent"
                 ? "bg-[#818cf8] text-white"
                 : "text-gray-500 hover:bg-gray-100 dark:text-[#6b6b8a] dark:hover:bg-[#252345]"
@@ -313,23 +324,44 @@ export function PlannedVsSpentChart({
 
       {mode === "amount" ? (
         <>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#252345" />
-              <XAxis dataKey="name" fontSize={11} interval={0} angle={-30} textAnchor="end" height={60} />
-              <YAxis fontSize={12} />
-              <Tooltip content={<BarTooltip currency={currency} />} />
-              <Bar dataKey="planned" stackId="budget" name="planned" fill={BAR_PLANNED} />
-              <Bar dataKey="contributed" stackId="budget" name="contributed" fill={BAR_CONTRIBUTED} />
-              <Bar dataKey="spent" name="spent" fill={BAR_SPENT} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="overflow-y-auto" style={{ maxHeight: 600 }}>
+            <ResponsiveContainer width="100%" height={Math.max(420, data.length * 40 + 40)}>
+              <BarChart data={data} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#252345" horizontal={false} />
+                <XAxis type="number" fontSize={11} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  fontSize={11}
+                  width={120}
+                  tick={{ fill: "currentColor" }}
+                  interval={0}
+                />
+                <Tooltip content={<BarTooltip currency={currency} data={data} />} />
+                <Bar dataKey="planned" stackId="budget" name="planned" barSize={18}>
+                  {data.map((_, i) => (
+                    <Cell key={`p-${i}`} fill={getBarColors(i).planned} />
+                  ))}
+                </Bar>
+                <Bar dataKey="contributed" stackId="budget" name="contributed" barSize={18}>
+                  {data.map((_, i) => (
+                    <Cell key={`c-${i}`} fill={getBarColors(i).contributed} />
+                  ))}
+                </Bar>
+                <Bar dataKey="spent" name="spent" barSize={18}>
+                  {data.map((_, i) => (
+                    <Cell key={`s-${i}`} fill={BAR_SPENT} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
           <div className="mt-2 flex items-center justify-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_PLANNED }} /> Planned
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-500 to-purple-500" /> Planned
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_CONTRIBUTED }} /> Contributed
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300" /> Contributed
             </span>
             <span className="flex items-center gap-1">
               <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: BAR_SPENT }} /> Spent
@@ -337,7 +369,9 @@ export function PlannedVsSpentChart({
           </div>
         </>
       ) : (
-        <PercentageBars data={data} currency={currency} />
+        <div className="overflow-y-auto" style={{ maxHeight: 600 }}>
+          <PercentageBars data={data} currency={currency} />
+        </div>
       )}
     </div>
   );

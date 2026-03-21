@@ -21,8 +21,6 @@ export default async function DashboardPage() {
       ) : (
         <DashboardContent
           budgetId={activeBudget.id}
-          budgetName={activeBudget.name}
-          budgetYear={activeBudget.year}
           budgetCurrency={activeBudget.currency}
         />
       )}

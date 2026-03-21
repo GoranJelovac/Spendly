@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useEffect } from "react";
 import { deleteExpense, deleteExpenses, updateExpense } from "@/actions/expense";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
@@ -33,17 +32,12 @@ type Expense = {
 export function ExpenseList({
   expenses,
   lines,
-  currentPage,
-  totalPages,
   pageSize,
 }: {
   expenses: Expense[];
   lines: BudgetLine[];
-  currentPage: number;
-  totalPages: number;
   pageSize: number;
 }) {
-  const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -52,6 +46,7 @@ export function ExpenseList({
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [columnFilters, setColumnFilters] = useState<Record<string, Set<string>>>({});
+  const [clientPage, setClientPage] = useState(1);
 
   const categories = Array.from(
     new Map(lines.map((l) => [l.categoryId, l.categoryName])).entries()
@@ -99,17 +94,30 @@ export function ExpenseList({
     });
   }, [expenses, columnFilters, columnValues]);
 
-  const allSelected = filteredExpenses.length > 0 && selected.size === filteredExpenses.length;
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setClientPage(1);
+  }, [columnFilters]);
+
+  // Client-side pagination
+  const totalPages = Math.max(1, Math.ceil(filteredExpenses.length / pageSize));
+  const currentPage = Math.min(clientPage, totalPages);
+  const displayedExpenses = filteredExpenses.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const allSelected = displayedExpenses.length > 0 && selected.size === displayedExpenses.length;
 
   function goToPage(page: number) {
-    router.push(`/expenses?page=${page}`);
+    setClientPage(page);
   }
 
   function toggleAll() {
     if (allSelected) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(filteredExpenses.map((e) => e.id)));
+      setSelected(new Set(displayedExpenses.map((e) => e.id)));
     }
   }
 
@@ -214,7 +222,7 @@ export function ExpenseList({
             </tr>
           </thead>
           <tbody>
-            {filteredExpenses.map((expense, index) =>
+            {displayedExpenses.map((expense, index) =>
               editingId === expense.id ? (
                 <tr key={expense.id} className="border-b bg-gray-50 dark:bg-[#1a1835]/50">
                   <td colSpan={7} className="py-3 px-1">

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useEffect } from "react";
 import { deleteContribution, deleteContributions, updateContribution } from "@/actions/contribution";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
@@ -33,17 +32,12 @@ type Contribution = {
 export function ContributionList({
   contributions,
   lines,
-  currentPage,
-  totalPages,
   pageSize,
 }: {
   contributions: Contribution[];
   lines: BudgetLine[];
-  currentPage: number;
-  totalPages: number;
   pageSize: number;
 }) {
-  const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -52,6 +46,7 @@ export function ContributionList({
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [columnFilters, setColumnFilters] = useState<Record<string, Set<string>>>({});
+  const [clientPage, setClientPage] = useState(1);
 
   const categories = Array.from(
     new Map(lines.map((l) => [l.categoryId, l.categoryName])).entries()
@@ -99,17 +94,30 @@ export function ContributionList({
     });
   }, [contributions, columnFilters, columnValues]);
 
-  const allSelected = filteredContributions.length > 0 && selected.size === filteredContributions.length;
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setClientPage(1);
+  }, [columnFilters]);
+
+  // Client-side pagination
+  const totalPages = Math.max(1, Math.ceil(filteredContributions.length / pageSize));
+  const currentPage = Math.min(clientPage, totalPages);
+  const displayedContributions = filteredContributions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const allSelected = displayedContributions.length > 0 && selected.size === displayedContributions.length;
 
   function goToPage(page: number) {
-    router.push(`/contributions?page=${page}`);
+    setClientPage(page);
   }
 
   function toggleAll() {
     if (allSelected) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(filteredContributions.map((c) => c.id)));
+      setSelected(new Set(displayedContributions.map((c) => c.id)));
     }
   }
 
@@ -214,7 +222,7 @@ export function ContributionList({
             </tr>
           </thead>
           <tbody>
-            {filteredContributions.map((c, index) =>
+            {displayedContributions.map((c, index) =>
               editingId === c.id ? (
                 <tr key={c.id} className="border-b bg-gray-50 dark:bg-[#1a1835]/50">
                   <td colSpan={7} className="py-3 px-1">
