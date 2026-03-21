@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 
-export async function createExpense(formData: FormData) {
+export async function createContribution(formData: FormData) {
   const user = await getAuthUser();
   const budgetLineId = formData.get("budgetLineId") as string;
   const amount = parseFloat(formData.get("amount") as string);
@@ -15,7 +15,6 @@ export async function createExpense(formData: FormData) {
     return { error: "Budget line, amount, and date are required." };
   }
 
-  // Verify ownership through budget line -> budget -> user
   const line = await db.budgetLine.findUnique({
     where: { id: budgetLineId },
     include: { budget: true },
@@ -25,7 +24,7 @@ export async function createExpense(formData: FormData) {
     return { error: "Budget line not found." };
   }
 
-  await db.expense.create({
+  await db.contribution.create({
     data: {
       budgetLineId,
       userId: user.id,
@@ -35,13 +34,12 @@ export async function createExpense(formData: FormData) {
     },
   });
 
-  revalidatePath("/expenses");
+  revalidatePath("/contributions");
   revalidatePath("/dashboard");
-  revalidatePath(`/budgets/${line.budgetId}`);
-  return { success: "Expense added!" };
+  return { success: "Contribution added!" };
 }
 
-export async function getExpenses(filters?: {
+export async function getContributions(filters?: {
   budgetId?: string;
   budgetLineId?: string;
   from?: string;
@@ -49,7 +47,7 @@ export async function getExpenses(filters?: {
 }) {
   const user = await getAuthUser();
 
-  return db.expense.findMany({
+  return db.contribution.findMany({
     where: {
       userId: user.id,
       ...(filters?.budgetLineId && { budgetLineId: filters.budgetLineId }),
@@ -72,7 +70,7 @@ export async function getExpenses(filters?: {
   });
 }
 
-export async function getExpensesPaginated(
+export async function getContributionsPaginated(
   filters: { budgetId?: string; budgetLineId?: string; from?: string; to?: string },
   page: number = 1,
   pageSize: number = 20,
@@ -94,7 +92,7 @@ export async function getExpensesPaginated(
   };
 
   const [items, total] = await Promise.all([
-    db.expense.findMany({
+    db.contribution.findMany({
       where,
       include: {
         budgetLine: {
@@ -105,13 +103,13 @@ export async function getExpensesPaginated(
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    db.expense.count({ where }),
+    db.contribution.count({ where }),
   ]);
 
   return { items, total };
 }
 
-export async function updateExpense(id: string, formData: FormData) {
+export async function updateContribution(id: string, formData: FormData) {
   const user = await getAuthUser();
   const budgetLineId = formData.get("budgetLineId") as string;
   const amount = parseFloat(formData.get("amount") as string);
@@ -122,12 +120,12 @@ export async function updateExpense(id: string, formData: FormData) {
     return { error: "Budget line, amount, and date are required." };
   }
 
-  const expense = await db.expense.findFirst({
+  const contribution = await db.contribution.findFirst({
     where: { id, userId: user.id },
   });
 
-  if (!expense) {
-    return { error: "Expense not found." };
+  if (!contribution) {
+    return { error: "Contribution not found." };
   }
 
   const line = await db.budgetLine.findUnique({
@@ -139,53 +137,44 @@ export async function updateExpense(id: string, formData: FormData) {
     return { error: "Budget line not found." };
   }
 
-  await db.expense.update({
+  await db.contribution.update({
     where: { id },
     data: { budgetLineId, amount, description, date: new Date(date) },
   });
 
-  revalidatePath("/expenses");
+  revalidatePath("/contributions");
   revalidatePath("/dashboard");
-  return { success: "Expense updated!" };
+  return { success: "Contribution updated!" };
 }
 
-export async function deleteExpense(id: string) {
+export async function deleteContribution(id: string) {
   const user = await getAuthUser();
 
-  const expense = await db.expense.findFirst({
+  const contribution = await db.contribution.findFirst({
     where: { id, userId: user.id },
   });
 
-  if (!expense) {
-    return { error: "Expense not found." };
+  if (!contribution) {
+    return { error: "Contribution not found." };
   }
 
-  await db.expense.delete({ where: { id } });
+  await db.contribution.delete({ where: { id } });
 
-  revalidatePath("/expenses");
+  revalidatePath("/contributions");
   revalidatePath("/dashboard");
-  return { success: "Expense deleted!" };
+  return { success: "Contribution deleted!" };
 }
 
-export async function deleteExpenses(ids: string[]) {
+export async function deleteContributions(ids: string[]) {
   const user = await getAuthUser();
 
-  if (ids.length === 0) return { error: "No expenses selected." };
+  if (ids.length === 0) return { error: "No contributions selected." };
 
-  const count = await db.expense.deleteMany({
+  const count = await db.contribution.deleteMany({
     where: { id: { in: ids }, userId: user.id },
   });
 
-  revalidatePath("/expenses");
+  revalidatePath("/contributions");
   revalidatePath("/dashboard");
-  return { success: `Deleted ${count.count} expense(s).` };
-}
-
-export async function getUserBudgetsWithLines() {
-  const user = await getAuthUser();
-  return db.budget.findMany({
-    where: { userId: user.id },
-    include: { lines: { orderBy: { sortOrder: "asc" } } },
-    orderBy: { name: "asc" },
-  });
+  return { success: `Deleted ${count.count} contribution(s).` };
 }

@@ -21,16 +21,47 @@ function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-lg border bg-white dark:bg-gray-900">
+    <div className="rounded-xl bg-white shadow-sm dark:bg-gray-900">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between p-4 text-left"
+        className="flex w-full items-center justify-between px-5 py-3.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl"
       >
-        <h3 className="font-semibold">{title}</h3>
-        <span className="text-gray-400 text-sm">{open ? "\u25B2" : "\u25BC"}</span>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          {title}
+        </h3>
+        <span
+          className={`text-gray-400 text-xs transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        >
+          &#9660;
+        </span>
       </button>
-      {open && <div className="border-t px-4 pb-4 pt-3">{children}</div>}
+      {open && <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-gray-800">{children}</div>}
     </div>
+  );
+}
+
+function ToggleButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
+        active
+          ? "bg-blue-600 text-white shadow-sm"
+          : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -73,7 +104,7 @@ export function DashboardContent({
   }, [data, categoryFilter]);
 
   const displayTotals = useMemo(() => {
-    if (!data) return { planned: 0, spent: 0, remaining: 0, percentage: 0 };
+    if (!data) return { planned: 0, contributed: 0, available: 0, spent: 0, remaining: 0, percentage: 0 };
     if (categoryFilter === "all" && viewMode === "lines") return data.totals;
 
     const items = viewMode === "categories" && categoryFilter === "all"
@@ -81,10 +112,12 @@ export function DashboardContent({
       : filteredLines;
 
     const planned = items.reduce((s, l) => s + l.planned, 0);
+    const contributed = items.reduce((s, l) => s + l.contributed, 0);
+    const available = items.reduce((s, l) => s + l.available, 0);
     const spent = items.reduce((s, l) => s + l.spent, 0);
-    const remaining = planned - spent;
-    const percentage = planned > 0 ? (spent / planned) * 100 : 0;
-    return { planned, spent, remaining, percentage };
+    const remaining = available - spent;
+    const percentage = available > 0 ? (spent / available) * 100 : 0;
+    return { planned, contributed, available, spent, remaining, percentage };
   }, [data, filteredLines, viewMode, categoryFilter]);
 
   const displayItems = useMemo(() => {
@@ -105,102 +138,80 @@ export function DashboardContent({
 
   return (
     <div className="space-y-4">
-      {/* Budget name - always visible */}
-      <p className="text-gray-500">
-        {budgetName} &middot; {budgetYear} &middot; {budgetCurrency}
-      </p>
+      {/* Budget name */}
+      <div className="flex items-center justify-center gap-2">
+        <span className="text-2xl font-bold">{budgetName}</span>
+        <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+          {budgetYear}
+        </span>
+        <span className="text-sm text-gray-400">{budgetCurrency}</span>
+      </div>
 
-      {/* Filters section */}
+      {/* Filters */}
       <CollapsibleSection title="Filters">
         <div className="space-y-3">
-          {/* Period selector */}
+          {/* Period */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs text-gray-500 w-12">Period</span>
-            <div className="flex rounded-md border">
-              {(["month", "ytd", "bymonth"] as const).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`px-3 py-1.5 text-sm ${
-                    period === p
-                      ? "bg-black text-white dark:bg-white dark:text-black"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  {p === "ytd" ? "Year to Date" : p === "month" ? "This Month" : "By Month"}
-                </button>
-              ))}
+            <span className="w-14 text-xs font-medium text-gray-500">Period</span>
+            <div className="flex gap-1 rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
+              <ToggleButton active={period === "month"} onClick={() => setPeriod("month")}>
+                This Month
+              </ToggleButton>
+              <ToggleButton active={period === "ytd"} onClick={() => setPeriod("ytd")}>
+                Year to Date
+              </ToggleButton>
+              <ToggleButton active={period === "bymonth"} onClick={() => setPeriod("bymonth")}>
+                By Month
+              </ToggleButton>
             </div>
           </div>
 
           {/* By Month controls */}
           {period === "bymonth" && (
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs text-gray-500 w-12">Month</span>
+              <span className="w-14 text-xs font-medium text-gray-500">Month</span>
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="rounded-md border px-3 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800"
               >
                 {MONTH_NAMES.map((name, i) => (
                   <option key={i} value={i}>{name}</option>
                 ))}
               </select>
-              <div className="flex rounded-md border">
-                <button
-                  onClick={() => setByMonthMode("single")}
-                  className={`px-3 py-1.5 text-sm ${
-                    byMonthMode === "single"
-                      ? "bg-black text-white dark:bg-white dark:text-black"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
+              <div className="flex gap-1 rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
+                <ToggleButton active={byMonthMode === "single"} onClick={() => setByMonthMode("single")}>
                   Only {MONTH_NAMES[selectedMonth]}
-                </button>
-                <button
-                  onClick={() => setByMonthMode("cumulative")}
-                  className={`px-3 py-1.5 text-sm ${
-                    byMonthMode === "cumulative"
-                      ? "bg-black text-white dark:bg-white dark:text-black"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
+                </ToggleButton>
+                <ToggleButton active={byMonthMode === "cumulative"} onClick={() => setByMonthMode("cumulative")}>
                   Jan &ndash; {MONTH_NAMES[selectedMonth]}
-                </button>
+                </ToggleButton>
               </div>
             </div>
           )}
 
-          {/* View mode + category filter */}
+          {/* View mode */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs text-gray-500 w-12">View</span>
-            <div className="flex rounded-md border">
-              <button
+            <span className="w-14 text-xs font-medium text-gray-500">View</span>
+            <div className="flex gap-1 rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
+              <ToggleButton
+                active={viewMode === "lines"}
                 onClick={() => { setViewMode("lines"); setCategoryFilter("all"); }}
-                className={`px-3 py-1.5 text-sm ${
-                  viewMode === "lines"
-                    ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                }`}
               >
                 Lines
-              </button>
-              <button
+              </ToggleButton>
+              <ToggleButton
+                active={viewMode === "categories"}
                 onClick={() => { setViewMode("categories"); setCategoryFilter("all"); }}
-                className={`px-3 py-1.5 text-sm ${
-                  viewMode === "categories"
-                    ? "bg-black text-white dark:bg-white dark:text-black"
-                    : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                }`}
               >
                 Categories
-              </button>
+              </ToggleButton>
             </div>
             {viewMode === "categories" && uniqueCategories.length > 1 && (
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-md border px-3 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
+                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800"
               >
                 <option value="all">All categories</option>
                 {uniqueCategories.map((cat) => (
@@ -213,54 +224,74 @@ export function DashboardContent({
       </CollapsibleSection>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        </div>
       ) : !data ? (
         <p className="text-gray-500">No data found.</p>
       ) : (
         <>
-          {/* Summary section */}
+          {/* Summary */}
           <CollapsibleSection title="Summary">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               <SummaryCard
                 label="Planned"
                 value={displayTotals.planned}
                 currency={budgetCurrency}
+                accent="blue"
+              />
+              <SummaryCard
+                label="Contributed"
+                value={displayTotals.contributed}
+                currency={budgetCurrency}
+                accent="purple"
+              />
+              <SummaryCard
+                label="Available"
+                value={displayTotals.available}
+                currency={budgetCurrency}
+                accent="cyan"
               />
               <SummaryCard
                 label="Spent"
                 value={displayTotals.spent}
                 currency={budgetCurrency}
+                accent="red"
               />
               <SummaryCard
                 label="Remaining"
                 value={displayTotals.remaining}
                 currency={budgetCurrency}
-                color={displayTotals.remaining < 0 ? "red" : "green"}
+                accent="green"
+                valueColor={displayTotals.remaining < 0 ? "red" : "green"}
               />
               <SummaryCard
                 label="Used"
                 value={displayTotals.percentage}
                 suffix="%"
-                color={displayTotals.percentage > 100 ? "red" : undefined}
+                accent="amber"
+                valueColor={displayTotals.percentage > 100 ? "red" : undefined}
               />
             </div>
           </CollapsibleSection>
 
-          {/* Charts section */}
+          {/* Charts */}
           <CollapsibleSection title="Charts">
             <PlannedVsSpentChart
               data={displayItems.map((l) => ({
                 name: l.name,
                 planned: l.planned,
+                contributed: l.contributed,
                 spent: l.spent,
               }))}
               currency={budgetCurrency}
             />
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
               <BudgetBreakdownChart
                 data={displayItems.map((l) => ({
                   name: l.name,
                   planned: l.planned,
+                  contributed: l.contributed,
                   spent: l.spent,
                 }))}
                 currency={budgetCurrency}
@@ -268,74 +299,75 @@ export function DashboardContent({
               <SpendingOverviewChart
                 data={displayItems.map((l) => ({
                   name: l.name,
-                  planned: l.planned,
+                  planned: l.available,
+                  contributed: 0,
                   spent: l.spent,
                 }))}
-                totalPlanned={displayTotals.planned}
+                totalPlanned={displayTotals.available}
                 currency={budgetCurrency}
               />
             </div>
           </CollapsibleSection>
 
-          {/* Details section */}
+          {/* Details */}
           <CollapsibleSection title="Details">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b text-gray-500">
-                  <tr>
-                    <th className="pb-2 font-medium">
+                <thead className="text-xs uppercase tracking-wider text-gray-500">
+                  <tr className="border-b border-gray-100 dark:border-gray-800">
+                    <th className="pb-3 font-medium">
                       {viewMode === "categories" && categoryFilter === "all" ? "Category" : "Line"}
                     </th>
                     {viewMode === "lines" && (
-                      <th className="pb-2 font-medium">Category</th>
+                      <th className="pb-3 font-medium">Category</th>
                     )}
-                    <th className="pb-2 text-right font-medium">
-                      Planned ({budgetCurrency})
-                    </th>
-                    <th className="pb-2 text-right font-medium">
-                      Spent ({budgetCurrency})
-                    </th>
-                    <th className="pb-2 text-right font-medium">
-                      Remaining ({budgetCurrency})
-                    </th>
-                    <th className="pb-2 font-medium">Progress</th>
+                    <th className="pb-3 text-right font-medium">Planned</th>
+                    <th className="pb-3 text-right font-medium">Contrib.</th>
+                    <th className="pb-3 text-right font-medium">Available</th>
+                    <th className="pb-3 text-right font-medium">Spent</th>
+                    <th className="pb-3 text-right font-medium">Remaining</th>
+                    <th className="pb-3 font-medium">Progress</th>
                   </tr>
                 </thead>
                 <tbody>
                   {displayItems.map((item) => (
-                    <tr key={item.id} className="border-b last:border-0">
-                      <td className="py-2 font-medium">{item.name}</td>
+                    <tr key={item.id} className="border-b border-gray-50 last:border-0 dark:border-gray-800/50">
+                      <td className="py-2.5 font-medium">{item.name}</td>
                       {viewMode === "lines" && (
-                        <td className="py-2 text-xs text-gray-500">
-                          {"categoryName" in item ? String(item.categoryName) : ""}
+                        <td className="py-2.5">
+                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                            {"categoryName" in item ? String(item.categoryName) : ""}
+                          </span>
                         </td>
                       )}
-                      <td className="py-2 text-right">{item.planned.toFixed(2)}</td>
-                      <td className="py-2 text-right">{item.spent.toFixed(2)}</td>
+                      <td className="py-2.5 text-right tabular-nums">{item.planned.toFixed(2)}</td>
+                      <td className="py-2.5 text-right tabular-nums ">{item.contributed > 0 ? item.contributed.toFixed(2) : "—"}</td>
+                      <td className="py-2.5 text-right tabular-nums font-medium">{item.available.toFixed(2)}</td>
+                      <td className="py-2.5 text-right tabular-nums">{item.spent.toFixed(2)}</td>
                       <td
-                        className={`py-2 text-right ${
+                        className={`py-2.5 text-right tabular-nums font-medium ${
                           item.remaining < 0 ? "text-red-500" : "text-green-600"
                         }`}
                       >
                         {item.remaining.toFixed(2)}
                       </td>
-                      <td className="py-2">
+                      <td className="py-2.5">
                         <div className="flex items-center gap-2">
-                          <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                          <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800">
                             <div
-                              className={`h-2 rounded-full ${
+                              className={`h-2 rounded-full transition-all duration-500 ease-out ${
                                 item.percentage > 100
                                   ? "bg-red-500"
                                   : item.percentage > 80
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
+                                  ? "bg-amber-500"
+                                  : "bg-emerald-500"
                               }`}
                               style={{
                                 width: `${Math.min(item.percentage, 100)}%`,
                               }}
                             />
                           </div>
-                          <span className="w-12 text-xs text-gray-500">
+                          <span className="w-12 text-xs tabular-nums text-gray-500">
                             {item.percentage.toFixed(0)}%
                           </span>
                         </div>
@@ -352,29 +384,45 @@ export function DashboardContent({
   );
 }
 
+const ACCENT_COLORS = {
+  blue: "border-l-blue-500",
+  purple: "border-l-purple-500",
+  cyan: "border-l-cyan-500",
+  red: "border-l-red-500",
+  green: "border-l-emerald-500",
+  amber: "border-l-amber-500",
+};
+
+const VALUE_COLORS = {
+  red: "text-red-500",
+  green: "text-emerald-600",
+};
+
 function SummaryCard({
   label,
   value,
   currency,
   suffix,
-  color,
+  accent,
+  valueColor,
 }: {
   label: string;
   value: number;
   currency?: string;
   suffix?: string;
-  color?: "red" | "green";
+  accent: keyof typeof ACCENT_COLORS;
+  valueColor?: "red" | "green";
 }) {
   return (
-    <div className="rounded-lg border bg-gray-50 p-3 dark:bg-gray-800">
-      <p className="text-xs text-gray-500">{label}</p>
+    <div
+      className={`rounded-xl border-l-4 bg-gray-50 p-3.5 shadow-sm dark:bg-gray-800/50 ${ACCENT_COLORS[accent]}`}
+    >
+      <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        {label}
+      </p>
       <p
-        className={`text-xl font-bold ${
-          color === "red"
-            ? "text-red-500"
-            : color === "green"
-            ? "text-green-600"
-            : ""
+        className={`mt-1 text-xl font-bold ${
+          valueColor ? VALUE_COLORS[valueColor] : ""
         }`}
       >
         {value.toFixed(suffix === "%" ? 1 : 2)}

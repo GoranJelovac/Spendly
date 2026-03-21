@@ -2,12 +2,20 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getActiveBudget } from "@/actions/active-budget";
 import { getBudget } from "@/actions/budget";
+import { getBudgetLinesPaginated } from "@/actions/budget-line";
 import { BudgetLineTable } from "@/components/budgets/budget-line-table";
 import { AddLineForm } from "@/components/budgets/add-line-form";
 import { ImportExportLines } from "@/components/budgets/import-export-lines";
-import { getMonthlyAmounts, getYearlyTotal } from "@/lib/budget-utils";
+import { MonthlyBreakdown } from "@/components/budgets/monthly-breakdown";
+import { getMonthlyAmounts } from "@/lib/budget-utils";
 
-export default async function BudgetLinesPage() {
+const PAGE_SIZE = 20;
+
+export default async function BudgetLinesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
@@ -15,49 +23,56 @@ export default async function BudgetLinesPage() {
 
   if (!activeBudget) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="mb-4 text-3xl font-bold">Budget Lines</h1>
-        <p className="text-gray-500">
-          No budget selected. Create one using the selector in the sidebar.
-        </p>
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+        <h1 className="mb-4 text-2xl font-bold">Budget Lines</h1>
+        <div className="rounded-xl bg-white p-8 text-center shadow-sm dark:bg-gray-900">
+          <p className="text-gray-500">
+            No budget selected. Create one using the selector in the sidebar.
+          </p>
+        </div>
       </div>
     );
   }
 
-  const budget = await getBudget(activeBudget.id);
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  const [budget, { items: paginatedLines, total }] = await Promise.all([
+    getBudget(activeBudget.id),
+    getBudgetLinesPaginated(activeBudget.id, page, PAGE_SIZE),
+  ]);
   if (!budget) return null;
 
-  const totalYearly = budget.lines.reduce(
-    (sum, l) => sum + getYearlyTotal(getMonthlyAmounts(l)),
-    0
-  );
-  const totalMonthly = totalYearly / 12;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // Calculate total per month across all lines (uses all lines from budget)
+  const monthTotals = Array(12).fill(0);
+  for (const line of budget.lines) {
+    const amounts = getMonthlyAmounts(line);
+    for (let i = 0; i < 12; i++) {
+      monthTotals[i] += amounts[i];
+    }
+  }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-2 text-3xl font-bold">Budget Lines</h1>
-      <p className="mb-6 text-gray-500">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+      <h1 className="mb-1 text-center text-2xl font-bold">Budget Lines</h1>
+      <p className="mb-6 text-center text-sm text-gray-500">
         {budget.name} &middot; {budget.year} &middot; {budget.currency}
       </p>
 
-      <div className="mb-6 grid grid-cols-2 gap-4">
-        <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
-          <p className="text-sm text-gray-500">Monthly Budget</p>
-          <p className="text-2xl font-bold">
-            {totalMonthly.toFixed(2)} {budget.currency}
-          </p>
-        </div>
-        <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
-          <p className="text-sm text-gray-500">Yearly Budget</p>
-          <p className="text-2xl font-bold">
-            {totalYearly.toFixed(2)} {budget.currency}
-          </p>
-        </div>
-      </div>
+      <MonthlyBreakdown monthTotals={monthTotals} currency={budget.currency} />
 
       <AddLineForm budgetId={budget.id} categories={budget.categories} />
       <ImportExportLines budgetId={budget.id} />
-      <BudgetLineTable lines={budget.lines} currency={budget.currency} categories={budget.categories} />
+      <BudgetLineTable
+        lines={paginatedLines}
+        currency={budget.currency}
+        categories={budget.categories}
+        currentPage={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
+      />
     </div>
   );
 }

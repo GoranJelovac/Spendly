@@ -17,6 +17,7 @@ import {
 type LineData = {
   name: string;
   planned: number;
+  contributed: number;
   spent: number;
 };
 
@@ -47,6 +48,17 @@ const COLORS = [
 function getColor(index: number, name?: string) {
   if (name === "Unspent") return "#d1d5db";
   return COLORS[index % COLORS.length];
+}
+
+/** Lighten a hex color by mixing with white. factor 0 = original, 1 = white */
+function lighten(hex: string, factor: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const lr = Math.round(r + (255 - r) * factor);
+  const lg = Math.round(g + (255 - g) * factor);
+  const lb = Math.round(b + (255 - b) * factor);
+  return `#${lr.toString(16).padStart(2, "0")}${lg.toString(16).padStart(2, "0")}${lb.toString(16).padStart(2, "0")}`;
 }
 
 function DonutWithLegend({
@@ -141,8 +153,12 @@ export function PlannedVsSpentChart({
   data: LineData[];
   currency: string;
 }) {
+  // Build custom bar colors per entry
+  const barColors = data.map((_, i) => COLORS[i % COLORS.length]);
+  const barColorsLight = barColors.map((c) => lighten(c, 0.45));
+
   return (
-    <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
+    <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
       <h3 className="mb-4 font-semibold">Planned vs Spent</h3>
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={data}>
@@ -150,12 +166,35 @@ export function PlannedVsSpentChart({
           <XAxis dataKey="name" fontSize={11} interval={0} angle={-30} textAnchor="end" height={60} />
           <YAxis fontSize={12} />
           <Tooltip
-            formatter={(value) => `${Number(value).toFixed(2)} ${currency}`}
+            formatter={(value, name) => {
+              const label = name === "planned" ? "Planned" : name === "contributed" ? "Contributed" : "Spent";
+              return [`${Number(value).toFixed(2)} ${currency}`, label];
+            }}
           />
-          <Bar dataKey="planned" fill="#3b82f6" name="Planned" />
-          <Bar dataKey="spent" fill="#ef4444" name="Spent" />
+          <Bar dataKey="planned" stackId="budget" name="planned">
+            {data.map((_, i) => (
+              <Cell key={`planned-${i}`} fill={barColors[i]} />
+            ))}
+          </Bar>
+          <Bar dataKey="contributed" stackId="budget" name="contributed">
+            {data.map((_, i) => (
+              <Cell key={`contrib-${i}`} fill={barColorsLight[i]} />
+            ))}
+          </Bar>
+          <Bar dataKey="spent" name="spent" fill="#ef4444" />
         </BarChart>
       </ResponsiveContainer>
+      <div className="mt-2 flex items-center justify-center gap-4 text-xs text-gray-500">
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-blue-500" /> Planned
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: lighten("#3b82f6", 0.45) }} /> Contributed
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-500" /> Spent
+        </span>
+      </div>
     </div>
   );
 }
@@ -169,13 +208,14 @@ export function BudgetBreakdownChart({
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+  // Use available (planned + contributed) for the breakdown
   const pieData = data
-    .filter((d) => d.planned > 0)
-    .map((d) => ({ name: d.name, value: d.planned }));
+    .filter((d) => d.planned + d.contributed > 0)
+    .map((d) => ({ name: d.name, value: d.planned + d.contributed }));
 
   if (pieData.length === 0) {
     return (
-      <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
+      <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
         <h3 className="mb-4 font-semibold">Budget Breakdown</h3>
         <p className="text-center text-gray-500">No budget data yet.</p>
       </div>
@@ -183,7 +223,7 @@ export function BudgetBreakdownChart({
   }
 
   return (
-    <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
+    <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
       <h3 className="mb-4 font-semibold">Budget Breakdown</h3>
       <DonutWithLegend
         data={pieData}
@@ -208,7 +248,7 @@ export function SpendingOverviewChart({
 
   if (totalPlanned <= 0) {
     return (
-      <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
+      <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
         <h3 className="mb-4 font-semibold">Spending Overview</h3>
         <p className="text-center text-gray-500">No budget data yet.</p>
       </div>
@@ -228,7 +268,7 @@ export function SpendingOverviewChart({
   const overspent = totalSpent > totalPlanned ? totalSpent - totalPlanned : 0;
 
   return (
-    <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
+    <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-900">
       <h3 className="mb-4 font-semibold">Spending Overview</h3>
       {overspent > 0 && (
         <p className="mb-2 text-xs text-red-500">

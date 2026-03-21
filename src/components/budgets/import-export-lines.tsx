@@ -197,7 +197,7 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
       {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 
       {preview && (
-        <div className="mb-6 rounded-lg border bg-white p-4 dark:bg-gray-900">
+        <div className="mb-6 rounded-xl bg-white p-5 shadow-sm dark:bg-gray-900">
           <h3 className="mb-3 text-lg font-semibold">Import Preview</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">

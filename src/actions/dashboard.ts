@@ -11,6 +11,8 @@ export type DashboardLine = {
   categoryName: string;
   monthlyAmount: number;
   planned: number;
+  contributed: number;
+  available: number;
   spent: number;
   remaining: number;
   percentage: number;
@@ -20,6 +22,8 @@ export type DashboardCategory = {
   id: string;
   name: string;
   planned: number;
+  contributed: number;
+  available: number;
   spent: number;
   remaining: number;
   percentage: number;
@@ -36,6 +40,8 @@ export type DashboardData = {
   categories: DashboardCategory[];
   totals: {
     planned: number;
+    contributed: number;
+    available: number;
     spent: number;
     remaining: number;
     percentage: number;
@@ -55,7 +61,7 @@ export async function getDashboardData(
     include: {
       lines: {
         orderBy: { sortOrder: "asc" },
-        include: { expenses: true, category: true },
+        include: { expenses: true, contributions: true, category: true },
       },
     },
   });
@@ -100,8 +106,12 @@ export async function getDashboardData(
     const spent = line.expenses
       .filter((e) => e.date >= dateFrom && e.date <= dateTo)
       .reduce((sum, e) => sum + e.amount, 0);
-    const remaining = planned - spent;
-    const percentage = planned > 0 ? (spent / planned) * 100 : 0;
+    const contributed = line.contributions
+      .filter((c) => c.date >= dateFrom && c.date <= dateTo)
+      .reduce((sum, c) => sum + c.amount, 0);
+    const available = planned + contributed;
+    const remaining = available - spent;
+    const percentage = available > 0 ? (spent / available) * 100 : 0;
 
     return {
       id: line.id,
@@ -110,6 +120,8 @@ export async function getDashboardData(
       categoryName: line.category.name,
       monthlyAmount: line.monthlyAmount,
       planned,
+      contributed,
+      available,
       spent,
       remaining,
       percentage,
@@ -118,33 +130,39 @@ export async function getDashboardData(
 
   const totals = {
     planned: lines.reduce((s, l) => s + l.planned, 0),
+    contributed: lines.reduce((s, l) => s + l.contributed, 0),
+    available: lines.reduce((s, l) => s + l.available, 0),
     spent: lines.reduce((s, l) => s + l.spent, 0),
     remaining: lines.reduce((s, l) => s + l.remaining, 0),
     percentage: 0,
   };
   totals.percentage =
-    totals.planned > 0 ? (totals.spent / totals.planned) * 100 : 0;
+    totals.available > 0 ? (totals.spent / totals.available) * 100 : 0;
 
   // Aggregate by category
-  const catMap = new Map<string, { id: string; name: string; planned: number; spent: number }>();
+  const catMap = new Map<string, { id: string; name: string; planned: number; contributed: number; available: number; spent: number }>();
   for (const line of lines) {
     const existing = catMap.get(line.categoryId);
     if (existing) {
       existing.planned += line.planned;
+      existing.contributed += line.contributed;
+      existing.available += line.available;
       existing.spent += line.spent;
     } else {
       catMap.set(line.categoryId, {
         id: line.categoryId,
         name: line.categoryName,
         planned: line.planned,
+        contributed: line.contributed,
+        available: line.available,
         spent: line.spent,
       });
     }
   }
   const categories: DashboardCategory[] = Array.from(catMap.values()).map((c) => ({
     ...c,
-    remaining: c.planned - c.spent,
-    percentage: c.planned > 0 ? (c.spent / c.planned) * 100 : 0,
+    remaining: c.available - c.spent,
+    percentage: c.available > 0 ? (c.spent / c.available) * 100 : 0,
   }));
 
   return {

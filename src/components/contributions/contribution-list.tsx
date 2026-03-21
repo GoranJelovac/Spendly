@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { deleteExpense, deleteExpenses, updateExpense } from "@/actions/expense";
+import { deleteContribution, deleteContributions, updateContribution } from "@/actions/contribution";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 
@@ -13,7 +13,7 @@ type BudgetLine = {
   categoryName: string;
 };
 
-type Expense = {
+type Contribution = {
   id: string;
   amount: number;
   description: string | null;
@@ -28,14 +28,14 @@ type Expense = {
   };
 };
 
-export function ExpenseList({
-  expenses,
+export function ContributionList({
+  contributions,
   lines,
   currentPage,
   totalPages,
   pageSize,
 }: {
-  expenses: Expense[];
+  contributions: Contribution[];
   lines: BudgetLine[];
   currentPage: number;
   totalPages: number;
@@ -58,17 +58,17 @@ export function ExpenseList({
     ? lines.filter((l) => l.categoryId === selectedCategory)
     : [];
 
-  const allSelected = expenses.length > 0 && selected.size === expenses.length;
+  const allSelected = contributions.length > 0 && selected.size === contributions.length;
 
   function goToPage(page: number) {
-    router.push(`/expenses?page=${page}`);
+    router.push(`/contributions?page=${page}`);
   }
 
   function toggleAll() {
     if (allSelected) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(expenses.map((e) => e.id)));
+      setSelected(new Set(contributions.map((c) => c.id)));
     }
   }
 
@@ -81,17 +81,17 @@ export function ExpenseList({
     });
   }
 
-  function startEdit(e: Expense) {
-    const line = lines.find((l) => l.id === e.budgetLineId);
+  function startEdit(c: Contribution) {
+    const line = lines.find((l) => l.id === c.budgetLineId);
     setSelectedCategory(line?.categoryId || "");
-    setEditingId(e.id);
+    setEditingId(c.id);
     setEditError("");
   }
 
   async function handleSave(id: string, formData: FormData) {
     setEditError("");
     setSaving(true);
-    const result = await updateExpense(id, formData);
+    const result = await updateContribution(id, formData);
     if (result?.error) {
       setEditError(result.error);
     } else {
@@ -101,23 +101,23 @@ export function ExpenseList({
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this expense?")) return;
+    if (!confirm("Delete this contribution?")) return;
     setDeleting(id);
-    await deleteExpense(id);
+    await deleteContribution(id);
     setDeleting(null);
   }
 
   async function handleBulkDelete() {
     if (selected.size === 0) return;
-    if (!confirm(`Delete ${selected.size} expense(s)?`)) return;
+    if (!confirm(`Delete ${selected.size} contribution(s)?`)) return;
     setBulkDeleting(true);
-    await deleteExpenses(Array.from(selected));
+    await deleteContributions(Array.from(selected));
     setSelected(new Set());
     setBulkDeleting(false);
   }
 
-  if (expenses.length === 0) {
-    return <p className="text-gray-500">No expenses yet. Add one above!</p>;
+  if (contributions.length === 0) {
+    return <p className="text-gray-500">No contributions yet. Add one above!</p>;
   }
 
   return (
@@ -161,12 +161,12 @@ export function ExpenseList({
             </tr>
           </thead>
           <tbody>
-            {expenses.map((expense, index) =>
-              editingId === expense.id ? (
-                <tr key={expense.id} className="border-b bg-gray-50 dark:bg-gray-800/50">
+            {contributions.map((c, index) =>
+              editingId === c.id ? (
+                <tr key={c.id} className="border-b bg-gray-50 dark:bg-gray-800/50">
                   <td colSpan={7} className="py-3 px-1">
                     <form
-                      action={(formData) => handleSave(expense.id, formData)}
+                      action={(formData) => handleSave(c.id, formData)}
                       className="space-y-3"
                     >
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -187,7 +187,7 @@ export function ExpenseList({
                           <label className="block text-xs font-medium text-gray-500">Budget Line</label>
                           <select
                             name="budgetLineId"
-                            defaultValue={expense.budgetLineId}
+                            defaultValue={c.budgetLineId}
                             className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
                             required
                             disabled={!selectedCategory}
@@ -204,7 +204,7 @@ export function ExpenseList({
                             name="date"
                             type="date"
                             required
-                            defaultValue={new Date(expense.date).toISOString().split("T")[0]}
+                            defaultValue={new Date(c.date).toISOString().split("T")[0]}
                             className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
                           />
                         </div>
@@ -215,7 +215,7 @@ export function ExpenseList({
                             type="number"
                             step="0.01"
                             required
-                            defaultValue={expense.amount}
+                            defaultValue={c.amount}
                             className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
                           />
                         </div>
@@ -224,7 +224,7 @@ export function ExpenseList({
                         <label className="block text-xs font-medium text-gray-500">Description</label>
                         <input
                           name="description"
-                          defaultValue={expense.description || ""}
+                          defaultValue={c.description || ""}
                           placeholder="Optional"
                           className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-gray-800 dark:border-gray-700"
                         />
@@ -247,45 +247,45 @@ export function ExpenseList({
                   </td>
                 </tr>
               ) : (
-                <tr key={expense.id} className="border-b">
+                <tr key={c.id} className="border-b">
                   <td className="py-2 text-gray-400">
                     {(currentPage - 1) * pageSize + index + 1}
                   </td>
                   <td className="py-2">
-                    {new Date(expense.date).toLocaleDateString()}
+                    {new Date(c.date).toLocaleDateString()}
                   </td>
-                  <td className="py-2">{expense.budgetLine.name}</td>
+                  <td className="py-2">{c.budgetLine.name}</td>
                   <td className="py-2 text-gray-500">
-                    {expense.description || "—"}
+                    {c.description || "—"}
                   </td>
-                  <td className="py-2 text-right">
-                    {expense.amount.toFixed(2)}{" "}
-                    {expense.budgetLine.budget.currency}
+                  <td className="py-2 text-right text-green-600 font-medium">
+                    +{c.amount.toFixed(2)}{" "}
+                    {c.budgetLine.budget.currency}
                   </td>
                   <td className="py-2 text-right">
                     <div className="flex justify-end gap-1">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => startEdit(expense)}
+                        onClick={() => startEdit(c)}
                       >
                         Edit
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleDelete(expense.id)}
-                        disabled={deleting === expense.id}
+                        onClick={() => handleDelete(c.id)}
+                        disabled={deleting === c.id}
                       >
-                        {deleting === expense.id ? "..." : "Delete"}
+                        {deleting === c.id ? "..." : "Delete"}
                       </Button>
                     </div>
                   </td>
                   <td className="py-2 text-right">
                     <input
                       type="checkbox"
-                      checked={selected.has(expense.id)}
-                      onChange={() => toggleOne(expense.id)}
+                      checked={selected.has(c.id)}
+                      onChange={() => toggleOne(c.id)}
                       className="rounded border-gray-300 dark:border-gray-600"
                     />
                   </td>

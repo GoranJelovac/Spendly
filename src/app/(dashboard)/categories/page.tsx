@@ -1,10 +1,16 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getActiveBudget } from "@/actions/active-budget";
-import { getCategories } from "@/actions/category";
+import { getCategoriesPaginated } from "@/actions/category";
 import { CategoryList } from "@/components/categories/category-list";
 
-export default async function CategoriesPage() {
+const PAGE_SIZE = 20;
+
+export default async function CategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
@@ -12,24 +18,35 @@ export default async function CategoriesPage() {
 
   if (!activeBudget) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="mb-4 text-3xl font-bold">Categories</h1>
-        <p className="text-gray-500">
-          No budget selected. Create one using the selector in the sidebar.
-        </p>
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+        <h1 className="mb-4 text-2xl font-bold">Categories</h1>
+        <div className="rounded-xl bg-white p-8 text-center shadow-sm dark:bg-gray-900">
+          <p className="text-gray-500">
+            No budget selected. Create one using the selector in the sidebar.
+          </p>
+        </div>
       </div>
     );
   }
 
-  const categories = await getCategories(activeBudget.id);
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+  const { items: categories, total } = await getCategoriesPaginated(activeBudget.id, page, PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-2 text-3xl font-bold">Categories</h1>
-      <p className="mb-6 text-gray-500">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+      <h1 className="mb-1 text-center text-2xl font-bold">Categories</h1>
+      <p className="mb-6 text-center text-sm text-gray-500">
         {activeBudget.name} &middot; {activeBudget.year} &middot; {activeBudget.currency}
       </p>
-      <CategoryList categories={categories} budgetId={activeBudget.id} />
+      <CategoryList
+        categories={categories}
+        budgetId={activeBudget.id}
+        currentPage={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
+      />
     </div>
   );
 }

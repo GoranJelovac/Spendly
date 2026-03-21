@@ -5,6 +5,28 @@ import { getAuthUser } from "@/lib/auth-utils";
 import { TIER_LIMITS, type SubscriptionTier } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 
+export async function getBudgetLinesPaginated(budgetId: string, page: number = 1, pageSize: number = 20) {
+  const user = await getAuthUser();
+
+  const budget = await db.budget.findFirst({
+    where: { id: budgetId, userId: user.id },
+  });
+  if (!budget) return { items: [], total: 0 };
+
+  const [items, total] = await Promise.all([
+    db.budgetLine.findMany({
+      where: { budgetId },
+      orderBy: { sortOrder: "asc" },
+      include: { category: true },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    db.budgetLine.count({ where: { budgetId } }),
+  ]);
+
+  return { items, total };
+}
+
 function parseAmountsFromForm(formData: FormData): {
   mode: "fixed" | "custom";
   monthlyAmount: number;
@@ -147,4 +169,28 @@ export async function deleteBudgetLine(id: string) {
 
   revalidatePath("/budgets");
   return { success: "Line deleted!" };
+}
+
+export async function deleteBudgetLines(ids: string[]) {
+  const user = await getAuthUser();
+
+  if (ids.length === 0) return { error: "No lines selected." };
+
+  // Verify ownership
+  const lines = await db.budgetLine.findMany({
+    where: { id: { in: ids } },
+    include: { budget: true },
+  });
+
+  const valid = lines.filter((l) => l.budget.userId === user.id);
+
+  if (valid.length === 0) return { error: "No lines found." };
+
+  const count = await db.budgetLine.deleteMany({
+    where: { id: { in: valid.map((l) => l.id) } },
+  });
+
+  revalidatePath("/budgets");
+  revalidatePath("/dashboard");
+  return { success: `Deleted ${count.count} line(s) and their expenses.` };
 }
