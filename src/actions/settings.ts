@@ -51,6 +51,22 @@ export async function updatePassword(formData: FormData) {
   return { success: "Password updated!" };
 }
 
+export async function updateDecimals(formData: FormData) {
+  const user = await getAuthUser();
+  const decimals = Number(formData.get("decimals"));
+
+  if (![0, 1, 2].includes(decimals)) {
+    return { error: "Decimals must be 0, 1, or 2." };
+  }
+
+  await db.user.update({
+    where: { id: user.id },
+    data: { decimals },
+  });
+
+  return { success: "Decimal places updated!" };
+}
+
 export async function deleteAccount() {
   const user = await getAuthUser();
   await db.user.delete({ where: { id: user.id } });

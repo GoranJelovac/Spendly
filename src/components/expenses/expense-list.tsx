@@ -5,7 +5,7 @@ import { deleteExpense, deleteExpenses, updateExpense } from "@/actions/expense"
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 import { ColumnFilter } from "@/components/shared/column-filter";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 type BudgetLine = {
   id: string;
@@ -38,6 +38,7 @@ export function ExpenseList({
   lines: BudgetLine[];
   pageSize: number;
 }) {
+  const { fmtD } = useDecimals();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,7 +66,7 @@ export function ExpenseList({
         date: new Date(e.date).toLocaleDateString(),
         line: e.budgetLine.name,
         description: e.description || "—",
-        amount: fmt(e.amount) + " " + e.budgetLine.budget.currency,
+        amount: fmtD(e.amount) + " " + e.budgetLine.budget.currency,
       };
       for (const key of Object.keys(vals) as ColKey[]) {
         if (!sets[key].has(vals[key])) { sets[key].add(vals[key]); cols[key].push(vals[key]); }
@@ -85,7 +86,7 @@ export function ExpenseList({
         date: new Date(e.date).toLocaleDateString(),
         line: e.budgetLine.name,
         description: e.description || "—",
-        amount: fmt(e.amount) + " " + e.budgetLine.budget.currency,
+        amount: fmtD(e.amount) + " " + e.budgetLine.budget.currency,
       };
       for (const [col, sel] of Object.entries(columnFilters)) {
         if (sel.size < columnValues[col as ColKey].length && !sel.has(vals[col as ColKey])) return false;
@@ -320,7 +321,7 @@ export function ExpenseList({
                     {expense.description || "—"}
                   </td>
                   <td className="py-2 text-right">
-                    {fmt(expense.amount)}{" "}
+                    {fmtD(expense.amount)}{" "}
                     {expense.budgetLine.budget.currency}
                   </td>
                   <td className="py-2 text-right">

@@ -8,7 +8,7 @@ import {
   Cell,
   Tooltip,
 } from "recharts";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 type LineData = {
   name: string;
@@ -65,6 +65,7 @@ function DonutWithLegend({
   activeIndex: number | null;
   onActiveChange: (index: number | null) => void;
 }) {
+  const { fmtD } = useDecimals();
   const total = data.reduce((s, d) => s + d.value, 0);
 
   return (
@@ -95,7 +96,7 @@ function DonutWithLegend({
               ))}
             </Pie>
             <Tooltip
-              formatter={(value) => `${fmt(Number(value))} ${currency}`}
+              formatter={(value) => `${fmtD(Number(value))} ${currency}`}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -105,7 +106,7 @@ function DonutWithLegend({
       <div className="flex-1 max-h-[200px] overflow-y-auto min-w-0">
         <div className="space-y-1">
           {data.map((entry, index) => {
-            const pct = total > 0 ? fmt((entry.value / total) * 100, 1) : "0,0";
+            const pct = total > 0 ? fmtD((entry.value / total) * 100, 1) : "0,0";
             return (
               <div
                 key={entry.name}
@@ -128,7 +129,7 @@ function DonutWithLegend({
                   {pct}%
                 </span>
                 <span className="flex-shrink-0 tabular-nums font-medium">
-                  {fmt(entry.value)}
+                  {fmtD(entry.value)}
                 </span>
               </div>
             );
@@ -172,6 +173,7 @@ function withAlpha(hex: string, alpha: number): string {
 }
 
 function AmountBars({ data, currency }: { data: LineData[]; currency: string }) {
+  const { fmtD } = useDecimals();
   const maxVal = Math.max(...data.map((d) => Math.max(d.planned + d.contributed, d.spent))) * 1.08;
 
   return (
@@ -193,14 +195,14 @@ function AmountBars({ data, currency }: { data: LineData[]; currency: string }) 
                 style={{ width: `${plannedW}%`, backgroundColor: withAlpha(color, 0.35) }}
               />
               <div className="absolute inset-0 flex items-center px-2.5 z-10">
-                <span className="w-[110px] shrink-0 truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
+                <span className="w-[40%] truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
                   {item.name}
                 </span>
-                <span className="flex-1 text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  {fmt(pct, 0)}%
+                <span className="w-[20%] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  {fmtD(pct, 0)}%
                 </span>
-                <span className="w-[80px] shrink-0 text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  <span className="font-semibold">{fmt(item.spent, 0)}</span> / {fmt(total, 0)}
+                <span className="w-[40%] text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  <span className="font-semibold">{fmtD(item.spent)}</span> / {fmtD(total)}
                 </span>
               </div>
             </div>
@@ -218,6 +220,7 @@ function AmountBars({ data, currency }: { data: LineData[]; currency: string }) 
 }
 
 function PercentageBars({ data, currency }: { data: LineData[]; currency: string }) {
+  const { fmtD } = useDecimals();
   return (
     <div className="space-y-3">
       {data.map((item, idx) => {
@@ -276,14 +279,14 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
 
               {/* Inline labels */}
               <div className="absolute inset-0 flex items-center px-2.5 z-10">
-                <span className="w-[110px] shrink-0 truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
+                <span className="w-[40%] truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
                   {item.name}
                 </span>
-                <span className="flex-1 text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  {fmt(spentPct, 0)}%
+                <span className="w-[20%] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  {fmtD(spentPct, 0)}%
                 </span>
-                <span className="w-[80px] shrink-0 text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  <span className="font-semibold">{fmt(item.spent, 0)}</span> / {fmt(total, 0)}
+                <span className="w-[40%] text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  <span className="font-semibold">{fmtD(item.spent)}</span> / {fmtD(total)}
                 </span>
               </div>
             </div>
@@ -401,6 +404,7 @@ export function SpendingOverviewChart({
     );
   }
 
+  const { fmtD } = useDecimals();
   const totalSpent = data.reduce((s, d) => s + d.spent, 0);
   const unspent = Math.max(0, totalPlanned - totalSpent);
 
@@ -421,7 +425,7 @@ export function SpendingOverviewChart({
         const overColor = getOverspendColor(overPct);
         return (
           <p className="mb-2 text-xs" style={overColor ? { color: overColor } : { color: "#f87171" }}>
-            Over budget by {fmt(overspent)} {currency}
+            Over budget by {fmtD(overspent)} {currency}
           </p>
         );
       })()}

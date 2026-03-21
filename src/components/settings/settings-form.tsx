@@ -1,21 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { updateName, updatePassword, deleteAccount } from "@/actions/settings";
+import { useTheme } from "next-themes";
+import { updateName, updatePassword, updateDecimals, deleteAccount } from "@/actions/settings";
+import { useDecimals } from "@/lib/decimals-context";
 import { Button } from "@/components/ui/button";
 
 export function SettingsForm({
   name,
   email,
+  decimals: initialDecimals,
 }: {
   name: string;
   email: string;
+  decimals: number;
 }) {
   const [nameMsg, setNameMsg] = useState("");
   const [pwMsg, setPwMsg] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Theme
+  const { theme, setTheme } = useTheme();
+
+  // Decimals
+  const { decimals, setDecimals } = useDecimals();
+  const [decimalsMsg, setDecimalsMsg] = useState("");
+  const [decimalsLoading, setDecimalsLoading] = useState(false);
 
   async function handleNameUpdate(formData: FormData) {
     setNameMsg("");
@@ -29,6 +41,17 @@ export function SettingsForm({
     setPwMsg(result.error || result.success || "");
   }
 
+  async function handleDecimalsChange(value: number) {
+    setDecimalsMsg("");
+    setDecimalsLoading(true);
+    setDecimals(value);
+    const fd = new FormData();
+    fd.set("decimals", String(value));
+    const result = await updateDecimals(fd);
+    setDecimalsMsg(result.error || result.success || "");
+    setDecimalsLoading(false);
+  }
+
   async function handleDeleteAccount() {
     if (deleteInput !== name) return;
     setDeleteLoading(true);
@@ -36,9 +59,73 @@ export function SettingsForm({
     setDeleteLoading(false);
   }
 
+  const themeOptions = [
+    { value: "light", label: "Light", icon: "\u2600" },
+    { value: "dark", label: "Dark", icon: "\u263E" },
+    { value: "system", label: "System", icon: "\u2699" },
+  ];
+
+  const decimalsOptions = [
+    { value: 0, label: "0", example: "1.234" },
+    { value: 1, label: "1", example: "1.234,5" },
+    { value: 2, label: "2", example: "1.234,56" },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Name */}
+      {/* Appearance */}
+      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+        <h2 className="mb-4 text-lg font-semibold">Appearance</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Theme</label>
+            <div className="flex gap-2">
+              {themeOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setTheme(opt.value)}
+                  className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                    theme === opt.value
+                      ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-300"
+                      : "border-gray-200 hover:border-gray-300 dark:border-[#252345] dark:hover:border-[#353355]"
+                  }`}
+                >
+                  <span>{opt.icon}</span>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Decimal Places</label>
+            <div className="flex gap-2">
+              {decimalsOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleDecimalsChange(opt.value)}
+                  disabled={decimalsLoading}
+                  className={`flex flex-col items-center rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                    decimals === opt.value
+                      ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-300"
+                      : "border-gray-200 hover:border-gray-300 dark:border-[#252345] dark:hover:border-[#353355]"
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-[#6b6b8a] tabular-nums">{opt.example}</span>
+                </button>
+              ))}
+            </div>
+            {decimalsMsg && (
+              <p className={`mt-2 text-sm ${decimalsMsg.includes("updated") ? "text-green-600" : "text-red-500"}`}>
+                {decimalsMsg}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Profile */}
       <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
         <h2 className="mb-4 text-lg font-semibold">Profile</h2>
         <form action={handleNameUpdate} className="space-y-3">

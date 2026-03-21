@@ -5,7 +5,7 @@ import { deleteContribution, deleteContributions, updateContribution } from "@/a
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 import { ColumnFilter } from "@/components/shared/column-filter";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 type BudgetLine = {
   id: string;
@@ -38,6 +38,7 @@ export function ContributionList({
   lines: BudgetLine[];
   pageSize: number;
 }) {
+  const { fmtD } = useDecimals();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,7 +66,7 @@ export function ContributionList({
         date: new Date(c.date).toLocaleDateString(),
         line: c.budgetLine.name,
         description: c.description || "—",
-        amount: "+" + fmt(c.amount) + " " + c.budgetLine.budget.currency,
+        amount: "+" + fmtD(c.amount) + " " + c.budgetLine.budget.currency,
       };
       for (const key of Object.keys(vals) as ColKey[]) {
         if (!sets[key].has(vals[key])) { sets[key].add(vals[key]); cols[key].push(vals[key]); }
@@ -85,7 +86,7 @@ export function ContributionList({
         date: new Date(c.date).toLocaleDateString(),
         line: c.budgetLine.name,
         description: c.description || "—",
-        amount: "+" + fmt(c.amount) + " " + c.budgetLine.budget.currency,
+        amount: "+" + fmtD(c.amount) + " " + c.budgetLine.budget.currency,
       };
       for (const [col, sel] of Object.entries(columnFilters)) {
         if (sel.size < columnValues[col as ColKey].length && !sel.has(vals[col as ColKey])) return false;
@@ -320,7 +321,7 @@ export function ContributionList({
                     {c.description || "—"}
                   </td>
                   <td className="py-2 text-right text-green-600 font-medium">
-                    +{fmt(c.amount)}{" "}
+                    +{fmtD(c.amount)}{" "}
                     {c.budgetLine.budget.currency}
                   </td>
                   <td className="py-2 text-right">

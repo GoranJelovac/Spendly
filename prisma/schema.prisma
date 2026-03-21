@@ -16,6 +16,7 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+  decimals       Int       @default(0) // 0, 1, or 2 decimal places for number formatting
 
   // Stripe
   stripeCustomerId     String?   @unique

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import * as XLSX from "xlsx";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 type ParsedTransaction = {
   date: string;
@@ -105,6 +105,7 @@ export function ImportExportTransactions({
   previewImport,
   applyImport,
 }: Props) {
+  const { fmtD } = useDecimals();
   const [preview, setPreview] = useState<PreviewRow[] | null>(null);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -267,7 +268,7 @@ export function ImportExportTransactions({
                         <div className="text-xs text-red-500">{row.error}</div>
                       )}
                     </td>
-                    <td className="py-2 text-right">{fmt(row.amount)}</td>
+                    <td className="py-2 text-right">{fmtD(row.amount)}</td>
                     <td className="py-2 text-gray-500">{row.description || "—"}</td>
                   </tr>
                 ))}

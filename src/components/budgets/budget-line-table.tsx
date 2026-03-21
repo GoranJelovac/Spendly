@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
 import { ColumnFilter } from "@/components/shared/column-filter";
 import { getMonthlyAmounts, getYearlyTotal } from "@/lib/budget-utils";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 const MONTH_SHORT = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -42,6 +42,7 @@ export function BudgetLineTable({
   totalPages: number;
   pageSize: number;
 }) {
+  const { fmtD } = useDecimals();
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState<"fixed" | "custom">("fixed");
@@ -205,8 +206,8 @@ export function BudgetLineTable({
               const yearly = getYearlyTotal(amounts);
               const isCustom = !!line.monthlyAmounts;
               const displayMonthly = isCustom
-                ? `${fmt(Math.min(...amounts))}–${fmt(Math.max(...amounts))}`
-                : fmt(line.monthlyAmount);
+                ? `${fmtD(Math.min(...amounts))}–${fmtD(Math.max(...amounts))}`
+                : fmtD(line.monthlyAmount);
               const rowNumber = (currentPage - 1) * pageSize + index + 1;
 
               return editingId === line.id ? (
@@ -320,7 +321,7 @@ export function BudgetLineTable({
                   <td className="py-2 text-gray-500 text-xs">{line.category.name}</td>
                   <td className="py-2 text-gray-500 text-xs">{isCustom ? "Custom" : "Fixed"}</td>
                   <td className="py-2 text-right">{displayMonthly}</td>
-                  <td className="py-2 text-right">{fmt(yearly)}</td>
+                  <td className="py-2 text-right">{fmtD(yearly)}</td>
                   <td className="py-2 text-right">
                     <div className="flex justify-end gap-1">
                       <Button size="sm" variant="outline" onClick={() => startEdit(line)}>

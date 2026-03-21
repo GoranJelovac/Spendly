@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -12,6 +12,7 @@ export function MonthlyBreakdown({
   monthTotals: number[];
   currency: string;
 }) {
+  const { fmtD } = useDecimals();
   const [open, setOpen] = useState(false);
   const yearlyTotal = monthTotals.reduce((sum, a) => sum + a, 0);
 
@@ -26,7 +27,7 @@ export function MonthlyBreakdown({
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold">
-            {fmt(yearlyTotal)} {currency} / year
+            {fmtD(yearlyTotal)} {currency} / year
           </span>
           <span
             className={`text-gray-400 text-xs transition-transform duration-200 ${
@@ -52,7 +53,7 @@ export function MonthlyBreakdown({
                 <p className={`mt-0.5 text-sm font-semibold ${
                   val === 0 ? "text-gray-300 dark:text-[#252345]" : ""
                 }`}>
-                  {fmt(val)}
+                  {fmtD(val)}
                 </p>
               </div>
             ))}
@@ -62,7 +63,7 @@ export function MonthlyBreakdown({
                 Total
               </p>
               <p className="mt-0.5 text-lg font-bold text-emerald-700 dark:text-emerald-300">
-                {fmt(yearlyTotal)}
+                {fmtD(yearlyTotal)}
               </p>
               <p className="text-[10px] text-emerald-500 dark:text-emerald-500">
                 {currency}
@@ -80,7 +81,7 @@ export function MonthlyBreakdown({
                 <p className={`mt-0.5 text-sm font-semibold ${
                   val === 0 ? "text-gray-300 dark:text-[#252345]" : ""
                 }`}>
-                  {fmt(val)}
+                  {fmtD(val)}
                 </p>
               </div>
             ))}

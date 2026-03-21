@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { getDashboardData, type DashboardData } from "@/actions/dashboard";
 import { PlannedVsSpentChart, BudgetBreakdownChart, SpendingOverviewChart } from "@/components/dashboard/charts";
 import { ColumnFilter } from "@/components/shared/column-filter";
-import { fmt } from "@/lib/format";
+import { useDecimals } from "@/lib/decimals-context";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -74,6 +74,7 @@ export function DashboardContent({
   budgetId: string;
   budgetCurrency: string;
 }) {
+  const { fmtD } = useDecimals();
   const [period, setPeriod] = useState<"month" | "ytd" | "bymonth">("month");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [byMonthMode, setByMonthMode] = useState<"single" | "cumulative">("single");
@@ -170,12 +171,12 @@ export function DashboardContent({
       const vals: Record<ColKey, string> = {
         name: item.name,
         categoryName: "categoryName" in item ? String(item.categoryName) : "",
-        planned: fmt(item.planned),
-        contributed: item.contributed > 0 ? fmt(item.contributed) : "—",
-        available: fmt(item.available),
-        spent: fmt(item.spent),
-        remaining: fmt(item.remaining),
-        percentage: fmt(item.percentage, 0) + "%",
+        planned: fmtD(item.planned),
+        contributed: item.contributed > 0 ? fmtD(item.contributed) : "—",
+        available: fmtD(item.available),
+        spent: fmtD(item.spent),
+        remaining: fmtD(item.remaining),
+        percentage: fmtD(item.percentage, 0) + "%",
       };
       for (const key of Object.keys(vals) as ColKey[]) {
         if (!sets[key].has(vals[key])) {
@@ -203,12 +204,12 @@ export function DashboardContent({
       const vals: Record<ColKey, string> = {
         name: item.name,
         categoryName: "categoryName" in item ? String(item.categoryName) : "",
-        planned: fmt(item.planned),
-        contributed: item.contributed > 0 ? fmt(item.contributed) : "—",
-        available: fmt(item.available),
-        spent: fmt(item.spent),
-        remaining: fmt(item.remaining),
-        percentage: fmt(item.percentage, 0) + "%",
+        planned: fmtD(item.planned),
+        contributed: item.contributed > 0 ? fmtD(item.contributed) : "—",
+        available: fmtD(item.available),
+        spent: fmtD(item.spent),
+        remaining: fmtD(item.remaining),
+        percentage: fmtD(item.percentage, 0) + "%",
       };
 
       for (const [col, selected] of Object.entries(columnFilters)) {
@@ -475,10 +476,10 @@ export function DashboardContent({
                           </span>
                         </td>
                       )}
-                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmt(item.planned)}</td>
-                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{item.contributed > 0 ? fmt(item.contributed) : "—"}</td>
-                      <td className="py-[6px] text-right tabular-nums font-semibold dark:text-[#e0e0f0]">{fmt(item.available)}</td>
-                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmt(item.spent)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmtD(item.planned)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{item.contributed > 0 ? fmtD(item.contributed) : "—"}</td>
+                      <td className="py-[6px] text-right tabular-nums font-semibold dark:text-[#e0e0f0]">{fmtD(item.available)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmtD(item.spent)}</td>
                       <td
                         className={`py-[6px] pr-4 text-right tabular-nums font-semibold ${
                           item.remaining < 0
@@ -490,7 +491,7 @@ export function DashboardContent({
                             : "text-emerald-500"
                         }`}
                       >
-                        {fmt(item.remaining)}
+                        {fmtD(item.remaining)}
                       </td>
                       <td className="rounded-r-xl py-[6px] pl-4 pr-3">
                         <div className="flex items-center gap-2">
@@ -513,7 +514,7 @@ export function DashboardContent({
                             />
                           </div>
                           <span className="w-12 text-xs tabular-nums text-gray-500 dark:text-[#6b6b8a]">
-                            {fmt(item.percentage, 0)}%
+                            {fmtD(item.percentage, 0)}%
                           </span>
                         </div>
                       </td>
@@ -567,6 +568,7 @@ function SummaryCard({
   accent: keyof typeof ACCENT_HEX;
   valueColor?: keyof typeof VALUE_COLORS;
 }) {
+  const { fmtD } = useDecimals();
   return (
     <div
       className="rounded-2xl border-2 bg-transparent p-[15px]"
@@ -580,7 +582,7 @@ function SummaryCard({
           valueColor ? VALUE_COLORS[valueColor] : "dark:text-[#e0e0f0]"
         }`}
       >
-        {fmt(value, suffix === "%" ? 1 : 2)}
+        {fmtD(value, suffix === "%" ? 1 : undefined)}
         {suffix || (currency ? ` ${currency}` : "")}
       </p>
     </div>
