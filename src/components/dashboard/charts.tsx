@@ -186,31 +186,29 @@ function AmountBars({ data, currency }: { data: LineData[]; currency: string }) 
         const spentW = (item.spent / maxVal) * 100;
 
         return (
-          <div key={item.name}>
-            <div className="mb-1 flex items-center gap-2">
-              <span className="w-[110px] shrink-0 truncate text-sm font-medium" style={{ color }} title={item.name}>
-                {item.name}
-              </span>
-              <span className="flex-1 text-center text-[11px] font-semibold tabular-nums" style={{ color }}>
-                {fmt(pct, 0)}%
-              </span>
-              <span className="shrink-0 text-[11px] tabular-nums" style={{ color }}>
-                <span className="font-semibold">{fmt(item.spent)}</span> / {fmt(total)}
-              </span>
+          <div key={item.name} className="flex flex-col gap-0.5">
+            <div className="relative h-7 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
+              <div
+                className="absolute inset-y-0 left-0 rounded-md transition-all duration-500"
+                style={{ width: `${plannedW}%`, backgroundColor: withAlpha(color, 0.35) }}
+              />
+              <div className="absolute inset-0 flex items-center px-2.5 z-10">
+                <span className="w-[110px] shrink-0 truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
+                  {item.name}
+                </span>
+                <span className="flex-1 text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  {fmt(pct, 0)}%
+                </span>
+                <span className="w-[80px] shrink-0 text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  <span className="font-semibold">{fmt(item.spent, 0)}</span> / {fmt(total, 0)}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <div className="relative h-5 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
-                <div
-                  className="absolute inset-y-0 left-0 rounded-md transition-all duration-500"
-                  style={{ width: `${plannedW}%`, backgroundColor: withAlpha(color, 0.35) }}
-                />
-              </div>
-              <div className="relative h-2 w-full overflow-hidden rounded bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
-                <div
-                  className="absolute inset-y-0 left-0 rounded transition-all duration-500"
-                  style={{ width: `${spentW}%`, backgroundColor: spentBarColor }}
-                />
-              </div>
+            <div className="relative h-2 w-full overflow-hidden rounded bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
+              <div
+                className="absolute inset-y-0 left-0 rounded transition-all duration-500"
+                style={{ width: `${spentW}%`, backgroundColor: spentBarColor }}
+              />
             </div>
           </div>
         );
@@ -230,47 +228,24 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
         const colors = getBarColors(idx);
 
         return (
-          <div key={item.name} className="group">
-            {/* Label row */}
-            <div className="mb-1 flex items-baseline justify-between gap-2">
-              <div className="min-w-0 flex items-center gap-1.5">
-                <span
-                  className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-sm"
-                  style={{ backgroundColor: colors.planned }}
-                />
-                <span className="text-sm font-medium truncate">{item.name}</span>
-                {item.categoryName && (
-                  <span className="text-[10px] text-gray-400 dark:text-[#6b6b8a]">{item.categoryName}</span>
-                )}
-              </div>
-              <div className="flex-shrink-0 text-right">
-                <span className="text-sm font-semibold tabular-nums" style={overspendClr ? { color: overspendClr } : undefined}>
-                  {fmt(spentPct, 1)}%
-                </span>
-                <span className="ml-2 text-[11px] text-gray-400 dark:text-[#6b6b8a] tabular-nums">
-                  {fmt(item.spent)} / {fmt(total)} {currency}
-                </span>
-              </div>
-            </div>
-
-            {/* Bar */}
-            <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-[#252345]">
+          <div key={item.name}>
+            {/* Bar with inline labels */}
+            <div className="relative h-7 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-[#252345]">
               {/* Contributed segment (lighter) */}
               {contributedPct > 0 && (
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full"
+                  className="absolute inset-y-0 left-0 rounded-md"
                   style={{
                     width: "100%",
                     backgroundColor: colors.contributed,
                     opacity: 0.5,
                   }}
-                  title={`Contributed: ${fmt(item.contributed)} ${currency}`}
                 />
               )}
 
               {/* Planned base (full bar = 100%) */}
               <div
-                className="absolute inset-y-0 left-0 rounded-full"
+                className="absolute inset-y-0 left-0 rounded-md"
                 style={{
                   width: `${Math.min(contributedPct > 0 ? 100 - contributedPct : 100, 100)}%`,
                   backgroundColor: colors.planned,
@@ -280,7 +255,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
 
               {/* Spent fill */}
               <div
-                className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+                className="absolute inset-y-0 left-0 rounded-md transition-all duration-500"
                 style={{
                   width: `${Math.min(spentPct, 100)}%`,
                   backgroundColor: overspendClr || colors.planned,
@@ -290,7 +265,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
               {/* Overspent portion */}
               {overspendClr && spentPct > 100 && (
                 <div
-                  className={`absolute inset-y-0 right-0 rounded-r-full ${spentPct > 150 ? "animate-pulse" : ""}`}
+                  className={`absolute inset-y-0 right-0 rounded-r-md ${spentPct > 150 ? "animate-pulse" : ""}`}
                   style={{
                     width: `${Math.min(spentPct - 100, 100)}%`,
                     backgroundColor: overspendClr,
@@ -298,26 +273,24 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
                   }}
                 />
               )}
+
+              {/* Inline labels */}
+              <div className="absolute inset-0 flex items-center px-2.5 z-10">
+                <span className="w-[110px] shrink-0 truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
+                  {item.name}
+                </span>
+                <span className="flex-1 text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  {fmt(spentPct, 0)}%
+                </span>
+                <span className="w-[80px] shrink-0 text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  <span className="font-semibold">{fmt(item.spent, 0)}</span> / {fmt(total, 0)}
+                </span>
+              </div>
             </div>
           </div>
         );
       })}
 
-      {/* Legend */}
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-500">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-500 to-purple-500" /> Spent
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300 opacity-20" /> Planned
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-gradient-to-r from-blue-300 to-purple-300 opacity-50" /> Contributed
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: "#f87171" }} /> Over budget
-        </span>
-      </div>
     </div>
   );
 }
