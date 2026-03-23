@@ -125,16 +125,16 @@ export function CategoryList({
       {/* Add form — card */}
       <form
         action={handleCreate}
-        className="mb-6 flex items-center gap-3 rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]"
+        className="mb-6 flex items-center gap-3 rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 shadow-md dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]"
       >
-        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] bg-indigo-50 text-lg text-indigo-500 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8]">
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] bg-sp-accent/10 text-lg text-sp-accent">
           +
         </div>
         <input
           name="name"
           required
           placeholder="New category name"
-          className="flex-1 rounded-[10px] border border-gray-200 bg-white px-3 py-2 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+          className="flex-1 rounded-[10px] border border-gray-200 bg-white px-3 py-2 text-sm dark:border-sp-border dark:bg-sp-surface"
         />
         <Button type="submit" size="sm">
           Add
@@ -163,12 +163,12 @@ export function CategoryList({
       )}
 
       {/* Category list */}
-      <div className="min-h-[20rem] rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
-        <table className="w-full text-left text-sm">
-          <thead className="text-xs uppercase tracking-wider text-gray-500">
-            <tr className="border-b border-gray-100 dark:border-[#252345]">
-              <th className="px-4 py-2 w-12 font-medium">#</th>
-              <th className="px-4 py-2 font-medium">
+      <div className="min-h-[20rem] rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
+        <table className="w-full border-separate border-spacing-y-2 text-left text-[14px]">
+          <thead>
+            <tr className="bg-sp-accent/8">
+              <th className="rounded-l-2xl pb-2.5 pl-3 pt-2.5 w-12 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">#</th>
+              <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Name
                 <ColumnFilter
                   values={columnValues.name}
@@ -176,7 +176,7 @@ export function CategoryList({
                   onChange={(s) => setColumnFilters((p) => ({ ...p, name: s }))}
                 />
               </th>
-              <th className="px-4 py-2 text-right font-medium">
+              <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Lines
                 <ColumnFilter
                   values={columnValues.lines}
@@ -184,8 +184,8 @@ export function CategoryList({
                   onChange={(s) => setColumnFilters((p) => ({ ...p, lines: s }))}
                 />
               </th>
-              <th className="px-4 py-2 text-right font-medium">Actions</th>
-              <th className="px-4 py-2 w-8 text-right">
+              <th className="pb-2.5 pr-4 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">Actions</th>
+              <th className="rounded-r-2xl pb-2.5 pr-4 pt-2.5 w-8 text-right">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -198,11 +198,11 @@ export function CategoryList({
           </thead>
           <tbody>
             {filteredCategories.map((cat, index) => (
-              <tr key={cat.id} className="border-b border-gray-50 last:border-0 dark:border-[#252345]/50">
-                <td className="px-4 py-2 text-gray-400">
+              <tr key={cat.id} className="bg-gray-50 dark:bg-sp-surface">
+                <td className="rounded-l-xl py-[6px] pl-3 text-gray-400">
                   {(currentPage - 1) * pageSize + index + 1}
                 </td>
-                <td className="px-4 py-2">
+                <td className="py-[6px]">
                   {editingId === cat.id ? (
                     <form
                       action={(fd) => handleRename(cat.id, fd)}
@@ -212,7 +212,7 @@ export function CategoryList({
                         name="name"
                         defaultValue={cat.name}
                         required
-                        className="rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+                        className="rounded-lg border border-gray-200 px-2 py-1 text-sm dark:border-sp-border dark:bg-sp-surface"
                       />
                       <Button size="sm" type="submit">Save</Button>
                       <Button
@@ -225,15 +225,15 @@ export function CategoryList({
                       </Button>
                     </form>
                   ) : (
-                    <span className="font-medium">{cat.name}</span>
+                    <span className="font-semibold dark:text-sp-text">{cat.name}</span>
                   )}
                 </td>
-                <td className="px-4 py-2 text-right">
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8]">
+                <td className="py-[6px] text-right">
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-sp-accent/10 dark:text-sp-accent">
                     {cat._count.lines}
                   </span>
                 </td>
-                <td className="px-4 py-2 text-right">
+                <td className="py-[6px] text-right">
                   {cat.name !== "General" && editingId !== cat.id && (
                     <div className="flex justify-end gap-1">
                       <Button
@@ -253,7 +253,7 @@ export function CategoryList({
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-2 text-right">
+                <td className="rounded-r-xl py-[6px] pr-4 text-right">
                   {cat.name !== "General" ? (
                     <input
                       type="checkbox"

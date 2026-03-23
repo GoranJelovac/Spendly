@@ -186,7 +186,6 @@ export function BudgetLineTable({
     return <p className="text-gray-500">No budget lines yet. Add one above!</p>;
   }
 
-  // Running row counter across all groups
   let globalRowIndex = 0;
 
   return (
@@ -226,27 +225,28 @@ export function BudgetLineTable({
           </div>
         )}
       </div>
-      <div className="min-h-[20rem] overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b text-gray-500">
-            <tr>
-              <th className="pb-2 w-12 font-medium">#</th>
-              <th className="pb-2 font-medium">
+
+      <div className="min-h-[20rem] overflow-x-auto rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
+        <table className="w-full text-left text-[14px]">
+          <thead>
+            <tr className="bg-sp-accent/8">
+              <th className="pb-2.5 pl-3 pt-2.5 w-12 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">#</th>
+              <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Name
                 <ColumnFilter values={columnValues.name} selected={getSelectedForCol("name")} onChange={(s) => setColumnFilters((p) => ({ ...p, name: s }))} />
               </th>
-              <th className="pb-2 font-medium">
+              <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Code
                 <ColumnFilter values={columnValues.code} selected={getSelectedForCol("code")} onChange={(s) => setColumnFilters((p) => ({ ...p, code: s }))} />
               </th>
-              <th className="pb-2 font-medium">
+              <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Type
                 <ColumnFilter values={columnValues.type} selected={getSelectedForCol("type")} onChange={(s) => setColumnFilters((p) => ({ ...p, type: s }))} />
               </th>
-              <th className="pb-2 text-right font-medium">Monthly ({currency})</th>
-              <th className="pb-2 text-right font-medium">Yearly ({currency})</th>
-              <th className="pb-2 text-right font-medium">Actions</th>
-              <th className="pb-2 w-8 text-right">
+              <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">Monthly ({currency})</th>
+              <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">Yearly ({currency})</th>
+              <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">Actions</th>
+              <th className="pb-2.5 pr-4 pt-2.5 w-8 text-right">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -263,37 +263,39 @@ export function BudgetLineTable({
                 const amounts = getMonthlyAmounts(line);
                 return sum + amounts.reduce((a, b) => a + b, 0) / 12;
               }, 0);
-              const groupYearlyTotal = group.lines.reduce((sum, line) => {
-                const amounts = getMonthlyAmounts(line);
-                return sum + getYearlyTotal(amounts);
-              }, 0);
 
               return (
                 <Fragment key={group.categoryId}>
                   {/* Category header row */}
                   <tr
-                    className="cursor-pointer select-none border-b bg-indigo-950/40 hover:bg-indigo-950/60 dark:bg-indigo-950/40 dark:hover:bg-indigo-950/60"
+                    className="cursor-pointer select-none"
                     onClick={() => toggleCategory(group.categoryId)}
                   >
-                    <td colSpan={8} className="py-2 px-2">
+                    <td colSpan={8} className="px-3 pb-1 pt-4">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-indigo-400">
-                          <span className="mr-1.5 inline-block w-4 text-xs">
-                            {isCollapsed ? "►" : "▼"}
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-[10px] text-gray-400 dark:text-sp-muted transition-transform duration-200 ${
+                              isCollapsed ? "" : "rotate-180"
+                            }`}
+                          >
+                            &#9660;
                           </span>
-                          {group.categoryName}
-                          <span className="ml-2 font-normal text-xs text-gray-500">
-                            {group.lines.length} {group.lines.length === 1 ? "line" : "lines"}
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-sp-accent/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-sp-accent">
+                            {group.categoryName}
+                            <span className="font-normal text-[10px] text-sp-accent/60 dark:text-sp-accent/50">
+                              {group.lines.length}
+                            </span>
                           </span>
-                        </span>
-                        <span className="text-sm font-semibold text-indigo-400">
-                          {fmtD(groupMonthlyTotal)} / mo
+                        </div>
+                        <span className="text-[11px] font-semibold tabular-nums text-gray-500 dark:text-sp-muted">
+                          {fmtD(groupMonthlyTotal)} {currency}/mo
                         </span>
                       </div>
                     </td>
                   </tr>
-                  {/* Line rows */}
-                  {!isCollapsed && group.lines.map((line) => {
+                  {/* Line rows — striped, indented */}
+                  {!isCollapsed && group.lines.map((line, lineIndex) => {
                     globalRowIndex++;
                     const amounts = getMonthlyAmounts(line);
                     const yearly = getYearlyTotal(amounts);
@@ -304,8 +306,8 @@ export function BudgetLineTable({
                     const rowNumber = (currentPage - 1) * pageSize + globalRowIndex;
 
                     return editingId === line.id ? (
-                      <tr key={line.id} className="border-b">
-                        <td colSpan={8} className="py-3">
+                      <tr key={line.id} className="bg-gray-50 dark:bg-sp-surface/50">
+                        <td colSpan={8} className="py-3 pl-7 pr-3">
                           <form
                             action={(fd) => handleUpdate(line.id, fd)}
                             className="space-y-3"
@@ -318,7 +320,7 @@ export function BudgetLineTable({
                                   name="name"
                                   defaultValue={line.name}
                                   required
-                                  className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                                  className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
                                 />
                               </div>
                               <div>
@@ -326,7 +328,7 @@ export function BudgetLineTable({
                                 <input
                                   name="code"
                                   defaultValue={line.code || ""}
-                                  className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                                  className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
                                 />
                               </div>
                               <div>
@@ -334,7 +336,7 @@ export function BudgetLineTable({
                                 <select
                                   name="categoryId"
                                   defaultValue={line.categoryId}
-                                  className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                                  className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
                                 >
                                   {categories.map((cat) => (
                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -347,7 +349,7 @@ export function BudgetLineTable({
                                   onClick={() => setEditMode("fixed")}
                                   className={`px-2 py-1 text-xs ${
                                     editMode === "fixed"
-                                      ? "bg-black text-white dark:bg-[#818cf8] dark:text-white"
+                                      ? "bg-black text-white dark:bg-sp-accent dark:text-white"
                                       : ""
                                   }`}
                                 >
@@ -358,7 +360,7 @@ export function BudgetLineTable({
                                   onClick={() => setEditMode("custom")}
                                   className={`px-2 py-1 text-xs ${
                                     editMode === "custom"
-                                      ? "bg-black text-white dark:bg-[#818cf8] dark:text-white"
+                                      ? "bg-black text-white dark:bg-sp-accent dark:text-white"
                                       : ""
                                   }`}
                                 >
@@ -376,7 +378,7 @@ export function BudgetLineTable({
                                   step="0.01"
                                   defaultValue={line.monthlyAmount}
                                   required
-                                  className="w-full rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                                  className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
                                 />
                               </div>
                             ) : (
@@ -389,7 +391,7 @@ export function BudgetLineTable({
                                       type="number"
                                       step="0.01"
                                       defaultValue={amounts[i]}
-                                      className="w-full rounded-md border px-2 py-1 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                                      className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
                                     />
                                   </div>
                                 ))}
@@ -407,14 +409,14 @@ export function BudgetLineTable({
                         </td>
                       </tr>
                     ) : (
-                      <tr key={line.id} className="border-b">
-                        <td className="py-2 text-gray-400">{rowNumber}</td>
-                        <td className="py-2">{line.name}</td>
-                        <td className="py-2 text-gray-500">{line.code || "—"}</td>
-                        <td className="py-2 text-gray-500 text-xs">{isCustom ? "Custom" : "Fixed"}</td>
-                        <td className="py-2 text-right">{displayMonthly}</td>
-                        <td className="py-2 text-right">{fmtD(yearly)}</td>
-                        <td className="py-2 text-right">
+                      <tr key={line.id} className={lineIndex % 2 === 0 ? "bg-sp-accent/[0.04]" : ""}>
+                        <td className="py-[5px] pl-7 text-gray-400">{rowNumber}</td>
+                        <td className="py-[5px] font-semibold dark:text-sp-text">{line.name}</td>
+                        <td className="py-[5px] text-gray-500 dark:text-sp-muted">{line.code || "—"}</td>
+                        <td className="py-[5px] text-gray-500 text-xs dark:text-sp-muted">{isCustom ? "Custom" : "Fixed"}</td>
+                        <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{displayMonthly}</td>
+                        <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{fmtD(yearly)}</td>
+                        <td className="py-[5px] text-right">
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant="outline" onClick={() => startEdit(line)}>
                               Edit
@@ -424,7 +426,7 @@ export function BudgetLineTable({
                             </Button>
                           </div>
                         </td>
-                        <td className="py-2 text-right">
+                        <td className="py-[5px] pr-4 text-right">
                           <input
                             type="checkbox"
                             checked={selected.has(line.id)}

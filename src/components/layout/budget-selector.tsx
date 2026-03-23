@@ -150,7 +150,7 @@ export function BudgetSelector({
           ))}
         </select>
         {activeBudget && (
-          <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-indigo-50 px-2 py-1 text-[11px] font-bold text-indigo-500 dark:bg-sp-accent/15 dark:text-sp-accent">
+          <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-sp-accent/10 px-2 py-1 text-[11px] font-bold text-sp-accent">
             <img
               src={currencyFlagUrl(activeBudget.currency, 32)}
               alt=""
@@ -166,7 +166,7 @@ export function BudgetSelector({
         <div className="flex gap-1">
           <button
             onClick={() => { closeAll(); setShowCreate(true); }}
-            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-sp-accent/10 dark:text-sp-accent dark:hover:bg-sp-accent/20"
+            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-sp-accent/10 px-2 py-1.5 text-[11px] font-semibold text-sp-accent transition-colors hover:bg-sp-accent/20"
           >
             New
           </button>
@@ -174,7 +174,7 @@ export function BudgetSelector({
             <>
               <button
                 onClick={() => { closeAll(); setShowEdit(true); }}
-                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-sp-accent/10 dark:text-sp-accent dark:hover:bg-sp-accent/20"
+                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-sp-accent/10 px-2 py-1.5 text-[11px] font-semibold text-sp-accent transition-colors hover:bg-sp-accent/20"
               >
                 Edit
               </button>

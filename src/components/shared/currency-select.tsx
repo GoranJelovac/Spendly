@@ -95,7 +95,7 @@ export function CurrencySelect({
               onClick={() => select(c)}
               className={`flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-gray-50 dark:hover:bg-sp-surface ${
                 c === selected
-                  ? "bg-indigo-50 font-semibold text-indigo-600 dark:bg-sp-accent/10 dark:text-sp-accent"
+                  ? "bg-sp-accent/10 font-semibold text-sp-accent"
                   : ""
               }`}
             >

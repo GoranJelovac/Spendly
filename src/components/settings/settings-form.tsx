@@ -2,18 +2,22 @@
 
 import { useState } from "react";
 import { useTheme } from "next-themes";
-import { updateName, updatePassword, updateDecimals, deleteAccount } from "@/actions/settings";
+import { updateName, updatePassword, updateDecimals, updateAccentColor, deleteAccount } from "@/actions/settings";
 import { useDecimals } from "@/lib/decimals-context";
+import { useAccent } from "@/lib/accent-context";
+import { ACCENT_THEMES, type AccentColor } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 
 export function SettingsForm({
   name,
   email,
   decimals: initialDecimals,
+  accentColor: initialAccent,
 }: {
   name: string;
   email: string;
   decimals: number;
+  accentColor: string;
 }) {
   const [nameMsg, setNameMsg] = useState("");
   const [pwMsg, setPwMsg] = useState("");
@@ -28,6 +32,9 @@ export function SettingsForm({
   const { decimals, setDecimals } = useDecimals();
   const [decimalsMsg, setDecimalsMsg] = useState("");
   const [decimalsLoading, setDecimalsLoading] = useState(false);
+
+  // Accent color
+  const { accentColor, setAccentColor } = useAccent();
 
   async function handleNameUpdate(formData: FormData) {
     setNameMsg("");
@@ -52,6 +59,11 @@ export function SettingsForm({
     setDecimalsLoading(false);
   }
 
+  async function handleAccentChange(color: AccentColor) {
+    setAccentColor(color);
+    await updateAccentColor(color);
+  }
+
   async function handleDeleteAccount() {
     if (deleteInput !== name) return;
     setDeleteLoading(true);
@@ -74,7 +86,7 @@ export function SettingsForm({
   return (
     <div className="space-y-6">
       {/* Appearance */}
-      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-sp-bg dark:border-2 dark:border-sp-border dark:shadow-[0_0_20px_var(--sp-glow)]">
         <h2 className="mb-4 text-lg font-semibold">Appearance</h2>
         <div className="space-y-4">
           <div>
@@ -86,14 +98,50 @@ export function SettingsForm({
                   onClick={() => setTheme(opt.value)}
                   className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                     theme === opt.value
-                      ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-300"
-                      : "border-gray-200 hover:border-gray-300 dark:border-[#252345] dark:hover:border-[#353355]"
+                      ? "border-sp-accent bg-sp-accent/10 text-sp-accent"
+                      : "border-gray-200 hover:border-gray-300 dark:border-sp-border dark:hover:border-sp-border"
                   }`}
                 >
                   <span>{opt.icon}</span>
                   {opt.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Accent Color</label>
+            <div className="flex flex-wrap gap-2">
+              {(Object.keys(ACCENT_THEMES) as AccentColor[]).map((key) => {
+                const t = ACCENT_THEMES[key];
+                const isActive = accentColor === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleAccentChange(key)}
+                    title={t.label}
+                    className={`relative h-8 w-8 rounded-full border-2 transition-all ${
+                      isActive
+                        ? "border-gray-800 dark:border-white scale-110"
+                        : "border-transparent hover:scale-105"
+                    }`}
+                    style={{ backgroundColor: t.swatch }}
+                  >
+                    {isActive && (
+                      <svg
+                        className="absolute inset-0 m-auto h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -107,12 +155,12 @@ export function SettingsForm({
                   disabled={decimalsLoading}
                   className={`flex flex-col items-center rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                     decimals === opt.value
-                      ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-300"
-                      : "border-gray-200 hover:border-gray-300 dark:border-[#252345] dark:hover:border-[#353355]"
+                      ? "border-sp-accent bg-sp-accent/10 text-sp-accent"
+                      : "border-gray-200 hover:border-gray-300 dark:border-sp-border dark:hover:border-sp-border"
                   }`}
                 >
                   <span>{opt.label}</span>
-                  <span className="text-[10px] text-gray-400 dark:text-[#6b6b8a] tabular-nums">{opt.example}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-sp-muted tabular-nums">{opt.example}</span>
                 </button>
               ))}
             </div>
@@ -126,7 +174,7 @@ export function SettingsForm({
       </div>
 
       {/* Profile */}
-      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-sp-bg dark:border-2 dark:border-sp-border dark:shadow-[0_0_20px_var(--sp-glow)]">
         <h2 className="mb-4 text-lg font-semibold">Profile</h2>
         <form action={handleNameUpdate} className="space-y-3">
           <div>
@@ -142,7 +190,7 @@ export function SettingsForm({
               name="name"
               defaultValue={name}
               required
-              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-sp-border dark:bg-sp-surface"
             />
           </div>
           {nameMsg && (
@@ -159,7 +207,7 @@ export function SettingsForm({
       </div>
 
       {/* Password */}
-      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+      <div className="rounded-2xl bg-white p-6 shadow-md dark:bg-sp-bg dark:border-2 dark:border-sp-border dark:shadow-[0_0_20px_var(--sp-glow)]">
         <h2 className="mb-4 text-lg font-semibold">Change Password</h2>
         <form action={handlePasswordUpdate} className="space-y-3">
           <div>
@@ -174,7 +222,7 @@ export function SettingsForm({
               name="currentPassword"
               type="password"
               required
-              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-sp-border dark:bg-sp-surface"
             />
           </div>
           <div>
@@ -187,7 +235,7 @@ export function SettingsForm({
               type="password"
               required
               minLength={6}
-              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-sp-border dark:bg-sp-surface"
             />
           </div>
           {pwMsg && (
@@ -204,7 +252,7 @@ export function SettingsForm({
       </div>
 
       {/* Danger Zone */}
-      <div className="rounded-2xl border-2 border-red-200 bg-white p-6 shadow-md dark:border-red-900 dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+      <div className="rounded-2xl border-2 border-red-200 bg-white p-6 shadow-md dark:border-red-900 dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
         <h2 className="mb-2 text-lg font-semibold text-red-600">Danger Zone</h2>
         <p className="mb-4 text-sm text-gray-500">
           Permanently delete your account and all associated data.
@@ -226,7 +274,7 @@ export function SettingsForm({
               value={deleteInput}
               onChange={(e) => setDeleteInput(e.target.value)}
               placeholder={name}
-              className="w-full rounded-lg border border-red-200 px-3 py-2 text-sm dark:border-red-800 dark:bg-[#1a1835]"
+              className="w-full rounded-lg border border-red-200 px-3 py-2 text-sm dark:border-red-800 dark:bg-sp-surface"
             />
             <div className="flex gap-2">
               <Button

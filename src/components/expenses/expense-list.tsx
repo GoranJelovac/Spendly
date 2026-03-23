@@ -191,28 +191,28 @@ export function ExpenseList({
         </div>
       )}
       <div className="min-h-[20rem] overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b text-gray-500">
-            <tr>
-              <th className="pb-2 w-12 font-medium">#</th>
-              <th className="pb-2 font-medium">
+        <table className="w-full border-separate border-spacing-y-2 text-left text-[14px]">
+          <thead>
+            <tr className="bg-sp-accent/8">
+              <th className="pl-3 pt-2.5 pb-2.5 w-12 rounded-l-2xl text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">#</th>
+              <th className="pt-2.5 pb-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Date
                 <ColumnFilter values={columnValues.date} selected={getSelectedForCol("date")} onChange={(s) => setColumnFilters((p) => ({ ...p, date: s }))} />
               </th>
-              <th className="pb-2 font-medium">
+              <th className="pt-2.5 pb-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Line
                 <ColumnFilter values={columnValues.line} selected={getSelectedForCol("line")} onChange={(s) => setColumnFilters((p) => ({ ...p, line: s }))} />
               </th>
-              <th className="pb-2 font-medium">
+              <th className="pt-2.5 pb-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Description
                 <ColumnFilter values={columnValues.description} selected={getSelectedForCol("description")} onChange={(s) => setColumnFilters((p) => ({ ...p, description: s }))} />
               </th>
-              <th className="pb-2 text-right font-medium">
+              <th className="pt-2.5 pb-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                 Amount
                 <ColumnFilter values={columnValues.amount} selected={getSelectedForCol("amount")} onChange={(s) => setColumnFilters((p) => ({ ...p, amount: s }))} />
               </th>
-              <th className="pb-2 text-right font-medium"></th>
-              <th className="pb-2 w-8 text-right">
+              <th className="pt-2.5 pb-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted"></th>
+              <th className="pr-4 pt-2.5 pb-2.5 w-8 text-right rounded-r-2xl">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -225,7 +225,7 @@ export function ExpenseList({
           <tbody>
             {displayedExpenses.map((expense, index) =>
               editingId === expense.id ? (
-                <tr key={expense.id} className="border-b bg-gray-50 dark:bg-[#1a1835]/50">
+                <tr key={expense.id} className="bg-gray-50 dark:bg-sp-surface/50">
                   <td colSpan={7} className="py-3 px-1">
                     <form
                       action={(formData) => handleSave(expense.id, formData)}
@@ -237,7 +237,7 @@ export function ExpenseList({
                           <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-sp-surface dark:border-sp-border"
                           >
                             <option value="">Select...</option>
                             {categories.map((cat) => (
@@ -250,7 +250,7 @@ export function ExpenseList({
                           <select
                             name="budgetLineId"
                             defaultValue={expense.budgetLineId}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-sp-surface dark:border-sp-border"
                             required
                             disabled={!selectedCategory}
                           >
@@ -267,7 +267,7 @@ export function ExpenseList({
                             type="date"
                             required
                             defaultValue={new Date(expense.date).toISOString().split("T")[0]}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-sp-surface dark:border-sp-border"
                           />
                         </div>
                         <div>
@@ -278,7 +278,7 @@ export function ExpenseList({
                             step="0.01"
                             required
                             defaultValue={expense.amount}
-                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                            className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-sp-surface dark:border-sp-border"
                           />
                         </div>
                       </div>
@@ -288,7 +288,7 @@ export function ExpenseList({
                           name="description"
                           defaultValue={expense.description || ""}
                           placeholder="Optional"
-                          className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-[#1a1835] dark:border-[#252345]"
+                          className="mt-1 w-full rounded-md border px-2 py-1.5 text-sm dark:bg-sp-surface dark:border-sp-border"
                         />
                       </div>
                       {editError && <p className="text-sm text-red-500">{editError}</p>}
@@ -309,22 +309,22 @@ export function ExpenseList({
                   </td>
                 </tr>
               ) : (
-                <tr key={expense.id} className="border-b">
-                  <td className="py-2 text-gray-400">
+                <tr key={expense.id} className="bg-gray-50 dark:bg-sp-surface">
+                  <td className="rounded-l-xl py-[6px] pl-3 text-gray-400">
                     {(currentPage - 1) * pageSize + index + 1}
                   </td>
-                  <td className="py-2">
+                  <td className="py-[6px] dark:text-sp-text">
                     {new Date(expense.date).toLocaleDateString()}
                   </td>
-                  <td className="py-2">{expense.budgetLine.name}</td>
-                  <td className="py-2 text-gray-500">
+                  <td className="py-[6px] font-semibold dark:text-sp-text">{expense.budgetLine.name}</td>
+                  <td className="py-[6px] text-gray-500 dark:text-sp-muted">
                     {expense.description || "—"}
                   </td>
-                  <td className="py-2 text-right">
+                  <td className="py-[6px] text-right tabular-nums dark:text-sp-text">
                     {fmtD(expense.amount)}{" "}
                     {expense.budgetLine.budget.currency}
                   </td>
-                  <td className="py-2 text-right">
+                  <td className="py-[6px] text-right">
                     <div className="flex justify-end gap-1">
                       <Button
                         size="sm"
@@ -343,7 +343,7 @@ export function ExpenseList({
                       </Button>
                     </div>
                   </td>
-                  <td className="py-2 text-right">
+                  <td className="rounded-r-xl py-[6px] pr-4 text-right">
                     <input
                       type="checkbox"
                       checked={selected.has(expense.id)}

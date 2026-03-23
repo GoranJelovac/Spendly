@@ -67,6 +67,25 @@ export async function updateDecimals(formData: FormData) {
   return { success: "Decimal places updated!" };
 }
 
+export async function updateAccentColor(color: string) {
+  const user = await getAuthUser();
+  const valid = [
+    "blue", "emerald", "violet", "amber", "rose", "cyan",
+    "orange", "pink", "teal", "slate", "indigo", "red",
+  ];
+
+  if (!valid.includes(color)) {
+    return { error: "Invalid accent color." };
+  }
+
+  await db.user.update({
+    where: { id: user.id },
+    data: { accentColor: color },
+  });
+
+  return { success: "Accent color updated!" };
+}
+
 export async function deleteAccount() {
   const user = await getAuthUser();
   await db.user.delete({ where: { id: user.id } });

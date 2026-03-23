@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BudgetSelector } from "./budget-selector";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const mainItems = [
   { href: "/dashboard", label: "Dashboard", icon: "⌂" },
@@ -36,19 +35,18 @@ export function Sidebar({
   const activeBudget = budgets.find((b) => b.id === activeBudgetId);
 
   return (
-    <aside className="hidden w-[280px] shrink-0 border-r border-gray-200 bg-white font-[var(--font-sora)] dark:border-[#252345] dark:bg-[#13112b] lg:block">
+    <aside className="hidden w-[280px] shrink-0 border-r border-sp-border bg-sp-bg font-[var(--font-sora)] lg:block">
       <div className="flex h-full flex-col">
-        {/* Logo + Theme */}
-        <div className="flex items-center justify-between px-5 py-5">
+        {/* Logo */}
+        <div className="px-5 py-5">
           <Link href="/dashboard" className="text-xl font-bold tracking-tight">
-            <span className="text-indigo-400 dark:text-[#818cf8]">$</span>pendly
+            <span className="text-sp-accent">$</span>pendly
           </Link>
-          <ThemeToggle />
         </div>
 
         {/* Budget Selector */}
         <div className="px-4 pb-4">
-          <div className="rounded-[15px] border border-gray-100 bg-gray-50/80 p-3 dark:border-[#252345] dark:bg-[#1a1835]">
+          <div className="rounded-[15px] border border-gray-100 bg-gray-50/80 p-3 dark:border-sp-border dark:bg-sp-surface">
             <BudgetSelector budgets={budgets} activeBudgetId={activeBudgetId} />
           </div>
         </div>
@@ -56,7 +54,7 @@ export function Sidebar({
         {/* Navigation */}
         <nav className="flex-1 px-3">
           {/* Main section */}
-          <p className="mb-1 px-3 pt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-[#6b6b8a]">
+          <p className="mb-1 px-3 pt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-sp-muted">
             Main
           </p>
           <div className="flex flex-col gap-[1px]">
@@ -68,8 +66,8 @@ export function Sidebar({
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-[9px] text-[14px] font-medium transition-colors ${
                     active
-                      ? "border-b-2 border-indigo-400 bg-indigo-500/[0.04] text-indigo-500 dark:border-[#818cf8] dark:bg-[rgba(129,140,248,0.08)] dark:text-[#818cf8]"
-                      : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.06)] dark:hover:text-[#e0e0f0]"
+                      ? "border-b-2 border-sp-accent bg-sp-accent/[0.04] text-sp-accent"
+                      : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 dark:text-sp-muted dark:hover:bg-sp-accent/6 dark:hover:text-sp-text"
                   }`}
                 >
                   <span className={`text-[15px] ${active ? "opacity-100" : "opacity-60"}`}>{item.icon}</span>
@@ -80,7 +78,7 @@ export function Sidebar({
           </div>
 
           {/* Account section */}
-          <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-[#6b6b8a]">
+          <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-sp-muted">
             Account
           </p>
           <div className="flex flex-col gap-[1px]">
@@ -92,8 +90,8 @@ export function Sidebar({
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-[9px] text-[14px] font-medium transition-colors ${
                     active
-                      ? "border-b-2 border-indigo-400 bg-indigo-500/[0.04] text-indigo-500 dark:border-[#818cf8] dark:bg-[rgba(129,140,248,0.08)] dark:text-[#818cf8]"
-                      : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.06)] dark:hover:text-[#e0e0f0]"
+                      ? "border-b-2 border-sp-accent bg-sp-accent/[0.04] text-sp-accent"
+                      : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 dark:text-sp-muted dark:hover:bg-sp-accent/6 dark:hover:text-sp-text"
                   }`}
                 >
                   <span className={`text-[15px] ${active ? "opacity-100" : "opacity-60"}`}>{item.icon}</span>
@@ -105,14 +103,14 @@ export function Sidebar({
         </nav>
 
         {/* User info */}
-        <div className="mt-auto border-t border-gray-100 p-4 dark:border-[#252345]">
+        <div className="mt-auto border-t border-gray-100 p-4 dark:border-sp-border">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-to-br from-indigo-500 to-purple-500 text-xs font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-sp-accent text-xs font-bold text-white">
               {activeBudget?.name?.charAt(0).toUpperCase() || "S"}
             </div>
             <div className="min-w-0">
               <p className="truncate text-[13px] font-medium">{activeBudget?.name || "Spendly"}</p>
-              <p className="truncate text-[11px] text-gray-400 dark:text-[#6b6b8a]">
+              <p className="truncate text-[11px] text-gray-400 dark:text-sp-muted">
                 {activeBudget ? `${activeBudget.year} · ${activeBudget.currency}` : "No budget"}
               </p>
             </div>

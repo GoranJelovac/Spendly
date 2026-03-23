@@ -17,6 +17,7 @@ model User {
   image          String?
   hashedPassword String?
   decimals       Int       @default(0) // 0, 1, or 2 decimal places for number formatting
+  accentColor    String    @default("blue") // accent theme: blue, emerald, violet, etc.
 
   // Stripe
   stripeCustomerId     String?   @unique

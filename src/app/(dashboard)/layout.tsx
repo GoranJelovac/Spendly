@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { DecimalsProvider } from "@/lib/decimals-context";
+import { AccentProvider } from "@/lib/accent-context";
+import type { AccentColor } from "@/lib/constants";
 
 export default async function DashboardLayout({
   children,
@@ -20,7 +22,7 @@ export default async function DashboardLayout({
     getActiveBudget(),
     db.user.findUnique({
       where: { id: session.user.id },
-      select: { decimals: true },
+      select: { decimals: true, accentColor: true },
     }),
   ]);
 
@@ -32,14 +34,16 @@ export default async function DashboardLayout({
   }));
 
   return (
-    <DecimalsProvider initial={user?.decimals ?? 0}>
-      <div className="flex min-h-screen bg-gray-50/50 dark:bg-[#0c0a1d]">
-        <Sidebar budgets={budgetData} activeBudgetId={activeBudget?.id || null} />
-        <div className="flex-1">
-          <MobileNav budgets={budgetData} activeBudgetId={activeBudget?.id || null} />
-          <main>{children}</main>
+    <AccentProvider initial={(user?.accentColor as AccentColor) ?? "blue"}>
+      <DecimalsProvider initial={user?.decimals ?? 0}>
+        <div className="flex min-h-screen bg-gray-50/50 dark:bg-[#0c0a1d]">
+          <Sidebar budgets={budgetData} activeBudgetId={activeBudget?.id || null} />
+          <div className="flex-1">
+            <MobileNav budgets={budgetData} activeBudgetId={activeBudget?.id || null} />
+            <main>{children}</main>
+          </div>
         </div>
-      </div>
-    </DecimalsProvider>
+      </DecimalsProvider>
+    </AccentProvider>
   );
 }

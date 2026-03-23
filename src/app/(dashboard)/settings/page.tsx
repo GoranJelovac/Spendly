@@ -9,7 +9,7 @@ export default async function SettingsPage() {
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { decimals: true },
+    select: { decimals: true, accentColor: true },
   });
 
   return (
@@ -19,6 +19,7 @@ export default async function SettingsPage() {
         name={session.user.name || ""}
         email={session.user.email || ""}
         decimals={user?.decimals ?? 0}
+        accentColor={user?.accentColor ?? "blue"}
       />
     </div>
   );

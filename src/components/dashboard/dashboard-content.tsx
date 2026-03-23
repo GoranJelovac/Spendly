@@ -23,23 +23,23 @@ function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-[#252345] dark:bg-[#13112b] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+    <div className="rounded-2xl border-2 border-gray-200 bg-white shadow-md dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-t-2xl px-5 py-3.5 text-left transition-colors bg-indigo-50/40 hover:bg-indigo-50/60 dark:bg-[rgba(129,140,248,0.08)] dark:hover:bg-[rgba(129,140,248,0.12)]"
+        className="flex w-full items-center justify-between rounded-t-2xl px-5 py-3.5 text-left transition-colors bg-sp-accent/8 hover:bg-sp-accent/12"
       >
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-[#6b6b8a]">
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-sp-muted">
           {title}
         </h3>
         <span
-          className={`text-[10px] text-gray-400 dark:text-[#6b6b8a] transition-transform duration-200 ${
+          className={`text-[10px] text-gray-400 dark:text-sp-muted transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         >
           &#9660;
         </span>
       </button>
-      {open && <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-[#252345]">{children}</div>}
+      {open && <div className="border-t border-gray-100 px-5 pb-5 pt-4 dark:border-sp-border">{children}</div>}
     </div>
   );
 }
@@ -58,8 +58,8 @@ function ToggleButton({
       onClick={onClick}
       className={`rounded-xl px-3.5 py-1.5 text-[13px] font-medium transition-all ${
         active
-          ? "bg-indigo-400 text-white shadow-sm dark:bg-[#818cf8]"
-          : "text-gray-500 hover:bg-gray-100 dark:text-[#6b6b8a] dark:hover:bg-[rgba(129,140,248,0.08)]"
+          ? "bg-sp-accent text-white shadow-sm"
+          : "text-gray-500 hover:bg-gray-100 dark:text-sp-muted dark:hover:bg-sp-accent/8"
       }`}
     >
       {children}
@@ -228,8 +228,8 @@ export function DashboardContent({
         <div className="space-y-3">
           {/* Period */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-[#6b6b8a]">Period</span>
-            <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-[#1e1c38]">
+            <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-sp-muted">Period</span>
+            <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-sp-surface">
               <ToggleButton active={period === "month"} onClick={() => setPeriod("month")}>
                 This Month
               </ToggleButton>
@@ -245,17 +245,17 @@ export function DashboardContent({
           {/* By Month controls */}
           {period === "bymonth" && (
             <div className="flex flex-wrap items-center gap-3">
-              <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-[#6b6b8a]">Month</span>
+              <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-sp-muted">Month</span>
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-[#252345] dark:bg-[#1e1c38] dark:text-[#e0e0f0]"
+                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-sp-border dark:bg-sp-surface dark:text-sp-text"
               >
                 {MONTH_NAMES.map((name, i) => (
                   <option key={i} value={i}>{name}</option>
                 ))}
               </select>
-              <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-[#1e1c38]">
+              <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-sp-surface">
                 <ToggleButton active={byMonthMode === "single"} onClick={() => setByMonthMode("single")}>
                   Only {MONTH_NAMES[selectedMonth]}
                 </ToggleButton>
@@ -268,8 +268,8 @@ export function DashboardContent({
 
           {/* View mode */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-[#6b6b8a]">View</span>
-            <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-[#1e1c38]">
+            <span className="w-14 text-[12px] font-medium text-gray-500 dark:text-sp-muted">View</span>
+            <div className="flex gap-1 rounded-[16px] bg-gray-100 p-[3px] dark:bg-sp-surface">
               <ToggleButton
                 active={viewMode === "lines"}
                 onClick={() => { setViewMode("lines"); setCategoryFilter("all"); }}
@@ -287,7 +287,7 @@ export function DashboardContent({
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-[#252345] dark:bg-[#1e1c38] dark:text-[#e0e0f0]"
+                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-sp-border dark:bg-sp-surface dark:text-sp-text"
               >
                 <option value="all">All categories</option>
                 {uniqueCategories.map((cat) => (
@@ -301,10 +301,10 @@ export function DashboardContent({
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-400 border-t-transparent dark:border-[#818cf8]" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-sp-accent border-t-transparent" />
         </div>
       ) : !data ? (
-        <p className="text-gray-500 dark:text-[#6b6b8a]">No data found.</p>
+        <p className="text-gray-500 dark:text-sp-muted">No data found.</p>
       ) : (
         <>
           {/* Summary */}
@@ -395,8 +395,8 @@ export function DashboardContent({
             <div className="min-h-[20rem] overflow-x-auto overflow-y-auto" style={{ maxHeight: 600 }}>
               <table className="w-full border-separate border-spacing-y-2 text-left text-[14px]">
                 <thead>
-                  <tr className="bg-indigo-50/50 dark:bg-[rgba(129,140,248,0.08)]">
-                    <th className="rounded-l-2xl pb-2.5 pl-3 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                  <tr className="bg-sp-accent/8">
+                    <th className="rounded-l-2xl pb-2.5 pl-3 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       {viewMode === "categories" && categoryFilter === "all" ? "Category" : "Line"}
                       <ColumnFilter
                         values={columnValues.name}
@@ -405,7 +405,7 @@ export function DashboardContent({
                       />
                     </th>
                     {viewMode === "lines" && (
-                      <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                      <th className="pb-2.5 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                         Category
                         <ColumnFilter
                           values={columnValues.categoryName}
@@ -414,7 +414,7 @@ export function DashboardContent({
                         />
                       </th>
                     )}
-                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       Planned
                       <ColumnFilter
                         values={columnValues.planned}
@@ -422,7 +422,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("planned", s)}
                       />
                     </th>
-                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       Contrib.
                       <ColumnFilter
                         values={columnValues.contributed}
@@ -430,7 +430,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("contributed", s)}
                       />
                     </th>
-                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       Available
                       <ColumnFilter
                         values={columnValues.available}
@@ -438,7 +438,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("available", s)}
                       />
                     </th>
-                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                    <th className="pb-2.5 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       Spent
                       <ColumnFilter
                         values={columnValues.spent}
@@ -446,7 +446,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("spent", s)}
                       />
                     </th>
-                    <th className="pb-2.5 pr-4 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                    <th className="pb-2.5 pr-4 pt-2.5 text-right text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       Remaining
                       <ColumnFilter
                         values={columnValues.remaining}
@@ -454,7 +454,7 @@ export function DashboardContent({
                         onChange={(s) => setColumnFilter("remaining", s)}
                       />
                     </th>
-                    <th className="rounded-r-2xl pb-2.5 pl-4 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+                    <th className="rounded-r-2xl pb-2.5 pl-4 pt-2.5 text-[10px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
                       Progress
                       <ColumnFilter
                         values={columnValues.percentage}
@@ -466,20 +466,20 @@ export function DashboardContent({
                 </thead>
                 <tbody>
                   {detailsItems.map((item) => (
-                    <tr key={item.id} className="bg-gray-50 dark:bg-[#1a1835]">
-                      <td className="rounded-l-xl py-[6px] pl-3 font-semibold dark:text-[#e0e0f0]">{item.name}</td>
+                    <tr key={item.id} className="bg-gray-50 dark:bg-sp-surface">
+                      <td className="rounded-l-xl py-[6px] pl-3 font-semibold dark:text-sp-text">{item.name}</td>
                       {viewMode === "lines" && (
                         <td className="py-[6px]">
-                          <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-[#6b6b8a]">
-                            <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-400 dark:bg-[#818cf8]" />
+                          <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-sp-muted">
+                            <span className="inline-block h-1.5 w-1.5 rounded-full bg-sp-accent" />
                             {"categoryName" in item ? String(item.categoryName) : ""}
                           </span>
                         </td>
                       )}
-                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmtD(item.planned)}</td>
-                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{item.contributed > 0 ? fmtD(item.contributed) : "—"}</td>
-                      <td className="py-[6px] text-right tabular-nums font-semibold dark:text-[#e0e0f0]">{fmtD(item.available)}</td>
-                      <td className="py-[6px] text-right tabular-nums dark:text-[#e0e0f0]">{fmtD(item.spent)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-sp-text">{fmtD(item.planned)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-sp-text">{item.contributed > 0 ? fmtD(item.contributed) : "—"}</td>
+                      <td className="py-[6px] text-right tabular-nums font-semibold dark:text-sp-text">{fmtD(item.available)}</td>
+                      <td className="py-[6px] text-right tabular-nums dark:text-sp-text">{fmtD(item.spent)}</td>
                       <td
                         className={`py-[6px] pr-4 text-right tabular-nums font-semibold ${
                           item.remaining < 0
@@ -495,7 +495,7 @@ export function DashboardContent({
                       </td>
                       <td className="rounded-r-xl py-[6px] pl-4 pr-3">
                         <div className="flex items-center gap-2">
-                          <div className="h-[11px] w-full rounded-xl bg-gray-200 dark:bg-[rgba(107,107,138,0.15)]">
+                          <div className="h-[11px] w-full rounded-xl bg-gray-200 dark:bg-sp-muted/15">
                             <div
                               className={`h-[11px] rounded-xl transition-all duration-500 ease-out ${
                                 item.percentage > 150
@@ -513,7 +513,7 @@ export function DashboardContent({
                               }}
                             />
                           </div>
-                          <span className="w-12 text-xs tabular-nums text-gray-500 dark:text-[#6b6b8a]">
+                          <span className="w-12 text-xs tabular-nums text-gray-500 dark:text-sp-muted">
                             {fmtD(item.percentage, 0)}%
                           </span>
                         </div>
@@ -522,7 +522,7 @@ export function DashboardContent({
                   ))}
                   {detailsItems.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="py-4 text-center text-gray-400 dark:text-[#6b6b8a]">
+                      <td colSpan={8} className="py-4 text-center text-gray-400 dark:text-sp-muted">
                         No items match the current filters.
                       </td>
                     </tr>
@@ -574,12 +574,12 @@ function SummaryCard({
       className="rounded-2xl border-2 bg-transparent p-[15px]"
       style={{ borderColor: ACCENT_HEX[accent] }}
     >
-      <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-gray-500 dark:text-[#6b6b8a]">
+      <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-gray-500 dark:text-sp-muted">
         {label}
       </p>
       <p
         className={`mt-1 text-[18px] font-bold tabular-nums ${
-          valueColor ? VALUE_COLORS[valueColor] : "dark:text-[#e0e0f0]"
+          valueColor ? VALUE_COLORS[valueColor] : "dark:text-sp-text"
         }`}
       >
         {fmtD(value, suffix === "%" ? 1 : undefined)}

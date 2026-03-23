@@ -112,8 +112,8 @@ function DonutWithLegend({
                 key={entry.name}
                 className={`flex items-center gap-2 rounded-lg px-2 py-1 text-xs cursor-pointer transition-colors ${
                   activeIndex === index
-                    ? "bg-gray-100 dark:bg-[rgba(129,140,248,0.1)]"
-                    : "hover:bg-gray-50 dark:hover:bg-[rgba(129,140,248,0.06)]"
+                    ? "bg-gray-100 dark:bg-sp-accent/10"
+                    : "hover:bg-gray-50 dark:hover:bg-sp-accent/6"
                 }`}
                 onMouseEnter={() => onActiveChange(index)}
                 onMouseLeave={() => onActiveChange(null)}
@@ -189,24 +189,24 @@ function AmountBars({ data, currency }: { data: LineData[]; currency: string }) 
 
         return (
           <div key={item.name} className="flex flex-col gap-0.5">
-            <div className="relative h-7 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
+            <div className="relative h-7 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-sp-muted/12">
               <div
                 className="absolute inset-y-0 left-0 rounded-md transition-all duration-500"
                 style={{ width: `${plannedW}%`, backgroundColor: withAlpha(color, 0.35) }}
               />
               <div className="absolute inset-0 flex items-center px-2.5 z-10">
-                <span className="w-[40%] truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
+                <span className="w-[40%] truncate text-[11px] font-semibold text-gray-800 dark:text-white dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
                   {item.name}
                 </span>
-                <span className="w-[20%] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                <span className="w-[20%] text-center text-[11px] font-semibold tabular-nums text-gray-800 dark:text-white dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                   {fmtD(pct, 0)}%
                 </span>
-                <span className="w-[40%] text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                <span className="w-[40%] text-right text-[11px] tabular-nums text-gray-800 dark:text-white dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                   <span className="font-semibold">{fmtD(item.spent)}</span> / {fmtD(total)}
                 </span>
               </div>
             </div>
-            <div className="relative h-2 w-full overflow-hidden rounded bg-gray-200 dark:bg-[rgba(107,107,138,0.12)]">
+            <div className="relative h-2 w-full overflow-hidden rounded bg-gray-200 dark:bg-sp-muted/12">
               <div
                 className="absolute inset-y-0 left-0 rounded transition-all duration-500"
                 style={{ width: `${spentW}%`, backgroundColor: spentBarColor }}
@@ -233,7 +233,7 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
         return (
           <div key={item.name}>
             {/* Bar with inline labels */}
-            <div className="relative h-7 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-[#252345]">
+            <div className="relative h-7 w-full overflow-hidden rounded-md bg-gray-200 dark:bg-sp-border">
               {/* Contributed segment (lighter) */}
               {contributedPct > 0 && (
                 <div
@@ -279,13 +279,13 @@ function PercentageBars({ data, currency }: { data: LineData[]; currency: string
 
               {/* Inline labels */}
               <div className="absolute inset-0 flex items-center px-2.5 z-10">
-                <span className="w-[40%] truncate text-[11px] font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
+                <span className="w-[40%] truncate text-[11px] font-semibold text-gray-800 dark:text-white dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" title={item.name}>
                   {item.name}
                 </span>
-                <span className="w-[20%] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                <span className="w-[20%] text-center text-[11px] font-semibold tabular-nums text-gray-800 dark:text-white dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                   {fmtD(spentPct, 0)}%
                 </span>
-                <span className="w-[40%] text-right text-[11px] tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                <span className="w-[40%] text-right text-[11px] tabular-nums text-gray-800 dark:text-white dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                   <span className="font-semibold">{fmtD(item.spent)}</span> / {fmtD(total)}
                 </span>
               </div>
@@ -308,16 +308,16 @@ export function PlannedVsSpentChart({
   const [mode, setMode] = useState<"amount" | "percent">("amount");
 
   return (
-    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-[#1a1835]">
+    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-sp-surface">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold">Planned vs Spent</h3>
-        <div className="flex rounded-xl border border-gray-200 dark:border-[#252345]">
+        <div className="flex rounded-xl border border-gray-200 dark:border-sp-border">
           <button
             onClick={() => setMode("amount")}
             className={`w-16 rounded-l-xl py-1 text-xs font-medium transition-colors ${
               mode === "amount"
-                ? "bg-[#818cf8] text-white"
-                : "text-gray-500 hover:bg-gray-100 dark:text-[#6b6b8a] dark:hover:bg-[#252345]"
+                ? "bg-sp-accent text-white"
+                : "text-gray-500 hover:bg-gray-100 dark:text-sp-muted dark:hover:bg-sp-border"
             }`}
           >
             Amount
@@ -326,8 +326,8 @@ export function PlannedVsSpentChart({
             onClick={() => setMode("percent")}
             className={`w-16 rounded-r-xl py-1 text-xs font-medium transition-colors ${
               mode === "percent"
-                ? "bg-[#818cf8] text-white"
-                : "text-gray-500 hover:bg-gray-100 dark:text-[#6b6b8a] dark:hover:bg-[#252345]"
+                ? "bg-sp-accent text-white"
+                : "text-gray-500 hover:bg-gray-100 dark:text-sp-muted dark:hover:bg-sp-border"
             }`}
           >
             %
@@ -364,7 +364,7 @@ export function BudgetBreakdownChart({
 
   if (pieData.length === 0) {
     return (
-      <div className="rounded-2xl bg-gray-50 p-4 dark:bg-[#1a1835]">
+      <div className="rounded-2xl bg-gray-50 p-4 dark:bg-sp-surface">
         <h3 className="mb-4 font-semibold">Budget Breakdown</h3>
         <p className="text-center text-gray-500">No budget data yet.</p>
       </div>
@@ -372,7 +372,7 @@ export function BudgetBreakdownChart({
   }
 
   return (
-    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-[#1a1835]">
+    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-sp-surface">
       <h3 className="mb-4 font-semibold">Budget Breakdown</h3>
       <DonutWithLegend
         data={pieData}
@@ -397,7 +397,7 @@ export function SpendingOverviewChart({
 
   if (totalPlanned <= 0) {
     return (
-      <div className="rounded-2xl bg-gray-50 p-4 dark:bg-[#1a1835]">
+      <div className="rounded-2xl bg-gray-50 p-4 dark:bg-sp-surface">
         <h3 className="mb-4 font-semibold">Spending Overview</h3>
         <p className="text-center text-gray-500">No budget data yet.</p>
       </div>
@@ -418,7 +418,7 @@ export function SpendingOverviewChart({
   const overspent = totalSpent > totalPlanned ? totalSpent - totalPlanned : 0;
 
   return (
-    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-[#1a1835]">
+    <div className="rounded-2xl bg-gray-50 p-4 dark:bg-sp-surface">
       <h3 className="mb-4 font-semibold">Spending Overview</h3>
       {overspent > 0 && (() => {
         const overPct = totalPlanned > 0 ? (totalSpent / totalPlanned) * 100 : 0;

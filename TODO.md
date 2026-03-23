@@ -3,8 +3,8 @@
 ## UI / UX
 
 - [x] Dodati zastave (flags) pored valuta (npr. 🇪🇺 EUR, 🇺🇸 USD, 🇷🇸 RSD)
-- [ ] Dodati više tema kombinacija (svetla/tamna) i omogućiti biranje u Settings
-- [ ] Izbaciti biranje teme sa početnog ekrana (sidebar, pored naziva aplikacije)
+- [x] Dodati više tema kombinacija (svetla/tamna) i omogućiti biranje u Settings
+- [x] Izbaciti biranje teme sa početnog ekrana (sidebar, pored naziva aplikacije)
 - [ ] Izbaciti column filtere iz Budget Lines tabele
 - [ ] Proveriti/ograničiti koliko se stranica Budget Lines može skrolovati (previše sadržaja van viewport-a?)
 - [ ] Popraviti zebra striping u Budget Lines — kategorija header red ima istu pozadinu kao parni redovi linija, treba bolje razlikovati nivoe (kategorija vs linija)
