@@ -70,8 +70,7 @@ export async function createCategory(budgetId: string, formData: FormData) {
     },
   });
 
-  revalidatePath("/categories");
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: "Category created!" };
 }
 
@@ -105,8 +104,7 @@ export async function deleteCategory(id: string) {
 
   await db.category.delete({ where: { id } });
 
-  revalidatePath("/categories");
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: "Category deleted. Lines moved to General." };
 }
 
@@ -143,8 +141,7 @@ export async function deleteCategories(ids: string[]) {
     where: { id: { in: valid.map((c) => c.id) } },
   });
 
-  revalidatePath("/categories");
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: `Deleted ${count.count} category(ies). Lines moved to General.` };
 }
 
@@ -177,7 +174,6 @@ export async function renameCategory(id: string, formData: FormData) {
     data: { name },
   });
 
-  revalidatePath("/categories");
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: "Category renamed!" };
 }

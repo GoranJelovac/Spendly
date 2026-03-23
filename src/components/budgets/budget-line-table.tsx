@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, Fragment } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { deleteBudgetLine, deleteBudgetLines, updateBudgetLine } from "@/actions/budget-line";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/shared/pagination";
@@ -34,6 +34,7 @@ export function BudgetLineTable({
   currentPage,
   totalPages,
   pageSize,
+  hideCategory = false,
 }: {
   lines: BudgetLine[];
   currency: string;
@@ -41,9 +42,11 @@ export function BudgetLineTable({
   currentPage: number;
   totalPages: number;
   pageSize: number;
+  hideCategory?: boolean;
 }) {
   const { fmtD } = useDecimals();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState<"fixed" | "custom">("fixed");
   const [error, setError] = useState("");
@@ -132,7 +135,9 @@ export function BudgetLineTable({
   }
 
   function goToPage(page: number) {
-    router.push(`/budgets?page=${page}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    router.push(`?${params.toString()}`);
   }
 
   function toggleAll() {
@@ -192,20 +197,23 @@ export function BudgetLineTable({
     <div>
       {/* Expand/Collapse All + Bulk actions */}
       <div className="mb-3 flex items-center justify-between">
-        <div className="flex gap-2">
-          <button
-            onClick={expandAll}
-            className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:hover:text-gray-300"
-          >
-            Expand All
-          </button>
-          <button
-            onClick={collapseAll}
-            className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:hover:text-gray-300"
-          >
-            Collapse All
-          </button>
-        </div>
+        {!hideCategory && (
+          <div className="flex gap-2">
+            <button
+              onClick={expandAll}
+              className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:hover:text-gray-300"
+            >
+              Expand All
+            </button>
+            <button
+              onClick={collapseAll}
+              className="rounded-md border border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:hover:text-gray-300"
+            >
+              Collapse All
+            </button>
+          </div>
+        )}
+        {hideCategory && <div />}
         {selected.size > 0 && (
           <div className="flex items-center gap-3">
             <button
@@ -257,189 +265,211 @@ export function BudgetLineTable({
             </tr>
           </thead>
           <tbody>
-            {groupedLines.map((group) => {
-              const isCollapsed = collapsedCategories.has(group.categoryId);
-              const groupMonthlyTotal = group.lines.reduce((sum, line) => {
-                const amounts = getMonthlyAmounts(line);
-                return sum + amounts.reduce((a, b) => a + b, 0) / 12;
-              }, 0);
+            {hideCategory
+              ? /* Flat list — no category headers */
+                filteredLines.map((line, lineIndex) => {
+                  const amounts = getMonthlyAmounts(line);
+                  const yearly = getYearlyTotal(amounts);
+                  const isCustom = !!line.monthlyAmounts;
+                  const displayMonthly = isCustom
+                    ? `${fmtD(Math.min(...amounts))}–${fmtD(Math.max(...amounts))}`
+                    : fmtD(line.monthlyAmount);
+                  const rowNumber = (currentPage - 1) * pageSize + lineIndex + 1;
 
-              return (
-                <Fragment key={group.categoryId}>
-                  {/* Category header row */}
-                  <tr
-                    className="cursor-pointer select-none"
-                    onClick={() => toggleCategory(group.categoryId)}
-                  >
-                    <td colSpan={8} className="px-3 pb-1 pt-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-[10px] text-gray-400 dark:text-sp-muted transition-transform duration-200 ${
-                              isCollapsed ? "" : "rotate-180"
-                            }`}
-                          >
-                            &#9660;
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-sp-accent/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-sp-accent">
-                            {group.categoryName}
-                            <span className="font-normal text-[10px] text-sp-accent/60 dark:text-sp-accent/50">
-                              {group.lines.length}
-                            </span>
-                          </span>
+                  return editingId === line.id ? (
+                    <tr key={line.id} className="bg-gray-50 dark:bg-sp-surface/50">
+                      <td colSpan={8} className="py-3 pl-3 pr-3">
+                        <form action={(fd) => handleUpdate(line.id, fd)} className="space-y-3">
+                          <input type="hidden" name="amountMode" value={editMode} />
+                          <div className="flex flex-wrap items-end gap-2">
+                            <div>
+                              <label className="block text-xs text-gray-500">Name</label>
+                              <input name="name" defaultValue={line.name} required className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500">Code</label>
+                              <input name="code" defaultValue={line.code || ""} className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500">Category</label>
+                              <select name="categoryId" defaultValue={line.categoryId} className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border">
+                                {categories.map((cat) => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
+                              </select>
+                            </div>
+                            <div className="flex rounded-md border">
+                              <button type="button" onClick={() => setEditMode("fixed")} className={`px-2 py-1 text-xs ${editMode === "fixed" ? "bg-black text-white dark:bg-sp-accent dark:text-white" : ""}`}>Fixed</button>
+                              <button type="button" onClick={() => setEditMode("custom")} className={`px-2 py-1 text-xs ${editMode === "custom" ? "bg-black text-white dark:bg-sp-accent dark:text-white" : ""}`}>Custom</button>
+                            </div>
+                          </div>
+                          {editMode === "fixed" ? (
+                            <div className="w-32">
+                              <label className="block text-xs text-gray-500">Monthly</label>
+                              <input name="monthlyAmount" type="number" step="0.01" defaultValue={line.monthlyAmount} required className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
+                              {MONTH_SHORT.map((m, i) => (
+                                <div key={i}>
+                                  <label className="block text-xs text-gray-500">{m}</label>
+                                  <input name={`month_${i}`} type="number" step="0.01" defaultValue={amounts[i]} className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {error && <p className="text-sm text-red-500">{error}</p>}
+                          <div className="flex gap-1">
+                            <Button size="sm" type="submit">Save</Button>
+                            <Button size="sm" variant="outline" type="button" onClick={() => setEditingId(null)}>Cancel</Button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={line.id} className={lineIndex % 2 === 0 ? "bg-sp-accent/[0.04]" : ""}>
+                      <td className="py-[5px] pl-3 text-gray-400">{rowNumber}</td>
+                      <td className="py-[5px] font-semibold dark:text-sp-text">{line.name}</td>
+                      <td className="py-[5px] text-gray-500 dark:text-sp-muted">{line.code || "—"}</td>
+                      <td className="py-[5px] text-gray-500 text-xs dark:text-sp-muted">{isCustom ? "Custom" : "Fixed"}</td>
+                      <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{displayMonthly}</td>
+                      <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{fmtD(yearly)}</td>
+                      <td className="py-[5px] text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button size="sm" variant="outline" onClick={() => startEdit(line)}>Edit</Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleDelete(line.id)}>Delete</Button>
                         </div>
-                        <span className="text-[11px] font-semibold tabular-nums text-gray-500 dark:text-sp-muted">
-                          {fmtD(groupMonthlyTotal)} {currency}/mo
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                  {/* Line rows — striped, indented */}
-                  {!isCollapsed && group.lines.map((line, lineIndex) => {
-                    globalRowIndex++;
+                      </td>
+                      <td className="py-[5px] pr-4 text-right">
+                        <input type="checkbox" checked={selected.has(line.id)} onChange={() => toggleOne(line.id)} className="rounded border-gray-300 dark:border-gray-600" />
+                      </td>
+                    </tr>
+                  );
+                })
+              : /* Grouped by category */
+                groupedLines.map((group) => {
+                  const isCollapsed = collapsedCategories.has(group.categoryId);
+                  const groupMonthlyTotal = group.lines.reduce((sum, line) => {
                     const amounts = getMonthlyAmounts(line);
-                    const yearly = getYearlyTotal(amounts);
-                    const isCustom = !!line.monthlyAmounts;
-                    const displayMonthly = isCustom
-                      ? `${fmtD(Math.min(...amounts))}–${fmtD(Math.max(...amounts))}`
-                      : fmtD(line.monthlyAmount);
-                    const rowNumber = (currentPage - 1) * pageSize + globalRowIndex;
+                    return sum + amounts.reduce((a, b) => a + b, 0) / 12;
+                  }, 0);
 
-                    return editingId === line.id ? (
-                      <tr key={line.id} className="bg-gray-50 dark:bg-sp-surface/50">
-                        <td colSpan={8} className="py-3 pl-7 pr-3">
-                          <form
-                            action={(fd) => handleUpdate(line.id, fd)}
-                            className="space-y-3"
-                          >
-                            <input type="hidden" name="amountMode" value={editMode} />
-                            <div className="flex flex-wrap items-end gap-2">
-                              <div>
-                                <label className="block text-xs text-gray-500">Name</label>
-                                <input
-                                  name="name"
-                                  defaultValue={line.name}
-                                  required
-                                  className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs text-gray-500">Code</label>
-                                <input
-                                  name="code"
-                                  defaultValue={line.code || ""}
-                                  className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs text-gray-500">Category</label>
-                                <select
-                                  name="categoryId"
-                                  defaultValue={line.categoryId}
-                                  className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
-                                >
-                                  {categories.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div className="flex rounded-md border">
-                                <button
-                                  type="button"
-                                  onClick={() => setEditMode("fixed")}
-                                  className={`px-2 py-1 text-xs ${
-                                    editMode === "fixed"
-                                      ? "bg-black text-white dark:bg-sp-accent dark:text-white"
-                                      : ""
-                                  }`}
-                                >
-                                  Fixed
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setEditMode("custom")}
-                                  className={`px-2 py-1 text-xs ${
-                                    editMode === "custom"
-                                      ? "bg-black text-white dark:bg-sp-accent dark:text-white"
-                                      : ""
-                                  }`}
-                                >
-                                  Custom
-                                </button>
-                              </div>
+                  return (
+                    <Fragment key={group.categoryId}>
+                      {/* Category header row */}
+                      <tr
+                        className="cursor-pointer select-none"
+                        onClick={() => toggleCategory(group.categoryId)}
+                      >
+                        <td colSpan={8} className="px-3 pb-1 pt-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-[10px] text-gray-400 dark:text-sp-muted transition-transform duration-200 ${
+                                  isCollapsed ? "" : "rotate-180"
+                                }`}
+                              >
+                                &#9660;
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-sp-accent/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-sp-accent">
+                                {group.categoryName}
+                                <span className="font-normal text-[10px] text-sp-accent/60 dark:text-sp-accent/50">
+                                  {group.lines.length}
+                                </span>
+                              </span>
                             </div>
-
-                            {editMode === "fixed" ? (
-                              <div className="w-32">
-                                <label className="block text-xs text-gray-500">Monthly</label>
-                                <input
-                                  name="monthlyAmount"
-                                  type="number"
-                                  step="0.01"
-                                  defaultValue={line.monthlyAmount}
-                                  required
-                                  className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
-                                />
-                              </div>
-                            ) : (
-                              <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
-                                {MONTH_SHORT.map((m, i) => (
-                                  <div key={i}>
-                                    <label className="block text-xs text-gray-500">{m}</label>
-                                    <input
-                                      name={`month_${i}`}
-                                      type="number"
-                                      step="0.01"
-                                      defaultValue={amounts[i]}
-                                      className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border"
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {error && <p className="text-sm text-red-500">{error}</p>}
-                            <div className="flex gap-1">
-                              <Button size="sm" type="submit">Save</Button>
-                              <Button size="sm" variant="outline" type="button" onClick={() => setEditingId(null)}>
-                                Cancel
-                              </Button>
-                            </div>
-                          </form>
-                        </td>
-                      </tr>
-                    ) : (
-                      <tr key={line.id} className={lineIndex % 2 === 0 ? "bg-sp-accent/[0.04]" : ""}>
-                        <td className="py-[5px] pl-7 text-gray-400">{rowNumber}</td>
-                        <td className="py-[5px] font-semibold dark:text-sp-text">{line.name}</td>
-                        <td className="py-[5px] text-gray-500 dark:text-sp-muted">{line.code || "—"}</td>
-                        <td className="py-[5px] text-gray-500 text-xs dark:text-sp-muted">{isCustom ? "Custom" : "Fixed"}</td>
-                        <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{displayMonthly}</td>
-                        <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{fmtD(yearly)}</td>
-                        <td className="py-[5px] text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button size="sm" variant="outline" onClick={() => startEdit(line)}>
-                              Edit
-                            </Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleDelete(line.id)}>
-                              Delete
-                            </Button>
+                            <span className="text-[11px] font-semibold tabular-nums text-gray-500 dark:text-sp-muted">
+                              {fmtD(groupMonthlyTotal)} {currency}/mo
+                            </span>
                           </div>
                         </td>
-                        <td className="py-[5px] pr-4 text-right">
-                          <input
-                            type="checkbox"
-                            checked={selected.has(line.id)}
-                            onChange={() => toggleOne(line.id)}
-                            className="rounded border-gray-300 dark:border-gray-600"
-                          />
-                        </td>
                       </tr>
-                    );
-                  })}
-                </Fragment>
-              );
-            })}
+                      {/* Line rows — striped, indented */}
+                      {!isCollapsed && group.lines.map((line, lineIndex) => {
+                        globalRowIndex++;
+                        const amounts = getMonthlyAmounts(line);
+                        const yearly = getYearlyTotal(amounts);
+                        const isCustom = !!line.monthlyAmounts;
+                        const displayMonthly = isCustom
+                          ? `${fmtD(Math.min(...amounts))}–${fmtD(Math.max(...amounts))}`
+                          : fmtD(line.monthlyAmount);
+                        const rowNumber = (currentPage - 1) * pageSize + globalRowIndex;
+
+                        return editingId === line.id ? (
+                          <tr key={line.id} className="bg-gray-50 dark:bg-sp-surface/50">
+                            <td colSpan={8} className="py-3 pl-7 pr-3">
+                              <form
+                                action={(fd) => handleUpdate(line.id, fd)}
+                                className="space-y-3"
+                              >
+                                <input type="hidden" name="amountMode" value={editMode} />
+                                <div className="flex flex-wrap items-end gap-2">
+                                  <div>
+                                    <label className="block text-xs text-gray-500">Name</label>
+                                    <input name="name" defaultValue={line.name} required className="w-40 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs text-gray-500">Code</label>
+                                    <input name="code" defaultValue={line.code || ""} className="w-20 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs text-gray-500">Category</label>
+                                    <select name="categoryId" defaultValue={line.categoryId} className="w-32 rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border">
+                                      {categories.map((cat) => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
+                                    </select>
+                                  </div>
+                                  <div className="flex rounded-md border">
+                                    <button type="button" onClick={() => setEditMode("fixed")} className={`px-2 py-1 text-xs ${editMode === "fixed" ? "bg-black text-white dark:bg-sp-accent dark:text-white" : ""}`}>Fixed</button>
+                                    <button type="button" onClick={() => setEditMode("custom")} className={`px-2 py-1 text-xs ${editMode === "custom" ? "bg-black text-white dark:bg-sp-accent dark:text-white" : ""}`}>Custom</button>
+                                  </div>
+                                </div>
+
+                                {editMode === "fixed" ? (
+                                  <div className="w-32">
+                                    <label className="block text-xs text-gray-500">Monthly</label>
+                                    <input name="monthlyAmount" type="number" step="0.01" defaultValue={line.monthlyAmount} required className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                                  </div>
+                                ) : (
+                                  <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
+                                    {MONTH_SHORT.map((m, i) => (
+                                      <div key={i}>
+                                        <label className="block text-xs text-gray-500">{m}</label>
+                                        <input name={`month_${i}`} type="number" step="0.01" defaultValue={amounts[i]} className="w-full rounded-md border px-2 py-1 text-sm dark:bg-sp-surface dark:border-sp-border" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {error && <p className="text-sm text-red-500">{error}</p>}
+                                <div className="flex gap-1">
+                                  <Button size="sm" type="submit">Save</Button>
+                                  <Button size="sm" variant="outline" type="button" onClick={() => setEditingId(null)}>Cancel</Button>
+                                </div>
+                              </form>
+                            </td>
+                          </tr>
+                        ) : (
+                          <tr key={line.id} className={lineIndex % 2 === 0 ? "bg-sp-accent/[0.04]" : ""}>
+                            <td className="py-[5px] pl-7 text-gray-400">{rowNumber}</td>
+                            <td className="py-[5px] font-semibold dark:text-sp-text">{line.name}</td>
+                            <td className="py-[5px] text-gray-500 dark:text-sp-muted">{line.code || "—"}</td>
+                            <td className="py-[5px] text-gray-500 text-xs dark:text-sp-muted">{isCustom ? "Custom" : "Fixed"}</td>
+                            <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{displayMonthly}</td>
+                            <td className="py-[5px] text-right tabular-nums dark:text-sp-text">{fmtD(yearly)}</td>
+                            <td className="py-[5px] text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button size="sm" variant="outline" onClick={() => startEdit(line)}>Edit</Button>
+                                <Button size="sm" variant="destructive" onClick={() => handleDelete(line.id)}>Delete</Button>
+                              </div>
+                            </td>
+                            <td className="py-[5px] pr-4 text-right">
+                              <input type="checkbox" checked={selected.has(line.id)} onChange={() => toggleOne(line.id)} className="rounded border-gray-300 dark:border-gray-600" />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </Fragment>
+                  );
+                })
+            }
           </tbody>
         </table>
       </div>

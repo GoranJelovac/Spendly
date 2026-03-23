@@ -168,8 +168,7 @@ export async function applyImport(
     }
   }
 
-  revalidatePath("/budgets");
-  revalidatePath("/categories");
+  revalidatePath("/budget-plan");
   return { success: `Applied ${linesToApply.length} line(s).` };
 }
 

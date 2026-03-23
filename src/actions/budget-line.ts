@@ -27,6 +27,33 @@ export async function getBudgetLinesPaginated(budgetId: string, page: number = 1
   return { items, total };
 }
 
+export async function getBudgetLinesByCategoryPaginated(
+  budgetId: string,
+  categoryId: string,
+  page: number = 1,
+  pageSize: number = 20,
+) {
+  const user = await getAuthUser();
+
+  const budget = await db.budget.findFirst({
+    where: { id: budgetId, userId: user.id },
+  });
+  if (!budget) return { items: [], total: 0 };
+
+  const [items, total] = await Promise.all([
+    db.budgetLine.findMany({
+      where: { budgetId, categoryId },
+      orderBy: { sortOrder: "asc" },
+      include: { category: true },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    db.budgetLine.count({ where: { budgetId, categoryId } }),
+  ]);
+
+  return { items, total };
+}
+
 function parseAmountsFromForm(formData: FormData): {
   mode: "fixed" | "custom";
   monthlyAmount: number;
@@ -108,7 +135,7 @@ export async function createBudgetLine(budgetId: string, formData: FormData) {
     },
   });
 
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: "Line added!" };
 }
 
@@ -149,7 +176,7 @@ export async function updateBudgetLine(id: string, formData: FormData) {
     },
   });
 
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: "Line updated!" };
 }
 
@@ -167,7 +194,7 @@ export async function deleteBudgetLine(id: string) {
 
   await db.budgetLine.delete({ where: { id } });
 
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   return { success: "Line deleted!" };
 }
 
@@ -190,7 +217,7 @@ export async function deleteBudgetLines(ids: string[]) {
     where: { id: { in: valid.map((l) => l.id) } },
   });
 
-  revalidatePath("/budgets");
+  revalidatePath("/budget-plan");
   revalidatePath("/dashboard");
   return { success: `Deleted ${count.count} line(s) and their expenses.` };
 }

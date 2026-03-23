@@ -6,8 +6,7 @@ import { BudgetSelector } from "./budget-selector";
 
 const mainItems = [
   { href: "/dashboard", label: "Dashboard", icon: "⌂" },
-  { href: "/categories", label: "Categories", icon: "☰" },
-  { href: "/budgets", label: "Budget Lines", icon: "≡" },
+  { href: "/budget-plan", label: "Budget Plan", icon: "≡" },
   { href: "/expenses", label: "Expenses", icon: "⚖" },
   { href: "/contributions", label: "Contributions", icon: "↥" },
 ];

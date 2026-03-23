@@ -15,10 +15,12 @@ export function AddLineForm({
   budgetId,
   categories,
   actionSlot,
+  fixedCategoryId,
 }: {
   budgetId: string;
   categories: CategoryOption[];
   actionSlot?: ReactNode;
+  fixedCategoryId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"fixed" | "custom">("fixed");
@@ -79,22 +81,26 @@ export function AddLineForm({
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-sp-surface dark:border-sp-border"
             />
           </div>
-          <div className="w-40">
-            <label htmlFor="categoryId" className="block text-sm font-medium">
-              Category
-            </label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-sp-surface dark:border-sp-border"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {fixedCategoryId ? (
+            <input type="hidden" name="categoryId" value={fixedCategoryId} />
+          ) : (
+            <div className="w-40">
+              <label htmlFor="categoryId" className="block text-sm font-medium">
+                Category
+              </label>
+              <select
+                id="categoryId"
+                name="categoryId"
+                className="mt-1 w-full rounded-md border px-3 py-2 text-sm dark:bg-sp-surface dark:border-sp-border"
+              >
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Mode toggle */}
