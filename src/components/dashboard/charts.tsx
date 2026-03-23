@@ -125,7 +125,7 @@ function DonutWithLegend({
                 <span className="truncate flex-1" title={entry.name}>
                   {entry.name}
                 </span>
-                <span className="flex-shrink-0 text-gray-500 tabular-nums">
+                <span className="flex-shrink-0 text-gray-700 dark:text-slate-400 font-medium tabular-nums">
                   {pct}%
                 </span>
                 <span className="flex-shrink-0 tabular-nums font-medium">

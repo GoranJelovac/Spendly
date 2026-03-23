@@ -67,10 +67,10 @@ export function Sidebar({
                   className={`flex items-center gap-3 px-3 py-[9px] text-[14px] font-medium transition-colors ${
                     active
                       ? "border-b-2 border-sp-accent bg-sp-accent/[0.04] text-sp-accent"
-                      : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 dark:text-sp-muted dark:hover:bg-sp-accent/6 dark:hover:text-sp-text"
+                      : "rounded-[15px] border-b-2 border-transparent text-gray-700 hover:bg-gray-100/80 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-sp-accent/6 dark:hover:text-sp-text"
                   }`}
                 >
-                  <span className={`text-[15px] ${active ? "opacity-100" : "opacity-60"}`}>{item.icon}</span>
+                  <span className={`text-[15px] ${active ? "opacity-100" : "opacity-70"}`}>{item.icon}</span>
                   {item.label}
                 </Link>
               );
@@ -91,10 +91,10 @@ export function Sidebar({
                   className={`flex items-center gap-3 px-3 py-[9px] text-[14px] font-medium transition-colors ${
                     active
                       ? "border-b-2 border-sp-accent bg-sp-accent/[0.04] text-sp-accent"
-                      : "rounded-[15px] border-b-2 border-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 dark:text-sp-muted dark:hover:bg-sp-accent/6 dark:hover:text-sp-text"
+                      : "rounded-[15px] border-b-2 border-transparent text-gray-700 hover:bg-gray-100/80 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-sp-accent/6 dark:hover:text-sp-text"
                   }`}
                 >
-                  <span className={`text-[15px] ${active ? "opacity-100" : "opacity-60"}`}>{item.icon}</span>
+                  <span className={`text-[15px] ${active ? "opacity-100" : "opacity-70"}`}>{item.icon}</span>
                   {item.label}
                 </Link>
               );

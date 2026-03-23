@@ -28,11 +28,11 @@ function CollapsibleSection({
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between rounded-t-2xl px-5 py-3.5 text-left transition-colors bg-sp-accent/8 hover:bg-sp-accent/12"
       >
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-sp-muted">
+        <h3 className="text-[12px] font-bold uppercase tracking-[0.12em] text-slate-700 dark:text-slate-400">
           {title}
         </h3>
         <span
-          className={`text-[10px] text-gray-400 dark:text-sp-muted transition-transform duration-200 ${
+          className={`text-[10px] text-gray-500 dark:text-slate-400 transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         >
@@ -59,7 +59,7 @@ function ToggleButton({
       className={`rounded-xl px-3.5 py-1.5 text-[13px] font-medium transition-all ${
         active
           ? "bg-sp-accent text-white shadow-sm"
-          : "text-gray-500 hover:bg-gray-100 dark:text-sp-muted dark:hover:bg-sp-accent/8"
+          : "text-gray-700 font-semibold hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-sp-accent/8"
       }`}
     >
       {children}
@@ -470,7 +470,7 @@ export function DashboardContent({
                       <td className="rounded-l-xl py-[6px] pl-3 font-semibold dark:text-sp-text">{item.name}</td>
                       {viewMode === "lines" && (
                         <td className="py-[6px]">
-                          <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-sp-muted">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-slate-400">
                             <span className="inline-block h-1.5 w-1.5 rounded-full bg-sp-accent" />
                             {"categoryName" in item ? String(item.categoryName) : ""}
                           </span>
