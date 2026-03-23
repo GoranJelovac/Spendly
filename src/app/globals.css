@@ -45,6 +45,16 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ─── Spendly theme tokens ─── */
+  --color-sp-bg: var(--sp-bg);
+  --color-sp-surface: var(--sp-surface);
+  --color-sp-border: var(--sp-border);
+  --color-sp-accent: var(--sp-accent);
+  --color-sp-accent-hover: var(--sp-accent-hover);
+  --color-sp-muted: var(--sp-muted);
+  --color-sp-dim: var(--sp-dim);
+  --color-sp-text: var(--sp-text);
 }
 
 :root {
@@ -80,6 +90,17 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Spendly: Clean Light */
+  --sp-bg: #ffffff;
+  --sp-surface: #f1f5f9;
+  --sp-border: #e2e8f0;
+  --sp-accent: #3b82f6;
+  --sp-accent-hover: #2563eb;
+  --sp-muted: #64748b;
+  --sp-dim: #94a3b8;
+  --sp-text: #0f172a;
+  --sp-glow: rgba(59, 130, 246, 0.08);
 }
 
 .dark {
@@ -114,6 +135,17 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Spendly: Slate Blue */
+  --sp-bg: #0f172a;
+  --sp-surface: #1e293b;
+  --sp-border: #334155;
+  --sp-accent: #3b82f6;
+  --sp-accent-hover: #2563eb;
+  --sp-muted: #64748b;
+  --sp-dim: #94a3b8;
+  --sp-text: #e2e8f0;
+  --sp-glow: rgba(59, 130, 246, 0.12);
 }
 
 @layer base {

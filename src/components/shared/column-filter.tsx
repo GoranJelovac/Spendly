@@ -59,7 +59,7 @@ export function ColumnFilter({ values, selected, onChange }: ColumnFilterProps) 
         onClick={() => setOpen(!open)}
         className={`ml-1 inline-flex items-center text-[10px] leading-none transition-colors ${
           isFiltered
-            ? "text-blue-600 dark:text-[#818cf8]"
+            ? "text-blue-600 dark:text-sp-accent"
             : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
         title="Filter column"
@@ -68,22 +68,22 @@ export function ColumnFilter({ values, selected, onChange }: ColumnFilterProps) 
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-[#252345] dark:bg-[#13112b]">
+        <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-sp-border dark:bg-sp-bg">
           {/* Search */}
-          <div className="border-b border-gray-100 p-2 dark:border-[#252345]">
+          <div className="border-b border-gray-100 p-2 dark:border-sp-border">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
-              className="w-full rounded border border-gray-200 px-2 py-1 text-xs dark:border-[#252345] dark:bg-[#1a1835]"
+              className="w-full rounded border border-gray-200 px-2 py-1 text-xs dark:border-sp-border dark:bg-sp-surface"
               autoFocus
             />
           </div>
 
           {/* Select all / Clear */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-3 py-1.5 dark:border-[#252345]">
-            <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-[#6b6b8a]">
+          <div className="flex items-center justify-between border-b border-gray-100 px-3 py-1.5 dark:border-sp-border">
+            <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-sp-muted">
               <input
                 type="checkbox"
                 checked={selected.size === values.length}
@@ -95,7 +95,7 @@ export function ColumnFilter({ values, selected, onChange }: ColumnFilterProps) 
             {isFiltered && (
               <button
                 onClick={clearFilter}
-                className="text-xs text-blue-600 hover:text-blue-800 dark:text-[#818cf8]"
+                className="text-xs text-blue-600 hover:text-blue-800 dark:text-sp-accent"
               >
                 Clear
               </button>
@@ -110,7 +110,7 @@ export function ColumnFilter({ values, selected, onChange }: ColumnFilterProps) 
               filtered.map((val) => (
                 <label
                   key={val}
-                  className="flex cursor-pointer items-center gap-1.5 rounded px-2 py-1 text-xs hover:bg-gray-50 dark:hover:bg-[#1a1835]"
+                  className="flex cursor-pointer items-center gap-1.5 rounded px-2 py-1 text-xs hover:bg-gray-50 dark:hover:bg-sp-surface"
                 >
                   <input
                     type="checkbox"

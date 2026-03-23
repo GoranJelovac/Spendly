@@ -41,7 +41,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         Previous
       </Button>
 
-      <span className="px-2 text-gray-600 dark:text-[#6b6b8a]">
+      <span className="px-2 text-gray-600 dark:text-sp-muted">
         Page {currentPage} of {totalPages}
       </span>
 
@@ -71,7 +71,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
           onChange={(e) => setGoToPage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleGoTo()}
           placeholder="#"
-          className="w-16 rounded-md border border-gray-200 px-2 py-1 text-center text-sm dark:border-[#252345] dark:bg-[#1a1835]"
+          className="w-16 rounded-md border border-gray-200 px-2 py-1 text-center text-sm dark:border-sp-border dark:bg-sp-surface"
         />
         <Button size="sm" variant="outline" onClick={handleGoTo}>
           Go

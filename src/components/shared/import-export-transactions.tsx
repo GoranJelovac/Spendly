@@ -228,7 +228,7 @@ export function ImportExportTransactions({
       {successMsg && <p className="mb-4 text-sm text-green-600">{successMsg}</p>}
 
       {preview && (
-        <div className="mb-6 rounded-2xl bg-white p-5 shadow-md dark:bg-[#13112b] dark:border-2 dark:border-[#252345] dark:shadow-[0_0_20px_rgba(129,140,248,0.12)]">
+        <div className="mb-6 rounded-2xl bg-white p-5 shadow-md dark:bg-sp-bg dark:border-2 dark:border-sp-border dark:shadow-[0_0_20px_var(--sp-glow)]">
           <h3 className="mb-1 text-lg font-semibold">Import Preview</h3>
           <p className="mb-3 text-sm text-gray-500">
             {readyCount} ready to import

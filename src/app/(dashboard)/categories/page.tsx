@@ -20,7 +20,7 @@ export default async function CategoriesPage({
     return (
       <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
         <h1 className="mb-4 text-2xl font-bold">Categories</h1>
-        <div className="rounded-2xl bg-white p-8 text-center shadow-md dark:bg-[#13112b]">
+        <div className="rounded-2xl bg-white p-8 text-center shadow-md dark:bg-sp-bg">
           <p className="text-gray-500">
             No budget selected. Create one using the selector in the sidebar.
           </p>

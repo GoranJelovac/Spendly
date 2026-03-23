@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-6xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
 
       {!activeBudget ? (
-        <div className="rounded-2xl bg-white p-8 text-center shadow-md dark:bg-[#13112b]">
+        <div className="rounded-2xl bg-white p-8 text-center shadow-md dark:bg-sp-bg">
           <p className="text-gray-500">
             No budget selected. Create one using the selector in the sidebar.
           </p>
