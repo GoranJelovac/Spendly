@@ -17,3 +17,18 @@ export const CURRENCIES = [
   "NOK", "DKK", "PLN", "CZK", "HUF", "RON", "BGN", "HRK", "TRY", "BRL",
   "INR", "KRW", "MXN", "ZAR",
 ] as const;
+
+export const CURRENCY_COUNTRIES: Record<string, string> = {
+  EUR: "eu", USD: "us", GBP: "gb", RSD: "rs", CHF: "ch",
+  JPY: "jp", CNY: "cn", AUD: "au", CAD: "ca", SEK: "se",
+  NOK: "no", DKK: "dk", PLN: "pl", CZK: "cz", HUF: "hu",
+  RON: "ro", BGN: "bg", HRK: "hr", TRY: "tr", BRL: "br",
+  INR: "in", KRW: "kr", MXN: "mx", ZAR: "za",
+};
+
+export function currencyFlagUrl(code: string, size = 24): string {
+  const country = CURRENCY_COUNTRIES[code];
+  if (!country) return "";
+  const h = Math.round(size * 0.75);
+  return `https://flagcdn.com/${size}x${h}/${country}.png`;
+}

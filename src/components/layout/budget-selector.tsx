@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { setActiveBudget } from "@/actions/active-budget";
 import { createBudget, deleteBudget, updateBudget } from "@/actions/budget";
-import { CURRENCIES } from "@/lib/constants";
+import { currencyFlagUrl } from "@/lib/constants";
+import { CurrencySelect } from "@/components/shared/currency-select";
 
 type Budget = {
   id: string;
@@ -13,7 +14,7 @@ type Budget = {
 };
 
 const INPUT_CLS =
-  "w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm dark:border-[#252345] dark:bg-[#13112b]";
+  "w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm dark:border-sp-border dark:bg-sp-bg";
 
 export function BudgetSelector({
   budgets,
@@ -88,7 +89,7 @@ export function BudgetSelector({
       <div className="px-3">
         <button
           onClick={() => setShowCreate(true)}
-          className="flex w-full items-center justify-center gap-1 rounded-lg bg-[#818cf8] px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#6366f1]"
+          className="flex w-full items-center justify-center gap-1 rounded-lg bg-sp-accent px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-sp-accent-hover"
         >
           + New Budget
         </button>
@@ -112,7 +113,7 @@ export function BudgetSelector({
             value={deleteConfirm}
             onChange={(e) => setDeleteConfirm(e.target.value)}
             placeholder={activeBudget.name}
-            className="mt-1.5 w-full rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-center text-sm dark:border-red-800 dark:bg-[#13112b]"
+            className="mt-1.5 w-full rounded-lg border border-red-200 bg-white px-2.5 py-1.5 text-center text-sm dark:border-red-800 dark:bg-sp-bg"
           />
           {error && <p className="mt-1 text-[10px] text-red-500">{error}</p>}
           <button
@@ -124,7 +125,7 @@ export function BudgetSelector({
           </button>
           <button
             onClick={closeAll}
-            className="mt-1 w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-[#6b6b8a] dark:hover:text-[#e0e0f0]"
+            className="mt-1 w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-sp-muted dark:hover:text-sp-text"
           >
             Cancel
           </button>
@@ -140,7 +141,7 @@ export function BudgetSelector({
         <select
           value={activeBudgetId || ""}
           onChange={(e) => handleSwitch(e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-semibold dark:border-[#252345] dark:bg-[#13112b]"
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-semibold dark:border-sp-border dark:bg-sp-bg"
         >
           {budgets.map((b) => (
             <option key={b.id} value={b.id}>
@@ -149,7 +150,12 @@ export function BudgetSelector({
           ))}
         </select>
         {activeBudget && (
-          <span className="shrink-0 rounded-md bg-indigo-50 px-2 py-1 text-[11px] font-bold text-indigo-500 dark:bg-[rgba(129,140,248,0.15)] dark:text-[#818cf8]">
+          <span className="flex shrink-0 items-center gap-1.5 rounded-md bg-indigo-50 px-2 py-1 text-[11px] font-bold text-indigo-500 dark:bg-sp-accent/15 dark:text-sp-accent">
+            <img
+              src={currencyFlagUrl(activeBudget.currency, 32)}
+              alt=""
+              className="h-[12px] w-[16px] rounded-[1px] object-cover"
+            />
             {activeBudget.currency}
           </span>
         )}
@@ -160,7 +166,7 @@ export function BudgetSelector({
         <div className="flex gap-1">
           <button
             onClick={() => { closeAll(); setShowCreate(true); }}
-            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8] dark:hover:bg-[rgba(129,140,248,0.2)]"
+            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-sp-accent/10 dark:text-sp-accent dark:hover:bg-sp-accent/20"
           >
             New
           </button>
@@ -168,7 +174,7 @@ export function BudgetSelector({
             <>
               <button
                 onClick={() => { closeAll(); setShowEdit(true); }}
-                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-[rgba(129,140,248,0.1)] dark:text-[#818cf8] dark:hover:bg-[rgba(129,140,248,0.2)]"
+                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1.5 text-[11px] font-semibold text-indigo-500 transition-colors hover:bg-indigo-100 dark:bg-sp-accent/10 dark:text-sp-accent dark:hover:bg-sp-accent/20"
               >
                 Edit
               </button>
@@ -199,27 +205,19 @@ export function BudgetSelector({
             defaultValue={new Date().getFullYear()}
             className={INPUT_CLS}
           />
-          <select
-            name="currency"
-            defaultValue="EUR"
-            className={INPUT_CLS}
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+          <CurrencySelect name="currency" defaultValue="EUR" />
           {error && <p className="text-[10px] text-red-500">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-[#818cf8] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#6366f1] disabled:opacity-50"
+            className="w-full rounded-lg bg-sp-accent px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-sp-accent-hover disabled:opacity-50"
           >
             {loading ? "..." : "Create"}
           </button>
           <button
             type="button"
             onClick={() => setShowCreate(false)}
-            className="w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-[#6b6b8a] dark:hover:text-[#e0e0f0]"
+            className="w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-sp-muted dark:hover:text-sp-text"
           >
             Cancel
           </button>
@@ -242,27 +240,19 @@ export function BudgetSelector({
             defaultValue={activeBudget.year}
             className={INPUT_CLS}
           />
-          <select
-            name="currency"
-            defaultValue={activeBudget.currency}
-            className={INPUT_CLS}
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+          <CurrencySelect name="currency" defaultValue={activeBudget.currency} />
           {error && <p className="text-[10px] text-red-500">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-[#818cf8] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#6366f1] disabled:opacity-50"
+            className="w-full rounded-lg bg-sp-accent px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-sp-accent-hover disabled:opacity-50"
           >
             {loading ? "..." : "Save"}
           </button>
           <button
             type="button"
             onClick={() => setShowEdit(false)}
-            className="w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-[#6b6b8a] dark:hover:text-[#e0e0f0]"
+            className="w-full rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-sp-muted dark:hover:text-sp-text"
           >
             Cancel
           </button>
