@@ -196,122 +196,150 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
         />
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+      {/* Import Preview Modal */}
+      {(preview || error) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => { setPreview(null); setError(""); }}
+          />
 
-      {preview && (
-        <div className="mb-6 rounded-2xl bg-white p-5 shadow-md dark:bg-sp-bg dark:border-2 dark:border-sp-border dark:shadow-[0_0_20px_var(--sp-glow)]">
-          <h3 className="mb-3 text-lg font-semibold">Import Preview</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b text-gray-500">
-                <tr>
-                  <th className="pb-2 font-medium">Status</th>
-                  <th className="pb-2 font-medium">Category</th>
-                  <th className="pb-2 font-medium">Name</th>
-                  <th className="pb-2 font-medium">Code</th>
-                  {MONTH_SHORT.map((m) => (
-                    <th key={m} className="pb-2 text-right font-medium text-xs">{m}</th>
-                  ))}
-                  <th className="pb-2 pl-4 font-medium">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {preview.map((line) => (
-                  <tr key={line.name} className="border-b">
-                    <td className="py-2">
-                      <span
-                        className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${
-                          line.status === "new"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                            : line.status === "changed"
-                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                              : "bg-gray-100 text-gray-600 dark:bg-sp-surface dark:text-sp-muted"
-                        }`}
-                      >
-                        {line.status}
-                      </span>
-                    </td>
-                    <td className="py-2 text-xs">
-                      {line.status === "changed" && line.existingCategory && line.existingCategory !== line.category ? (
-                        <div>
-                          <div className="text-red-400 line-through">{line.existingCategory}</div>
-                          <div className="text-green-600">{line.category}</div>
-                        </div>
-                      ) : (
-                        line.category
-                      )}
-                    </td>
-                    <td className="py-2">{line.name}</td>
-                    <td className="py-2 text-gray-500">{line.code || "—"}</td>
-                    {line.months.map((val, i) => (
-                      <td key={i} className="py-2 text-right text-xs">
-                        {line.status === "changed" && line.existingMonths ? (
-                          <div>
-                            {val !== line.existingMonths[i] ? (
-                              <>
-                                <div className="text-red-400 line-through">{line.existingMonths[i]}</div>
-                                <div className="text-green-600">{val}</div>
-                              </>
+          {/* Modal panel */}
+          <div className="relative z-10 mx-4 max-h-[85vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl dark:border-2 dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-sp-border px-5 py-3">
+              <h3 className="text-lg font-semibold">{preview ? "Import Preview" : "Import Error"}</h3>
+              <button
+                onClick={() => { setPreview(null); setError(""); }}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-sp-surface dark:hover:text-sp-text"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="overflow-auto p-5" style={{ maxHeight: "calc(85vh - 120px)" }}>
+              {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+
+              {preview && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="border-b text-gray-500">
+                      <tr>
+                        <th className="pb-2 font-medium">Status</th>
+                        <th className="pb-2 font-medium">Category</th>
+                        <th className="pb-2 font-medium">Name</th>
+                        <th className="pb-2 font-medium">Code</th>
+                        {MONTH_SHORT.map((m) => (
+                          <th key={m} className="pb-2 text-right font-medium text-xs">{m}</th>
+                        ))}
+                        <th className="pb-2 pl-4 font-medium">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {preview.map((line) => (
+                        <tr key={line.name} className="border-b">
+                          <td className="py-2">
+                            <span
+                              className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${
+                                line.status === "new"
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                  : line.status === "changed"
+                                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                    : "bg-gray-100 text-gray-600 dark:bg-sp-surface dark:text-sp-muted"
+                              }`}
+                            >
+                              {line.status}
+                            </span>
+                          </td>
+                          <td className="py-2 text-xs">
+                            {line.status === "changed" && line.existingCategory && line.existingCategory !== line.category ? (
+                              <div>
+                                <div className="text-red-400 line-through">{line.existingCategory}</div>
+                                <div className="text-green-600">{line.category}</div>
+                              </div>
                             ) : (
-                              val
+                              line.category
                             )}
-                          </div>
-                        ) : (
-                          val
-                        )}
-                      </td>
-                    ))}
-                    <td className="py-2 pl-4">
-                      {line.status === "new" && (
-                        <span className="text-xs text-green-600">Will add</span>
-                      )}
-                      {line.status === "unchanged" && (
-                        <span className="text-xs text-gray-400">Skip</span>
-                      )}
-                      {line.status === "changed" && (
-                        <div className="flex gap-2">
-                          <label className="flex items-center gap-1 text-xs">
-                            <input
-                              type="radio"
-                              name={`choice-${line.name}`}
-                              checked={selections[line.name] === "old"}
-                              onChange={() =>
-                                setSelections((s) => ({ ...s, [line.name]: "old" }))
-                              }
-                            />
-                            Keep old
-                          </label>
-                          <label className="flex items-center gap-1 text-xs">
-                            <input
-                              type="radio"
-                              name={`choice-${line.name}`}
-                              checked={selections[line.name] === "new"}
-                              onChange={() =>
-                                setSelections((s) => ({ ...s, [line.name]: "new" }))
-                              }
-                            />
-                            Use new
-                          </label>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          </td>
+                          <td className="py-2">{line.name}</td>
+                          <td className="py-2 text-gray-500">{line.code || "—"}</td>
+                          {line.months.map((val, i) => (
+                            <td key={i} className="py-2 text-right text-xs">
+                              {line.status === "changed" && line.existingMonths ? (
+                                <div>
+                                  {val !== line.existingMonths[i] ? (
+                                    <>
+                                      <div className="text-red-400 line-through">{line.existingMonths[i]}</div>
+                                      <div className="text-green-600">{val}</div>
+                                    </>
+                                  ) : (
+                                    val
+                                  )}
+                                </div>
+                              ) : (
+                                val
+                              )}
+                            </td>
+                          ))}
+                          <td className="py-2 pl-4">
+                            {line.status === "new" && (
+                              <span className="text-xs text-green-600">Will add</span>
+                            )}
+                            {line.status === "unchanged" && (
+                              <span className="text-xs text-gray-400">Skip</span>
+                            )}
+                            {line.status === "changed" && (
+                              <div className="flex gap-2">
+                                <label className="flex items-center gap-1 text-xs">
+                                  <input
+                                    type="radio"
+                                    name={`choice-${line.name}`}
+                                    checked={selections[line.name] === "old"}
+                                    onChange={() =>
+                                      setSelections((s) => ({ ...s, [line.name]: "old" }))
+                                    }
+                                  />
+                                  Keep old
+                                </label>
+                                <label className="flex items-center gap-1 text-xs">
+                                  <input
+                                    type="radio"
+                                    name={`choice-${line.name}`}
+                                    checked={selections[line.name] === "new"}
+                                    onChange={() =>
+                                      setSelections((s) => ({ ...s, [line.name]: "new" }))
+                                    }
+                                  />
+                                  Use new
+                                </label>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
-          <div className="mt-4 flex gap-2">
-            <Button size="sm" onClick={handleApply} disabled={loading}>
-              {loading ? "Applying..." : "Apply"}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPreview(null)}
-            >
-              Cancel
-            </Button>
+            {/* Footer */}
+            <div className="flex gap-2 border-t border-sp-border px-5 py-3">
+              {preview && (
+                <Button size="sm" onClick={handleApply} disabled={loading}>
+                  {loading ? "Applying..." : "Apply"}
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => { setPreview(null); setError(""); }}
+              >
+                {preview ? "Cancel" : "Close"}
+              </Button>
+            </div>
           </div>
         </div>
       )}
