@@ -16,13 +16,19 @@ export function AddLineForm({
   categories,
   actionSlot,
   fixedCategoryId,
+  externalOpen,
+  onOpenChange,
 }: {
   budgetId: string;
   categories: CategoryOption[];
   actionSlot?: ReactNode;
   fixedCategoryId?: string;
+  externalOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [mode, setMode] = useState<"fixed" | "custom">("fixed");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,14 +47,7 @@ export function AddLineForm({
   }
 
   if (!open) {
-    return (
-      <div className="mb-4 flex items-center justify-between">
-        <Button onClick={() => setOpen(true)}>
-          + Add Line
-        </Button>
-        <div>{actionSlot}</div>
-      </div>
-    );
+    return null;
   }
 
   return (

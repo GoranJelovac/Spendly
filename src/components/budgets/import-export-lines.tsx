@@ -174,17 +174,19 @@ export function ImportExportLines({ budgetId }: { budgetId: string }) {
   return (
     <div>
       <div className="flex gap-1.5">
-        <Button variant="outline" size="sm" onClick={handleDownload}>
+        <button
+          onClick={handleDownload}
+          className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06]"
+        >
           Export
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
+        </button>
+        <button
           onClick={() => fileRef.current?.click()}
           disabled={loading}
+          className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06] disabled:opacity-50"
         >
           Import
-        </Button>
+        </button>
         <input
           ref={fileRef}
           type="file"

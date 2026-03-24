@@ -21,12 +21,14 @@ export function CategorySelector({
   categories,
   activeCategoryId,
   budgetId,
-  totalLineCount,
+  onAddLine,
+  importExportSlot,
 }: {
   categories: Category[];
   activeCategoryId: string | null;
   budgetId: string;
-  totalLineCount: number;
+  onAddLine?: () => void;
+  importExportSlot?: React.ReactNode;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -38,15 +40,12 @@ export function CategorySelector({
   const [error, setError] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const items: DropdownItem[] = [
-    { id: "all", name: "All", count: totalLineCount, protected: true },
-    ...categories.map((c) => ({
-      id: c.id,
-      name: c.name,
-      count: c._count.lines,
-      protected: c.name === "General",
-    })),
-  ];
+  const items: DropdownItem[] = categories.map((c) => ({
+    id: c.id,
+    name: c.name,
+    count: c._count.lines,
+    protected: c.name === "General",
+  }));
 
   const activeItem = activeCategoryId
     ? items.find((i) => i.id === activeCategoryId) || items[0]
@@ -64,8 +63,7 @@ export function CategorySelector({
 
   function navigateTo(item: DropdownItem) {
     setDropdownOpen(false);
-    const catParam = item.id === "all" ? "" : `cat=${item.id}`;
-    const url = `/budget-plan${catParam ? `?${catParam}` : ""}`;
+    const url = `/budget-plan?cat=${item.id}`;
     startTransition(() => router.push(url));
   }
 
@@ -149,30 +147,66 @@ export function CategorySelector({
         </div>
 
         {/* Category actions: New, Rename, Delete */}
-        <div className="flex gap-1.5">
-          <button
-            onClick={() => setAddingCategory(true)}
-            className="flex h-7 items-center rounded-lg border border-sp-border px-2.5 text-[12px] font-medium text-gray-500 transition-all hover:border-sp-accent hover:bg-sp-accent/[0.06] hover:text-sp-accent dark:text-sp-muted"
-          >
-            New
-          </button>
-          {!activeItem.protected && (
-            <>
-              <button
-                onClick={() => { setEditingId(activeItem.id); setEditName(activeItem.name); }}
-                className="flex h-7 items-center rounded-lg border border-sp-border px-2.5 text-[12px] font-medium text-gray-500 transition-all hover:border-sp-accent hover:bg-sp-accent/[0.06] hover:text-sp-accent dark:text-sp-muted"
-              >
-                Rename
-              </button>
-              <button
-                onClick={() => handleDelete(activeItem.id, activeItem.name)}
-                className="flex h-7 items-center rounded-lg border border-sp-border px-2.5 text-[12px] font-medium text-gray-500 transition-all hover:border-red-400 hover:bg-red-500/[0.06] hover:text-red-500 dark:text-sp-muted"
-              >
-                Delete
-              </button>
-            </>
-          )}
+        <div className="flex flex-col items-start gap-0.5">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.06em] text-gray-500/70 dark:text-sp-muted/70">
+            Category
+          </span>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setAddingCategory(true)}
+              className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06]"
+            >
+              New
+            </button>
+            {!activeItem.protected && (
+              <>
+                <button
+                  onClick={() => { setEditingId(activeItem.id); setEditName(activeItem.name); }}
+                  className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06]"
+                >
+                  Rename
+                </button>
+                <button
+                  onClick={() => handleDelete(activeItem.id, activeItem.name)}
+                  className="flex h-7 items-center rounded-lg border border-red-400 px-2.5 text-[12px] font-semibold text-red-500 transition-all hover:bg-red-500/[0.06]"
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
         </div>
+
+        {/* Separator */}
+        <div className="mx-0.5 h-[18px] w-px bg-sp-border" />
+
+        {/* Line actions: + New */}
+        <div className="flex flex-col items-start gap-0.5">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.06em] text-gray-500/70 dark:text-sp-muted/70">
+            Line
+          </span>
+          <button
+            onClick={onAddLine}
+            className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06]"
+          >
+            + New
+          </button>
+        </div>
+
+        {/* Spacer pushes data actions to the right */}
+        <div className="flex-1" />
+
+        {/* Data actions: Export, Import */}
+        {importExportSlot && (
+          <div className="flex flex-col items-start gap-0.5">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.06em] text-gray-500/70 dark:text-sp-muted/70">
+              Data
+            </span>
+            <div className="flex gap-1.5">
+              {importExportSlot}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Inline add category form */}

@@ -35,6 +35,7 @@ export function BudgetLineTable({
   totalPages,
   pageSize,
   hideCategory = false,
+  beforePagination,
 }: {
   lines: BudgetLine[];
   currency: string;
@@ -43,6 +44,7 @@ export function BudgetLineTable({
   totalPages: number;
   pageSize: number;
   hideCategory?: boolean;
+  beforePagination?: React.ReactNode;
 }) {
   const { fmtD } = useDecimals();
   const router = useRouter();
@@ -473,6 +475,8 @@ export function BudgetLineTable({
           </tbody>
         </table>
       </div>
+
+      {beforePagination && <div>{beforePagination}</div>}
 
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={goToPage} />
     </div>
