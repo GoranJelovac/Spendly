@@ -4,7 +4,6 @@ import { getActiveBudget } from "@/actions/active-budget";
 import { getExpensesPaginated } from "@/actions/expense";
 import { getBudget } from "@/actions/budget";
 import { ExpenseList } from "@/components/expenses/expense-list";
-import { ImportExportTransactions } from "@/components/shared/import-export-transactions";
 import { ExpensesClient } from "@/components/expenses/expenses-client";
 import {
   downloadExpensesCsv,
@@ -50,15 +49,10 @@ export default async function ExpensesPage() {
       <h1 className="mb-6 text-center text-2xl font-bold">Expenses</h1>
       <ExpensesClient
         lines={lines}
-        importExportSlot={
-          <ImportExportTransactions
-            budgetId={activeBudget.id}
-            label="Expenses"
-            downloadCsv={downloadExpensesCsv}
-            previewImport={previewImportExpenses}
-            applyImport={applyImportExpenses}
-          />
-        }
+        budgetId={activeBudget.id}
+        downloadCsv={downloadExpensesCsv}
+        previewImport={previewImportExpenses}
+        applyImport={applyImportExpenses}
       >
         <ExpenseList
           expenses={expenses}

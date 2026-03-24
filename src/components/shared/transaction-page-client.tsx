@@ -14,7 +14,7 @@ export function TransactionPageClient({
   children,
 }: Props) {
   return (
-    <>
+    <div>
       {/* Action bar */}
       <div className="flex flex-wrap items-center gap-2 rounded-t-2xl border border-sp-border bg-sp-surface px-3 py-2">
         <div className="flex flex-col items-start gap-0.5">
@@ -45,6 +45,6 @@ export function TransactionPageClient({
       <div className="rounded-b-2xl border border-t-0 border-sp-border bg-white p-4 dark:bg-sp-bg">
         {children}
       </div>
-    </>
+    </div>
   );
 }

@@ -4,7 +4,6 @@ import { getActiveBudget } from "@/actions/active-budget";
 import { getContributionsPaginated } from "@/actions/contribution";
 import { getBudget } from "@/actions/budget";
 import { ContributionList } from "@/components/contributions/contribution-list";
-import { ImportExportTransactions } from "@/components/shared/import-export-transactions";
 import { ContributionsClient } from "@/components/contributions/contributions-client";
 import {
   downloadContributionsCsv,
@@ -50,15 +49,10 @@ export default async function ContributionsPage() {
       <h1 className="mb-6 text-center text-2xl font-bold">Contributions</h1>
       <ContributionsClient
         lines={lines}
-        importExportSlot={
-          <ImportExportTransactions
-            budgetId={activeBudget.id}
-            label="Contributions"
-            downloadCsv={downloadContributionsCsv}
-            previewImport={previewImportContributions}
-            applyImport={applyImportContributions}
-          />
-        }
+        budgetId={activeBudget.id}
+        downloadCsv={downloadContributionsCsv}
+        previewImport={previewImportContributions}
+        applyImport={applyImportContributions}
       >
         <ContributionList
           contributions={contributions}

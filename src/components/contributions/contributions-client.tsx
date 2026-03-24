@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { TransactionPageClient } from "@/components/shared/transaction-page-client";
 import { AddContributionForm } from "@/components/contributions/add-contribution-form";
+import { ImportExportTransactions } from "@/components/shared/import-export-transactions";
 
 type BudgetLine = {
   id: string;
@@ -11,15 +12,29 @@ type BudgetLine = {
   categoryName: string;
 };
 
+type Props = {
+  lines: BudgetLine[];
+  budgetId: string;
+  downloadCsv: (budgetId: string) => Promise<{ csv: string } | { error: string }>;
+  previewImport: (
+    budgetId: string,
+    rows: { date: string; line: string; amount: number; description: string }[]
+  ) => Promise<{ rows: any[] } | { error: string }>;
+  applyImport: (
+    budgetId: string,
+    rows: { date: string; line: string; amount: number; description: string }[]
+  ) => Promise<{ success: string } | { error: string }>;
+  children: ReactNode;
+};
+
 export function ContributionsClient({
   lines,
-  importExportSlot,
+  budgetId,
+  downloadCsv,
+  previewImport,
+  applyImport,
   children,
-}: {
-  lines: BudgetLine[];
-  importExportSlot: ReactNode;
-  children: ReactNode;
-}) {
+}: Props) {
   const [addOpen, setAddOpen] = useState(false);
 
   if (lines.length === 0) {
@@ -33,14 +48,24 @@ export function ContributionsClient({
   return (
     <TransactionPageClient
       onAddNew={() => setAddOpen(true)}
-      importExportSlot={importExportSlot}
+      importExportSlot={
+        <ImportExportTransactions
+          budgetId={budgetId}
+          label="Contributions"
+          downloadCsv={downloadCsv}
+          previewImport={previewImport}
+          applyImport={applyImport}
+        />
+      }
     >
-      <AddContributionForm
-        lines={lines}
-        externalOpen={addOpen}
-        onOpenChange={setAddOpen}
-      />
-      {children}
+      <div>
+        <AddContributionForm
+          lines={lines}
+          externalOpen={addOpen}
+          onOpenChange={setAddOpen}
+        />
+        {children}
+      </div>
     </TransactionPageClient>
   );
 }
