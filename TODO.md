@@ -18,6 +18,6 @@
 - [x] Pomeriti total bar iznad paginacije, razdvojiti pagination na dva reda
 - [x] Razmotriti da li treba import kategorija — ne treba, import linija već auto-kreira kategorije
 - [x] Pregledati kako trenutno radi import linija — premešten preview u overlay modal
-- [ ] Uskladiti izgled Expenses i Contributions stranica sa Budget Plan estetikom (dropdown bar, panel, dugmići)
+- [x] Uskladiti izgled Expenses i Contributions stranica sa Budget Plan estetikom (dropdown bar, panel, dugmići)
 - [ ] Urediti Billing stranicu
 - [ ] Dashboard charts — razdvojiti na dve collapsible grupe: (1) "Planned vs Spent" bar chart, (2) "Budget Breakdown" + "Spending Overview" donut charts zajedno (povećani za bolju čitljivost kad ima mnogo linija/kategorija). Istražiti i alternativne načine prikaza celokupnog budžeta ako postoji bolji od donut-a
