@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { createExpense } from "@/actions/expense";
 import { Button } from "@/components/ui/button";
 
@@ -11,8 +11,18 @@ type BudgetLine = {
   categoryName: string;
 };
 
-export function AddExpenseForm({ lines, actionSlot }: { lines: BudgetLine[]; actionSlot?: ReactNode }) {
-  const [open, setOpen] = useState(false);
+export function AddExpenseForm({
+  lines,
+  externalOpen,
+  onOpenChange,
+}: {
+  lines: BudgetLine[];
+  externalOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -38,27 +48,12 @@ export function AddExpenseForm({ lines, actionSlot }: { lines: BudgetLine[]; act
     setLoading(false);
   }
 
-  if (lines.length === 0) {
-    return (
-      <p className="mb-6 text-gray-500">
-        No budget lines yet. Add some on the Budget Lines page first.
-      </p>
-    );
-  }
-
   if (!open) {
-    return (
-      <div className="mb-6 flex items-center justify-between">
-        <Button onClick={() => setOpen(true)}>
-          + Add Expense
-        </Button>
-        <div>{actionSlot}</div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="mb-6 rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-md dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
+    <div className="mb-4 rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-md dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
       <h2 className="mb-4 text-lg font-semibold">Add Expense</h2>
       <form action={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-3 gap-3">

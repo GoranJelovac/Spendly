@@ -202,19 +202,20 @@ export function ImportExportTransactions({
 
   return (
     <div>
-      <div className="flex gap-1">
-        <Button variant="outline" size="icon" onClick={handleDownload} title="Download CSV">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
+      <div className="flex gap-1.5">
+        <button
+          onClick={handleDownload}
+          className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06]"
+        >
+          Export
+        </button>
+        <button
           onClick={() => fileRef.current?.click()}
           disabled={loading}
-          title="Import CSV / Excel"
+          className="flex h-7 items-center rounded-lg border border-sp-accent px-2.5 text-[12px] font-semibold text-sp-accent transition-all hover:bg-sp-accent/[0.06] disabled:opacity-50"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </Button>
+          Import
+        </button>
         <input
           ref={fileRef}
           type="file"
@@ -224,69 +225,101 @@ export function ImportExportTransactions({
         />
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
-      {successMsg && <p className="mb-4 text-sm text-green-600">{successMsg}</p>}
+      {/* Import Preview Modal */}
+      {(preview || error) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => { setPreview(null); setError(""); setSuccessMsg(""); }}
+          />
 
-      {preview && (
-        <div className="mb-6 rounded-2xl bg-white p-5 shadow-md dark:bg-sp-bg dark:border-2 dark:border-sp-border dark:shadow-[0_0_20px_var(--sp-glow)]">
-          <h3 className="mb-1 text-lg font-semibold">Import Preview</h3>
-          <p className="mb-3 text-sm text-gray-500">
-            {readyCount} ready to import
-            {errorCount > 0 && (
-              <span className="text-red-500"> · {errorCount} with errors (will be skipped)</span>
-            )}
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b text-gray-500">
-                <tr>
-                  <th className="pb-2 font-medium">Status</th>
-                  <th className="pb-2 font-medium">Date</th>
-                  <th className="pb-2 font-medium">Line</th>
-                  <th className="pb-2 text-right font-medium">Amount</th>
-                  <th className="pb-2 font-medium">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {preview.map((row, i) => (
-                  <tr key={i} className="border-b">
-                    <td className="py-2">
-                      <span
-                        className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${
-                          row.status === "ready"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                        }`}
-                      >
-                        {row.status === "ready" ? "ready" : "error"}
-                      </span>
-                    </td>
-                    <td className="py-2">{row.date}</td>
-                    <td className="py-2">
-                      {row.line}
-                      {row.error && (
-                        <div className="text-xs text-red-500">{row.error}</div>
-                      )}
-                    </td>
-                    <td className="py-2 text-right">{fmtD(row.amount)}</td>
-                    <td className="py-2 text-gray-500">{row.description || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Modal panel */}
+          <div className="relative z-10 mx-4 max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl dark:border-2 dark:border-sp-border dark:bg-sp-bg dark:shadow-[0_0_20px_var(--sp-glow)]">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-sp-border px-5 py-3">
+              <h3 className="text-lg font-semibold">
+                {preview ? "Import Preview" : "Import Error"}
+              </h3>
+              <button
+                onClick={() => { setPreview(null); setError(""); setSuccessMsg(""); }}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-sp-surface dark:hover:text-sp-text"
+              >
+                ✕
+              </button>
+            </div>
 
-          <div className="mt-4 flex gap-2">
-            <Button size="sm" onClick={handleApply} disabled={loading || readyCount === 0}>
-              {loading ? "Importing..." : `Import ${readyCount} row(s)`}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => { setPreview(null); setSuccessMsg(""); }}
-            >
-              Cancel
-            </Button>
+            {/* Body */}
+            <div className="overflow-auto p-5" style={{ maxHeight: "calc(85vh - 120px)" }}>
+              {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+              {successMsg && <p className="mb-4 text-sm text-green-600">{successMsg}</p>}
+
+              {preview && (
+                <>
+                  <p className="mb-3 text-sm text-gray-500">
+                    {readyCount} ready to import
+                    {errorCount > 0 && (
+                      <span className="text-red-500"> · {errorCount} with errors (will be skipped)</span>
+                    )}
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="border-b text-gray-500">
+                        <tr>
+                          <th className="pb-2 font-medium">Status</th>
+                          <th className="pb-2 font-medium">Date</th>
+                          <th className="pb-2 font-medium">Line</th>
+                          <th className="pb-2 text-right font-medium">Amount</th>
+                          <th className="pb-2 font-medium">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {preview.map((row, i) => (
+                          <tr key={i} className="border-b">
+                            <td className="py-2">
+                              <span
+                                className={`inline-block rounded px-1.5 py-0.5 text-xs font-medium ${
+                                  row.status === "ready"
+                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                }`}
+                              >
+                                {row.status === "ready" ? "ready" : "error"}
+                              </span>
+                            </td>
+                            <td className="py-2">{row.date}</td>
+                            <td className="py-2">
+                              {row.line}
+                              {row.error && (
+                                <div className="text-xs text-red-500">{row.error}</div>
+                              )}
+                            </td>
+                            <td className="py-2 text-right">{fmtD(row.amount)}</td>
+                            <td className="py-2 text-gray-500">{row.description || "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-2 border-t border-sp-border px-5 py-3">
+              {preview && (
+                <Button size="sm" onClick={handleApply} disabled={loading || readyCount === 0}>
+                  {loading ? "Importing..." : `Import ${readyCount} row(s)`}
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => { setPreview(null); setError(""); setSuccessMsg(""); }}
+              >
+                {preview ? "Cancel" : "Close"}
+              </Button>
+            </div>
           </div>
         </div>
       )}

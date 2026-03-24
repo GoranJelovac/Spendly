@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { getActiveBudget } from "@/actions/active-budget";
 import { getExpensesPaginated } from "@/actions/expense";
 import { getBudget } from "@/actions/budget";
-import { AddExpenseForm } from "@/components/expenses/add-expense-form";
 import { ExpenseList } from "@/components/expenses/expense-list";
 import { ImportExportTransactions } from "@/components/shared/import-export-transactions";
+import { ExpensesClient } from "@/components/expenses/expenses-client";
 import {
   downloadExpensesCsv,
   previewImportExpenses,
@@ -48,20 +48,24 @@ export default async function ExpensesPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
       <h1 className="mb-6 text-center text-2xl font-bold">Expenses</h1>
-      <AddExpenseForm lines={lines} actionSlot={
-        <ImportExportTransactions
-          budgetId={activeBudget.id}
-          label="Expenses"
-          downloadCsv={downloadExpensesCsv}
-          previewImport={previewImportExpenses}
-          applyImport={applyImportExpenses}
-        />
-      } />
-      <ExpenseList
-        expenses={expenses}
+      <ExpensesClient
         lines={lines}
-        pageSize={PAGE_SIZE}
-      />
+        importExportSlot={
+          <ImportExportTransactions
+            budgetId={activeBudget.id}
+            label="Expenses"
+            downloadCsv={downloadExpensesCsv}
+            previewImport={previewImportExpenses}
+            applyImport={applyImportExpenses}
+          />
+        }
+      >
+        <ExpenseList
+          expenses={expenses}
+          lines={lines}
+          pageSize={PAGE_SIZE}
+        />
+      </ExpensesClient>
     </div>
   );
 }

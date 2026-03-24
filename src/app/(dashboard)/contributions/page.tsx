@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { getActiveBudget } from "@/actions/active-budget";
 import { getContributionsPaginated } from "@/actions/contribution";
 import { getBudget } from "@/actions/budget";
-import { AddContributionForm } from "@/components/contributions/add-contribution-form";
 import { ContributionList } from "@/components/contributions/contribution-list";
 import { ImportExportTransactions } from "@/components/shared/import-export-transactions";
+import { ContributionsClient } from "@/components/contributions/contributions-client";
 import {
   downloadContributionsCsv,
   previewImportContributions,
@@ -48,20 +48,24 @@ export default async function ContributionsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 font-[var(--font-jakarta)] sm:px-6">
       <h1 className="mb-6 text-center text-2xl font-bold">Contributions</h1>
-      <AddContributionForm lines={lines} actionSlot={
-        <ImportExportTransactions
-          budgetId={activeBudget.id}
-          label="Contributions"
-          downloadCsv={downloadContributionsCsv}
-          previewImport={previewImportContributions}
-          applyImport={applyImportContributions}
-        />
-      } />
-      <ContributionList
-        contributions={contributions}
+      <ContributionsClient
         lines={lines}
-        pageSize={PAGE_SIZE}
-      />
+        importExportSlot={
+          <ImportExportTransactions
+            budgetId={activeBudget.id}
+            label="Contributions"
+            downloadCsv={downloadContributionsCsv}
+            previewImport={previewImportContributions}
+            applyImport={applyImportContributions}
+          />
+        }
+      >
+        <ContributionList
+          contributions={contributions}
+          lines={lines}
+          pageSize={PAGE_SIZE}
+        />
+      </ContributionsClient>
     </div>
   );
 }

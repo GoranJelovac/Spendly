@@ -12,11 +12,12 @@
 
 ## Budget Plan — sledeći koraci
 
-- [ ] Odlučiti da li zadržati "All" u category dropdown-u i ako da, kako prikazivati (grupisano po kategorijama ili flat lista)
-- [ ] Povećati PAGE_SIZE sa 15 na 20
-- [ ] Bolje organizovati raspored dugmića (Add Line, Add Category, Rename, Delete, Import, Export)
-- [ ] Razmotriti da li treba import kategorija (zasebno od linija)
-- [ ] Pregledati kako trenutno radi import linija i da li treba izmene za Budget Plan stranicu
+- [x] Odlučiti da li zadržati "All" u category dropdown-u — uklonjen, uvek konkretna kategorija
+- [x] Povećati PAGE_SIZE sa 15 na 20
+- [x] Bolje organizovati raspored dugmića — unified action bar sa group labels (Category/Line/Data)
+- [x] Pomeriti total bar iznad paginacije, razdvojiti pagination na dva reda
+- [x] Razmotriti da li treba import kategorija — ne treba, import linija već auto-kreira kategorije
+- [x] Pregledati kako trenutno radi import linija — premešten preview u overlay modal
 - [ ] Uskladiti izgled Expenses i Contributions stranica sa Budget Plan estetikom (dropdown bar, panel, dugmići)
 - [ ] Urediti Billing stranicu
 - [ ] Dashboard charts — razdvojiti na dve collapsible grupe: (1) "Planned vs Spent" bar chart, (2) "Budget Breakdown" + "Spending Overview" donut charts zajedno (povećani za bolju čitljivost kad ima mnogo linija/kategorija). Istražiti i alternativne načine prikaza celokupnog budžeta ako postoji bolji od donut-a
