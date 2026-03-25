@@ -21,4 +21,5 @@
 - [x] Uskladiti izgled Expenses i Contributions stranica sa Budget Plan estetikom (dropdown bar, panel, dugmići)
 - [x] Urediti Billing stranicu
 - [ ] Odlučiti da li koristimo Stripe ili Lemon Squeezy za naplatu
-- [ ] Dashboard charts — razdvojiti na dve collapsible grupe: (1) "Planned vs Spent" bar chart, (2) "Budget Breakdown" + "Spending Overview" donut charts zajedno (povećani za bolju čitljivost kad ima mnogo linija/kategorija). Istražiti i alternativne načine prikaza celokupnog budžeta ako postoji bolji od donut-a
+- [x] Dashboard charts — razdvojiti na dve collapsible grupe: (1) "Planned vs Spent" bar chart, (2) "Budget Distribution" sa dva donuta (280px, legenda ispod, total u centru). Odobrena After B varijanta iz playground-dashboard-charts.html
+- [ ] Obrisati sve playground-*.html fajlove nakon završetka redesign-a

@@ -353,8 +353,8 @@ export function DashboardContent({
             </div>
           </CollapsibleSection>
 
-          {/* Charts */}
-          <CollapsibleSection title="Charts">
+          {/* Planned vs Spent */}
+          <CollapsibleSection title="Planned vs Spent">
             <PlannedVsSpentChart
               data={displayItems.map((l) => ({
                 name: l.name,
@@ -365,7 +365,11 @@ export function DashboardContent({
               }))}
               currency={budgetCurrency}
             />
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
+          </CollapsibleSection>
+
+          {/* Budget Distribution */}
+          <CollapsibleSection title="Budget Distribution">
+            <div className="grid gap-4 md:grid-cols-2">
               <BudgetBreakdownChart
                 data={displayItems.map((l) => ({
                   name: l.name,

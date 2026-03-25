@@ -59,27 +59,29 @@ function DonutWithLegend({
   currency,
   activeIndex,
   onActiveChange,
+  centerLabel,
 }: {
   data: PieEntry[];
   currency: string;
   activeIndex: number | null;
   onActiveChange: (index: number | null) => void;
+  centerLabel?: { sublabel: string; value: string; detail?: string };
 }) {
   const { fmtD } = useDecimals();
   const total = data.reduce((s, d) => s + d.value, 0);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3">
-      {/* Donut */}
-      <div className="flex-shrink-0">
-        <ResponsiveContainer width={200} height={200}>
+    <div className="flex flex-col items-center gap-3">
+      {/* Donut with center label */}
+      <div className="relative flex-shrink-0" style={{ width: 280, height: 280 }}>
+        <ResponsiveContainer width={280} height={280}>
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={55}
-              outerRadius={95}
+              innerRadius={82}
+              outerRadius={135}
               paddingAngle={1}
               dataKey="value"
               onMouseEnter={(_, index) => onActiveChange(index)}
@@ -100,10 +102,25 @@ function DonutWithLegend({
             />
           </PieChart>
         </ResponsiveContainer>
+        {centerLabel && total > 0 && (
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[9px] font-semibold uppercase text-gray-500 dark:text-sp-muted">
+              {centerLabel.sublabel}
+            </span>
+            <span className="text-[18px] font-extrabold dark:text-sp-text">
+              {centerLabel.value}
+            </span>
+            {centerLabel.detail && (
+              <span className="text-[9px] text-gray-500 dark:text-sp-muted">
+                {centerLabel.detail}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Scrollable legend */}
-      <div className="flex-1 max-h-[200px] overflow-y-auto min-w-0">
+      {/* Scrollable legend below */}
+      <div className="w-full max-h-[160px] overflow-y-auto">
         <div className="space-y-1">
           {data.map((entry, index) => {
             const pct = total > 0 ? fmtD((entry.value / total) * 100, 1) : "0,0";
@@ -355,12 +372,15 @@ export function BudgetBreakdownChart({
   data: LineData[];
   currency: string;
 }) {
+  const { fmtD } = useDecimals();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   // Use available (planned + contributed) for the breakdown
   const pieData = data
     .filter((d) => d.planned + d.contributed > 0)
     .map((d) => ({ name: d.name, value: d.planned + d.contributed }));
+
+  const total = pieData.reduce((s, d) => s + d.value, 0);
 
   if (pieData.length === 0) {
     return (
@@ -379,6 +399,11 @@ export function BudgetBreakdownChart({
         currency={currency}
         activeIndex={activeIndex}
         onActiveChange={setActiveIndex}
+        centerLabel={{
+          sublabel: "Total",
+          value: fmtD(total),
+          detail: currency,
+        }}
       />
     </div>
   );
@@ -434,6 +459,11 @@ export function SpendingOverviewChart({
         currency={currency}
         activeIndex={activeIndex}
         onActiveChange={setActiveIndex}
+        centerLabel={{
+          sublabel: "Spent",
+          value: fmtD(totalSpent),
+          detail: `of ${fmtD(totalPlanned)} ${currency}`,
+        }}
       />
     </div>
   );
