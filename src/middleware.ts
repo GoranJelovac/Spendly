@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default auth((req) => {
-  if (!req.auth) {
-    return NextResponse.redirect(new URL("/login", req.url));
+export async function middleware(request: NextRequest) {
+  // Auth.js v5 on HTTPS uses __Secure- prefix cookie
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+    secureCookie: request.nextUrl.protocol === "https:",
+    salt: request.nextUrl.protocol === "https:"
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token",
+  });
+
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
+
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/dashboard/:path*", "/budgets/:path*", "/expenses/:path*", "/settings/:path*", "/billing/:path*"],
