@@ -1,0 +1,3 @@
+{"type":"server-started","port":64732,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:64732","screen_dir":"/mnt/e/_Projects/Spendly/.superpowers/brainstorm/6281-1774299114"}
+{"type":"screen-added","file":"/mnt/e/_Projects/Spendly/.superpowers/brainstorm/6281-1774299114/visibility-fixes.html"}
+{"type":"server-stopped","reason":"idle timeout"}

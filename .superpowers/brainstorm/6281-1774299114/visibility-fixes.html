@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visibility Fixes</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #111118;
+    color: #e0e0e8;
+    padding: 24px;
+  }
+
+  h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #a78bfa; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 24px; }
+
+  .fix-section {
+    background: #16161e;
+    border: 1px solid #2a2a35;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .fix-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2a2a35;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fix-number {
+    background: #a78bfa;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #2a2a35;
+  }
+
+  .side {
+    padding: 16px;
+    background: #16161e;
+  }
+
+  .side-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .side-label.before { color: #ef4444; }
+  .side-label.after { color: #22c55e; }
+
+  /* ---- Section header mock ---- */
+  .section-header-mock {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10px 10px 0 0;
+    padding: 10px 16px;
+  }
+
+  .section-header-mock .title {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+
+  .section-header-mock .arrow {
+    font-size: 10px;
+  }
+
+  /* ---- Pill toggle mock ---- */
+  .pill-group {
+    display: inline-flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 3px;
+    border-radius: 10px;
+  }
+
+  .pill-group.dark-bg { background: #1e293b; }
+
+  .pill {
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .pill.active-before {
+    background: var(--accent, #3b82f6);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .pill.inactive { color: #94a3b8; }
+  .pill.inactive-fix { color: #475569; font-weight: 600; }
+  .pill.inactive-fix-dark { color: #cbd5e1; font-weight: 600; }
+
+  /* ---- Donut legend mock ---- */
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .legend-name { flex: 1; }
+  .legend-pct { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .legend-val { flex-shrink: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  /* ---- Details category ---- */
+  .details-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .cat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cat-name { font-size: 11px; }
+
+  /* ---- Sidebar nav mock ---- */
+  .sidebar-mock {
+    border-radius: 10px;
+    padding: 8px;
+    max-width: 220px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .nav-item .icon { font-size: 14px; }
+
+  /* Colors */
+  .dark-card { background: #0f172a; }
+  .light-card { background: #ffffff; color: #0f172a; }
+</style>
+</head>
+<body>
+
+<h1>Visibility Fixes — Before vs After</h1>
+<p class="subtitle">5 elemenata za pojačavanje. Levo je trenutno stanje, desno je predlog.</p>
+
+<!-- 1. Section Headers (Filters, Summary, Charts...) -->
+<div class="fix-section">
+  <div class="fix-header">
+    <div class="fix-number">1</div>
+    Section Headers (Filters, Summary, Charts, Details)
+  </div>
+  <div class="comparison">
+    <div class="side">
+      <div class="side-label before">Trenutno (dark)</div>
+      <div class="section-header-mock" style="background:rgba(59,130,246,0.08);">
+        <span class="title" style="font-size:11px;color:#64748b;">FILTERS</span>
+        <span class="arrow" style="color:#64748b;">▼</span>
+      </div>
+      <div style="height:8px"></div>
+      <div class="section-header-mock" style="background:rgba(59,130,246,0.08);">
+        <span class="title" style="font-size:11px;color:#64748b;">SUMMARY</span>
+        <span class="arrow" style="color:#64748b;">▼</span>
+      </div>
+    </div>
+    <div class="side">
+      <div class="side-label after">Predlog (dark)</div>
+      <div class="section-header-mock" style="background:rgba(59,130,246,0.12);">
+        <span class="title" style="font-size:12px;color:#94a3b8;letter-spacing:0.12em;">FILTERS</span>
+        <span class="arrow" style="color:#94a3b8;">▼</span>
+      </div>
+      <div style="height:8px"></div>
+      <div class="section-header-mock" style="background:rgba(59,130,246,0.12);">
+        <span class="title" style="font-size:12px;color:#94a3b8;letter-spacing:0.12em;">SUMMARY</span>
+        <span class="arrow" style="color:#94a3b8;">▼</span>
+      </div>
+    </div>
+  </div>
+  <div class="comparison">
+    <div class="side" style="background:#f8fafc;">
+      <div class="side-label before">Trenutno (light)</div>
+      <div class="section-header-mock" style="background:rgba(59,130,246,0.06);">
+        <span class="title" style="font-size:11px;color:#64748b;">CHARTS</span>
+        <span class="arrow" style="color:#9ca3af;">▼</span>
+      </div>
+    </div>
+    <div class="side" style="background:#f8fafc;">
+      <div class="side-label after">Predlog (light)</div>
+      <div class="section-header-mock" style="background:rgba(59,130,246,0.08);">
+        <span class="title" style="font-size:12px;color:#334155;letter-spacing:0.12em;">CHARTS</span>
+        <span class="arrow" style="color:#64748b;">▼</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;font-size:11px;color:#888;border-top:1px solid #2a2a35;">
+    <b>Promene:</b> font-size 11px → 12px, boja text-gray-500 → text-gray-400/text-slate-700, jači background
+  </div>
+</div>
+
+<!-- 2. Amount/% Toggle -->
+<div class="fix-section">
+  <div class="fix-header">
+    <div class="fix-number">2</div>
+    Charts Toggle (Amount vs %)
+  </div>
+  <div class="comparison">
+    <div class="side">
+      <div class="side-label before">Trenutno (dark)</div>
+      <div class="pill-group dark-bg">
+        <div class="pill active-before">Amount</div>
+        <div class="pill inactive">%</div>
+      </div>
+      <div style="height:6px"></div>
+      <div style="font-size:10px;color:#666;">Neaktivan: #94a3b8 (slab)</div>
+    </div>
+    <div class="side">
+      <div class="side-label after">Predlog (dark)</div>
+      <div class="pill-group dark-bg">
+        <div class="pill active-before">Amount</div>
+        <div class="pill inactive-fix-dark">%</div>
+      </div>
+      <div style="height:6px"></div>
+      <div style="font-size:10px;color:#666;">Neaktivan: #cbd5e1 (jači) + font-weight 600</div>
+    </div>
+  </div>
+  <div class="comparison">
+    <div class="side" style="background:#f8fafc;">
+      <div class="side-label before">Trenutno (light)</div>
+      <div class="pill-group">
+        <div class="pill active-before">Amount</div>
+        <div class="pill inactive">%</div>
+      </div>
+    </div>
+    <div class="side" style="background:#f8fafc;">
+      <div class="side-label after">Predlog (light)</div>
+      <div class="pill-group">
+        <div class="pill active-before">Amount</div>
+        <div class="pill inactive-fix">%</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;font-size:11px;color:#888;border-top:1px solid #2a2a35;">
+    <b>Promene:</b> neaktivna boja pojačana, dodat font-weight: 600
+  </div>
+</div>
+
+<!-- 3. Donut Legend Percentages -->
+<div class="fix-section">
+  <div class="fix-header">
+    <div class="fix-number">3</div>
+    Donut Legend — Procenti
+  </div>
+  <div class="comparison">
+    <div class="side dark-card">
+      <div class="side-label before">Trenutno (dark)</div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:#3b82f6;"></div>
+        <span class="legend-name" style="color:#e2e8f0;">Groceries</span>
+        <span class="legend-pct" style="color:#64748b;">35,2%</span>
+        <span class="legend-val" style="color:#e2e8f0;">840</span>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:#10b981;"></div>
+        <span class="legend-name" style="color:#e2e8f0;">Rent</span>
+        <span class="legend-pct" style="color:#64748b;">28,1%</span>
+        <span class="legend-val" style="color:#e2e8f0;">670</span>
+      </div>
+    </div>
+    <div class="side dark-card">
+      <div class="side-label after">Predlog (dark)</div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:#3b82f6;"></div>
+        <span class="legend-name" style="color:#e2e8f0;">Groceries</span>
+        <span class="legend-pct" style="color:#94a3b8;font-weight:500;">35,2%</span>
+        <span class="legend-val" style="color:#e2e8f0;">840</span>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:#10b981;"></div>
+        <span class="legend-name" style="color:#e2e8f0;">Rent</span>
+        <span class="legend-pct" style="color:#94a3b8;font-weight:500;">28,1%</span>
+        <span class="legend-val" style="color:#e2e8f0;">670</span>
+      </div>
+    </div>
+  </div>
+  <div class="comparison">
+    <div class="side light-card">
+      <div class="side-label before">Trenutno (light)</div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:#3b82f6;"></div>
+        <span class="legend-name">Groceries</span>
+        <span class="legend-pct" style="color:#6b7280;">35,2%</span>
+        <span class="legend-val">840</span>
+      </div>
+    </div>
+    <div class="side light-card">
+      <div class="side-label after">Predlog (light)</div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:#3b82f6;"></div>
+        <span class="legend-name">Groceries</span>
+        <span class="legend-pct" style="color:#374151;font-weight:500;">35,2%</span>
+        <span class="legend-val">840</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;font-size:11px;color:#888;border-top:1px solid #2a2a35;">
+    <b>Promene:</b> procenat boja text-gray-500 → text-gray-700 (light) / text-slate-400 (dark), dodat font-weight: 500
+  </div>
+</div>
+
+<!-- 4. Details — Category Names -->
+<div class="fix-section">
+  <div class="fix-header">
+    <div class="fix-number">4</div>
+    Details Table — Category Names
+  </div>
+  <div class="comparison">
+    <div class="side dark-card">
+      <div class="side-label before">Trenutno (dark)</div>
+      <div class="details-row" style="background:#1e293b;">
+        <span style="font-weight:600;color:#e2e8f0;flex:1;">Groceries</span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span class="cat-dot" style="background:#3b82f6;"></span>
+          <span class="cat-name" style="color:#64748b;">Food & Drink</span>
+        </span>
+        <span style="color:#e2e8f0;margin-left:12px;">840,00</span>
+      </div>
+      <div class="details-row" style="background:#1e293b;margin-top:4px;">
+        <span style="font-weight:600;color:#e2e8f0;flex:1;">Electricity</span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span class="cat-dot" style="background:#3b82f6;"></span>
+          <span class="cat-name" style="color:#64748b;">Bills</span>
+        </span>
+        <span style="color:#e2e8f0;margin-left:12px;">120,00</span>
+      </div>
+    </div>
+    <div class="side dark-card">
+      <div class="side-label after">Predlog (dark)</div>
+      <div class="details-row" style="background:#1e293b;">
+        <span style="font-weight:600;color:#e2e8f0;flex:1;">Groceries</span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span class="cat-dot" style="background:#3b82f6;"></span>
+          <span class="cat-name" style="color:#94a3b8;font-weight:500;">Food & Drink</span>
+        </span>
+        <span style="color:#e2e8f0;margin-left:12px;">840,00</span>
+      </div>
+      <div class="details-row" style="background:#1e293b;margin-top:4px;">
+        <span style="font-weight:600;color:#e2e8f0;flex:1;">Electricity</span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <span class="cat-dot" style="background:#3b82f6;"></span>
+          <span class="cat-name" style="color:#94a3b8;font-weight:500;">Bills</span>
+        </span>
+        <span style="color:#e2e8f0;margin-left:12px;">120,00</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;font-size:11px;color:#888;border-top:1px solid #2a2a35;">
+    <b>Promene:</b> category name boja text-gray-500 → text-slate-400 (dark) / text-gray-600 (light), dodat font-weight: 500
+  </div>
+</div>
+
+<!-- 5. Sidebar Nav Items -->
+<div class="fix-section">
+  <div class="fix-header">
+    <div class="fix-number">5</div>
+    Sidebar — Neaktivni Nav Items
+  </div>
+  <div class="comparison">
+    <div class="side dark-card">
+      <div class="side-label before">Trenutno (dark)</div>
+      <div class="sidebar-mock">
+        <div class="nav-item" style="color:#3b82f6;background:rgba(59,130,246,0.04);border-bottom:2px solid #3b82f6;">
+          <span class="icon">⌂</span> Dashboard
+        </div>
+        <div class="nav-item" style="color:#64748b;">
+          <span class="icon" style="opacity:0.6;">☰</span> Categories
+        </div>
+        <div class="nav-item" style="color:#64748b;">
+          <span class="icon" style="opacity:0.6;">≡</span> Budget Lines
+        </div>
+        <div class="nav-item" style="color:#64748b;">
+          <span class="icon" style="opacity:0.6;">⚖</span> Expenses
+        </div>
+      </div>
+    </div>
+    <div class="side dark-card">
+      <div class="side-label after">Predlog (dark)</div>
+      <div class="sidebar-mock">
+        <div class="nav-item" style="color:#3b82f6;background:rgba(59,130,246,0.04);border-bottom:2px solid #3b82f6;">
+          <span class="icon">⌂</span> Dashboard
+        </div>
+        <div class="nav-item" style="color:#94a3b8;">
+          <span class="icon" style="opacity:0.7;">☰</span> Categories
+        </div>
+        <div class="nav-item" style="color:#94a3b8;">
+          <span class="icon" style="opacity:0.7;">≡</span> Budget Lines
+        </div>
+        <div class="nav-item" style="color:#94a3b8;">
+          <span class="icon" style="opacity:0.7;">⚖</span> Expenses
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="comparison">
+    <div class="side light-card">
+      <div class="side-label before">Trenutno (light)</div>
+      <div class="sidebar-mock" style="background:#f8fafc;">
+        <div class="nav-item" style="color:#3b82f6;background:rgba(59,130,246,0.04);border-bottom:2px solid #3b82f6;">
+          <span class="icon">⌂</span> Dashboard
+        </div>
+        <div class="nav-item" style="color:#6b7280;">
+          <span class="icon" style="opacity:0.6;">☰</span> Categories
+        </div>
+        <div class="nav-item" style="color:#6b7280;">
+          <span class="icon" style="opacity:0.6;">≡</span> Budget Lines
+        </div>
+      </div>
+    </div>
+    <div class="side light-card">
+      <div class="side-label after">Predlog (light)</div>
+      <div class="sidebar-mock" style="background:#f8fafc;">
+        <div class="nav-item" style="color:#3b82f6;background:rgba(59,130,246,0.04);border-bottom:2px solid #3b82f6;">
+          <span class="icon">⌂</span> Dashboard
+        </div>
+        <div class="nav-item" style="color:#374151;">
+          <span class="icon" style="opacity:0.7;">☰</span> Categories
+        </div>
+        <div class="nav-item" style="color:#374151;">
+          <span class="icon" style="opacity:0.7;">≡</span> Budget Lines
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:10px 16px;font-size:11px;color:#888;border-top:1px solid #2a2a35;">
+    <b>Promene:</b> text-gray-500 → text-gray-700 (light) / text-slate-400 (dark), icon opacity 0.6 → 0.7
+  </div>
+</div>
+
+</body>
+</html>

@@ -20,6 +20,8 @@
 - [x] Pregledati kako trenutno radi import linija — premešten preview u overlay modal
 - [x] Uskladiti izgled Expenses i Contributions stranica sa Budget Plan estetikom (dropdown bar, panel, dugmići)
 - [x] Urediti Billing stranicu
-- [ ] Odlučiti da li koristimo Stripe ili Lemon Squeezy za naplatu
+- [x] Odlučiti da li koristimo Stripe ili Lemon Squeezy za naplatu — izabran Lemon Squeezy (MoR, ne treba firma)
+- [ ] Deploy na Vercel (povezati GitHub repo, podesiti env varijable, NEXT_PUBLIC_APP_URL)
+- [ ] Integrisati Lemon Squeezy (checkout, webhooks, subscription management)
 - [x] Dashboard charts — razdvojiti na dve collapsible grupe: (1) "Planned vs Spent" bar chart, (2) "Budget Distribution" sa dva donuta (280px, legenda ispod, total u centru). Odobrena After B varijanta iz playground-dashboard-charts.html
-- [ ] Obrisati sve playground-*.html fajlove nakon završetka redesign-a
+- [x] Obrisati sve playground-*.html fajlove nakon završetka redesign-a

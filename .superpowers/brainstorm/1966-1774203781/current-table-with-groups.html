@@ -1,0 +1,150 @@
+<h2>Postojeća tabela + kategorije kao collapse header</h2>
+<p class="subtitle">Ista tabela kao sada, samo sa category header redovima koji se mogu kolapsirati</p>
+
+<div class="mockup">
+  <div class="mockup-header">Budget Lines — kako bi izgledalo</div>
+  <div class="mockup-body" style="padding: 0; background: #0f172a;">
+
+    <!-- Toolbar row -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #1e293b;">
+      <div style="display: flex; gap: 8px;">
+        <button style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;">Expand All</button>
+        <button style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;">Collapse All</button>
+      </div>
+      <span style="color: #64748b; font-size: 12px;">8 linija · 3 kategorije</span>
+    </div>
+
+    <!-- Table header -->
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+      <thead>
+        <tr style="background: #1e293b;">
+          <th style="padding: 8px 12px; text-align: left; color: #94a3b8; font-weight: 500; width: 30px;">#</th>
+          <th style="padding: 8px 12px; text-align: left; color: #94a3b8; font-weight: 500;">Name</th>
+          <th style="padding: 8px 12px; text-align: left; color: #94a3b8; font-weight: 500; width: 60px;">Code</th>
+          <th style="padding: 8px 12px; text-align: left; color: #94a3b8; font-weight: 500; width: 60px;">Type</th>
+          <th style="padding: 8px 12px; text-align: right; color: #94a3b8; font-weight: 500; width: 90px;">Monthly (€)</th>
+          <th style="padding: 8px 12px; text-align: right; color: #94a3b8; font-weight: 500; width: 90px;">Yearly (€)</th>
+          <th style="padding: 8px 12px; text-align: center; color: #94a3b8; font-weight: 500; width: 70px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- CATEGORY: Stanovanje — EXPANDED -->
+        <tr style="background: #172554; cursor: pointer;" onclick="this.classList.toggle('collapsed')">
+          <td colspan="7" style="padding: 8px 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #60a5fa; font-weight: 600; font-size: 14px;">
+                <span style="display:inline-block; width: 16px; font-size: 11px;">▼</span>
+                Stanovanje
+                <span style="color: #475569; font-weight: 400; font-size: 12px; margin-left: 8px;">3 linije</span>
+              </span>
+              <span style="color: #60a5fa; font-weight: 600; font-size: 13px;">680.00€ / mes</span>
+            </div>
+          </td>
+        </tr>
+        <!-- Row 1 -->
+        <tr style="background: #0f172a; border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px 12px; color: #64748b;">1</td>
+          <td style="padding: 8px 12px; color: #e2e8f0;">Kirija</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">KIR</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">Fixed</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">500.00</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">6,000.00</td>
+          <td style="padding: 8px 12px; text-align: center;">
+            <span style="color: #64748b; cursor: pointer;">✎ 🗑</span>
+          </td>
+        </tr>
+        <!-- Row 2 -->
+        <tr style="background: #0f172a; border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px 12px; color: #64748b;">2</td>
+          <td style="padding: 8px 12px; color: #e2e8f0;">Komunalije</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">KOM</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">Custom</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">150.00</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">1,800.00</td>
+          <td style="padding: 8px 12px; text-align: center;">
+            <span style="color: #64748b; cursor: pointer;">✎ 🗑</span>
+          </td>
+        </tr>
+        <!-- Row 3 -->
+        <tr style="background: #0f172a; border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px 12px; color: #64748b;">3</td>
+          <td style="padding: 8px 12px; color: #e2e8f0;">Internet</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">INT</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">Fixed</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">30.00</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">360.00</td>
+          <td style="padding: 8px 12px; text-align: center;">
+            <span style="color: #64748b; cursor: pointer;">✎ 🗑</span>
+          </td>
+        </tr>
+
+        <!-- CATEGORY: Hrana — EXPANDED -->
+        <tr style="background: #172554; cursor: pointer;">
+          <td colspan="7" style="padding: 8px 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #60a5fa; font-weight: 600; font-size: 14px;">
+                <span style="display:inline-block; width: 16px; font-size: 11px;">▼</span>
+                Hrana
+                <span style="color: #475569; font-weight: 400; font-size: 12px; margin-left: 8px;">2 linije</span>
+              </span>
+              <span style="color: #60a5fa; font-weight: 600; font-size: 13px;">550.00€ / mes</span>
+            </div>
+          </td>
+        </tr>
+        <!-- Row 4 -->
+        <tr style="background: #0f172a; border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px 12px; color: #64748b;">4</td>
+          <td style="padding: 8px 12px; color: #e2e8f0;">Namirnice</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">NAM</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">Fixed</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">400.00</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">4,800.00</td>
+          <td style="padding: 8px 12px; text-align: center;">
+            <span style="color: #64748b; cursor: pointer;">✎ 🗑</span>
+          </td>
+        </tr>
+        <!-- Row 5 -->
+        <tr style="background: #0f172a; border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px 12px; color: #64748b;">5</td>
+          <td style="padding: 8px 12px; color: #e2e8f0;">Restoran</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">RES</td>
+          <td style="padding: 8px 12px; color: #94a3b8;">Fixed</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">150.00</td>
+          <td style="padding: 8px 12px; color: #e2e8f0; text-align: right;">1,800.00</td>
+          <td style="padding: 8px 12px; text-align: center;">
+            <span style="color: #64748b; cursor: pointer;">✎ 🗑</span>
+          </td>
+        </tr>
+
+        <!-- CATEGORY: Transport — COLLAPSED -->
+        <tr style="background: #172554; cursor: pointer;">
+          <td colspan="7" style="padding: 8px 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #60a5fa; font-weight: 600; font-size: 14px;">
+                <span style="display:inline-block; width: 16px; font-size: 11px;">►</span>
+                Transport
+                <span style="color: #475569; font-weight: 400; font-size: 12px; margin-left: 8px;">3 linije</span>
+              </span>
+              <span style="color: #60a5fa; font-weight: 600; font-size: 13px;">250.00€ / mes</span>
+            </div>
+          </td>
+        </tr>
+        <!-- (rows 6-8 hidden because collapsed) -->
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div style="margin-top: 24px; padding: 16px; background: #1e293b; border-radius: 8px; color: #cbd5e1; font-size: 14px; line-height: 1.7;">
+  <strong style="color: #e2e8f0;">Šta se menja u odnosu na sadašnje:</strong>
+  <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+    <li>Dodaje se plavi <strong>category header red</strong> iznad grupe linija</li>
+    <li>Header prikazuje ime kategorije, broj linija, i ukupan mesečni iznos</li>
+    <li>Klik na header <strong>kolapsira/expanduje</strong> linije ispod</li>
+    <li><strong>Expand All / Collapse All</strong> dugmad na vrhu</li>
+    <li>Svi ostali redovi (Name, Code, Type, Monthly, Yearly, Actions) ostaju <strong>identični</strong></li>
+    <li>Kolona "Category" iz tabele se <strong>uklanja</strong> jer je sada vidljiva kao header</li>
+  </ul>
+</div>

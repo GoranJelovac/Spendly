@@ -1,0 +1,53 @@
+<h2>Kakav tip tema varijanti želiš?</h2>
+<p class="subtitle">Svaka varijanta menja boje (accent, background, surface...) i ima light + dark verziju</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Samo accent boja se menja</h3>
+      <p>Background ostaje isti (beli/tamni), menja se samo accent boja (plava → zelena, ljubičasta, narandžasta...). Najčistiji pristup, lako za implementaciju.</p>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <div style="width:28px;height:28px;border-radius:6px;background:#3b82f6;border:2px solid rgba(255,255,255,0.2)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#10b981"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#f59e0b"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#ef4444"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#8b5cf6"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#ec4899"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Kompletne teme — boja + background</h3>
+      <p>Svaka tema ima potpuno drugačiji "vibe" — različit background, surface, border, accent. Npr. "Midnight Purple", "Forest Green", "Warm Sand". Izgleda premium, ali je više posla za dizajn.</p>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#1e1b4b,#7c3aed)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#052e16,#22c55e)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#451a03,#f59e0b)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#1c1917,#ef4444)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#0c4a6e,#06b6d4)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#1f2937,#f472b6)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Miks — accent varijante + par specijalnih tema</h3>
+      <p>Većina tema su "accent only" (brže se prave), plus 2-3 premium teme sa kompletno drugačijim background-om i atmosferom. Najbolji balans effort vs variety.</p>
+      <div style="display:flex;gap:6px;margin-top:8px;align-items:center;">
+        <div style="width:28px;height:28px;border-radius:6px;background:#3b82f6"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#10b981"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#f59e0b"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:#8b5cf6"></div>
+        <span style="color:#888;font-size:12px;margin:0 4px;">+</span>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#1e1b4b,#7c3aed)"></div>
+        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#052e16,#22c55e)"></div>
+      </div>
+    </div>
+  </div>
+</div>
